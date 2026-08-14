@@ -12,6 +12,7 @@ import { NewPropertyModal } from "@/components/modals/NewPropertyModal";
 import { CategoryModal } from "@/components/modals/CategoryModal";
 import { ExportModal } from "@/components/modals/ExportModal";
 import { AuthModal } from "@/components/auth/AuthModal";
+import { LogoutConfirmModal } from "@/components/modals/LogoutConfirmModal";
 import { SuperAdminDashboard } from "@/components/admin/SuperAdminDashboard";
 import {
   CommercialDashboardMetrics,
@@ -22,8 +23,6 @@ import {
   SeedProperty,
   SeedTransaction,
   SeedCategory,
-  INITIAL_PROPERTIES,
-  INITIAL_TRANSACTIONS,
   INITIAL_CATEGORIES,
 } from "@/lib/seedData";
 import {
@@ -35,10 +34,8 @@ export default function DashboardPage() {
   const [appMode, setAppMode] = useState<"commercial" | "personal">(
     "commercial"
   );
-  const [properties, setProperties] =
-    useState<SeedProperty[]>(INITIAL_PROPERTIES);
-  const [transactions, setTransactions] =
-    useState<SeedTransaction[]>(INITIAL_TRANSACTIONS);
+  const [properties, setProperties] = useState<SeedProperty[]>([]);
+  const [transactions, setTransactions] = useState<SeedTransaction[]>([]);
   const [categories, setCategories] =
     useState<SeedCategory[]>(INITIAL_CATEGORIES);
 
@@ -54,7 +51,9 @@ export default function DashboardPage() {
     role: string;
     datasetId?: string;
   } | null>(null);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   // Super Admin Workspace / Dataset State
   const [currentDatasetId, setCurrentDatasetId] = useState<string>(
@@ -141,13 +140,14 @@ export default function DashboardPage() {
                 : meData.data.datasetId || "fresh_user";
             setCurrentDatasetId(activeDs);
             await loadDatasetData(activeDs);
+            setIsAuthChecking(false);
             return;
           }
         }
-        setIsAuthModalOpen(true);
-        await loadDatasetData("ds_yousuf_portfolio");
       } catch (e) {
         console.warn("API init error", e);
+      } finally {
+        setIsAuthChecking(false);
       }
     }
     initSessionAndData();
@@ -157,13 +157,35 @@ export default function DashboardPage() {
     recompute();
   }, [recompute]);
 
+  // Intercept browser back button & swipe back when authenticated
+  useEffect(() => {
+    if (!user) return;
+
+    // Push state so back gesture / button can be captured
+    window.history.pushState({ dashboard: true }, "");
+
+    const handlePopState = () => {
+      // Re-push state to keep user on the dashboard URL
+      window.history.pushState({ dashboard: true }, "");
+      // Prompt explicit logout confirmation modal
+      setIsLogoutModalOpen(true);
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [user]);
+
   // Handlers
-  const handleLogout = async () => {
+  const handleConfirmedLogout = async () => {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
     } catch {}
     setUser(null);
-    setIsAuthModalOpen(true);
+    setProperties([]);
+    setTransactions([]);
+    setIsLogoutModalOpen(false);
   };
 
   const handleSwitchDataset = async (newDsId: string) => {
@@ -285,6 +307,43 @@ export default function DashboardPage() {
     setIsLedgerModalOpen(true);
   };
 
+  // Initial Auth Loading Screen (Clean, dark, zero data flicker)
+  if (isAuthChecking) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center text-white">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin"></div>
+          <span className="text-xs font-mono text-[#888888]">
+            Verifying security session...
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // Clean Login Landing Screen (When unauthenticated)
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-black text-white flex flex-col justify-between font-sans">
+        <AuthModal
+          isOpen={true}
+          allowClose={false}
+          onSuccess={async (authUserData) => {
+            setUser(authUserData);
+            const activeDs =
+              authUserData.role === "super_admin"
+                ? "ds_yousuf_portfolio"
+                : (authUserData as any).datasetId || "fresh_user";
+            setCurrentDatasetId(activeDs);
+            await loadDatasetData(activeDs);
+          }}
+        />
+        <Footer />
+      </div>
+    );
+  }
+
+  // Authenticated Main Dashboard
   return (
     <div className="min-h-screen bg-black text-white flex flex-col font-sans">
       {/* Header Bar with Mode Switcher & Quick Actions */}
@@ -297,7 +356,7 @@ export default function DashboardPage() {
         onOpenCategoryModal={() => setIsCategoryModalOpen(true)}
         user={user}
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
-        onLogout={handleLogout}
+        onLogout={() => setIsLogoutModalOpen(true)}
         onOpenSuperAdminModal={() => setIsSuperAdminModalOpen(true)}
         currentDatasetId={currentDatasetId}
         onSwitchDataset={handleSwitchDataset}
@@ -342,21 +401,31 @@ export default function DashboardPage() {
         onSwitchDataset={handleSwitchDataset}
       />
 
-      {/* Authentication Screen / Modal */}
-      <AuthModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-        allowClose={!!user}
-        onSuccess={async (authUserData) => {
-          setUser(authUserData);
-          setIsAuthModalOpen(false);
-          const activeDs =
-            authUserData.role === "super_admin"
-              ? "ds_yousuf_portfolio"
-              : (authUserData as any).datasetId || "fresh_user";
-          setCurrentDatasetId(activeDs);
-          await loadDatasetData(activeDs);
-        }}
+      {/* Re-Auth Modal (When opened from Header) */}
+      {isAuthModalOpen && (
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+          allowClose={true}
+          onSuccess={async (authUserData) => {
+            setUser(authUserData);
+            setIsAuthModalOpen(false);
+            const activeDs =
+              authUserData.role === "super_admin"
+                ? "ds_yousuf_portfolio"
+                : (authUserData as any).datasetId || "fresh_user";
+            setCurrentDatasetId(activeDs);
+            await loadDatasetData(activeDs);
+          }}
+        />
+      )}
+
+      {/* Logout Confirmation Prompt Modal (Triggered by button click OR swipe/back) */}
+      <LogoutConfirmModal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={handleConfirmedLogout}
+        userName={user?.name}
       />
 
       {/* Property Deep-Dive Ledger Modal */}
