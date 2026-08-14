@@ -6,7 +6,7 @@ import {
   CommercialDashboardMetrics,
   PropertyFinancialMetrics,
 } from "@/lib/formulaEngine";
-import { SeedTransaction } from "@/lib/seedData";
+import { SeedProperty, SeedTransaction } from "@/lib/seedData";
 import {
   LayoutGrid,
   Table as TableIcon,
