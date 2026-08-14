@@ -2,6 +2,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface ITransaction extends Document {
   userId: string;
+  datasetId?: string;
   scope: "commercial" | "personal";
   transactionType: "outflow" | "deal_inflow" | "capital_inflow" | "transfer";
   transCode?: string;
@@ -25,6 +26,7 @@ export interface ITransaction extends Document {
 const TransactionSchema = new Schema<ITransaction>(
   {
     userId: { type: String, required: true, index: true },
+    datasetId: { type: String, default: "", index: true },
     scope: {
       type: String,
       enum: ["commercial", "personal"],

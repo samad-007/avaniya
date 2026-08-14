@@ -11,6 +11,7 @@ export interface IMilestone {
 
 export interface IProperty extends Document {
   userId: string;
+  datasetId?: string;
   type: "commercial" | "personal";
   propertyCode: string;
   name: string;
@@ -47,6 +48,7 @@ const MilestoneSchema = new Schema<IMilestone>(
 const PropertySchema = new Schema<IProperty>(
   {
     userId: { type: String, required: true, index: true },
+    datasetId: { type: String, default: "", index: true },
     type: {
       type: String,
       enum: ["commercial", "personal"],
@@ -73,7 +75,6 @@ const PropertySchema = new Schema<IProperty>(
   { timestamps: true }
 );
 
-// Prevent mongoose model overwrite in serverless
 export const Property: Model<IProperty> =
   mongoose.models.Property ||
   mongoose.model<IProperty>("Property", PropertySchema);

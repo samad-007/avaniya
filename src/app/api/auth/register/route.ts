@@ -16,7 +16,9 @@ export async function POST(req: NextRequest) {
 
     const normalizedEmail = email.toLowerCase().trim();
     let userId = `user_${Date.now()}`;
-    let userRole: "admin" | "user" = "admin";
+    let userRole: "super_admin" | "admin" | "user" =
+      normalizedEmail === "samad@avaniya.com" ? "super_admin" : "user";
+    let datasetId = `ds_${normalizedEmail.replace(/[^a-zA-Z0-9]/g, "_")}`;
 
     // If MongoDB is connected, register the user in the User collection
     if (process.env.MONGODB_URI) {
@@ -32,16 +34,23 @@ export async function POST(req: NextRequest) {
 
         const totalUsers = await User.countDocuments();
         const passwordHash = await hashPassword(password);
+        const assignedRole =
+          totalUsers === 0 || normalizedEmail === "samad@avaniya.com"
+            ? "super_admin"
+            : "user";
 
         const newUser = await User.create({
           email: normalizedEmail,
           passwordHash,
           name: name.trim(),
-          role: totalUsers === 0 ? "admin" : "user",
+          role: assignedRole,
+          datasetId,
+          status: "active",
         });
 
         userId = newUser._id.toString();
         userRole = newUser.role;
+        datasetId = newUser.datasetId;
       } catch (dbErr: any) {
         console.warn("MongoDB write failed, creating local session", dbErr);
       }
@@ -52,6 +61,7 @@ export async function POST(req: NextRequest) {
       email: normalizedEmail,
       name: name.trim(),
       role: userRole,
+      datasetId,
     };
 
     const token = await signSessionToken(payload);
@@ -63,6 +73,7 @@ export async function POST(req: NextRequest) {
         email: payload.email,
         name: payload.name,
         role: payload.role,
+        datasetId: payload.datasetId,
       },
     });
 

@@ -2,6 +2,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IAccountBalance extends Document {
   userId: string;
+  datasetId?: string;
   name: string;
   type: "bank" | "deposit" | "cash" | "investment";
   balance: number;
@@ -13,6 +14,7 @@ export interface IAccountBalance extends Document {
 const AccountBalanceSchema = new Schema<IAccountBalance>(
   {
     userId: { type: String, required: true, index: true },
+    datasetId: { type: String, default: "", index: true },
     name: { type: String, required: true },
     type: {
       type: String,

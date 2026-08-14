@@ -4,19 +4,26 @@ import { getSessionFromRequest } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
   const session = await getSessionFromRequest(req);
-  const userId = session?.userId || "demo_businessman_1";
   const { searchParams } = new URL(req.url);
   const scope = searchParams.get("scope") || "all";
+  const requestedDataset = searchParams.get("datasetId");
+
+  const isSuperAdmin = session?.role === "super_admin";
+  const datasetId = isSuperAdmin
+    ? requestedDataset || session?.datasetId || "ds_yousuf_portfolio"
+    : session?.datasetId || session?.userId || "fresh_user";
+
+  const isAll = isSuperAdmin && requestedDataset === "all";
 
   try {
     const commercial =
       scope === "all" || scope === "commercial"
-        ? await getCommercialMetrics(userId)
+        ? await getCommercialMetrics(datasetId, isAll)
         : null;
 
     const personal =
       scope === "all" || scope === "personal"
-        ? await getPersonalMetrics(userId)
+        ? await getPersonalMetrics(datasetId, isAll)
         : null;
 
     return NextResponse.json({

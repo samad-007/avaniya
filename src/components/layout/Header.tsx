@@ -11,6 +11,8 @@ import {
   Settings2,
   LogOut,
   User as UserIcon,
+  ShieldCheck,
+  FolderLock,
 } from "lucide-react";
 
 interface HeaderProps {
@@ -20,9 +22,12 @@ interface HeaderProps {
   onOpenNewPropertyModal: () => void;
   onOpenExportModal: () => void;
   onOpenCategoryModal: () => void;
-  user?: { name: string; email: string; role: string } | null;
+  user?: { name: string; email: string; role: string; datasetId?: string } | null;
   onOpenAuthModal: () => void;
   onLogout: () => void;
+  onOpenSuperAdminModal?: () => void;
+  currentDatasetId?: string;
+  onSwitchDataset?: (datasetId: string) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -35,7 +40,12 @@ export const Header: React.FC<HeaderProps> = ({
   user,
   onOpenAuthModal,
   onLogout,
+  onOpenSuperAdminModal,
+  currentDatasetId,
+  onSwitchDataset,
 }) => {
+  const isSuperAdmin = user?.role === "super_admin";
+
   return (
     <header className="sticky top-0 z-40 bg-black/95 backdrop-blur-md border-b border-[#222222] px-4 py-3">
       <div className="max-w-[1440px] mx-auto flex flex-wrap items-center justify-between gap-3">
@@ -53,13 +63,13 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
           <div>
             <div className="text-sm md:text-base font-semibold text-white tracking-tight flex items-center gap-2">
-              <span>Avaniya Land & Asset Portfolio</span>
+              <span>Avaniya Land &amp; Asset Portfolio</span>
               <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#161616] text-[#888888] border border-[#222222]">
                 v1.0
               </span>
             </div>
             <div className="text-xs text-[#888888]">
-              Indian Real Estate Liquidity & Deal Tracking Engine
+              Indian Real Estate Liquidity &amp; Deal Tracking Engine
             </div>
           </div>
         </div>
@@ -92,6 +102,38 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Action Buttons & Auth Profile */}
         <div className="flex items-center gap-2">
+          {/* Super Admin Dataset Switcher (Only visible to Super Admin) */}
+          {isSuperAdmin && onSwitchDataset && (
+            <div className="hidden lg:flex items-center gap-1 bg-[#111111] px-2 py-1 rounded border border-emerald-800/40 text-xs">
+              <FolderLock className="w-3 h-3 text-emerald-400" />
+              <select
+                value={currentDatasetId || "ds_yousuf_portfolio"}
+                onChange={(e) => onSwitchDataset(e.target.value)}
+                className="bg-transparent text-emerald-400 font-mono text-[11px] outline-none cursor-pointer"
+                title="Super Admin Workspace Switcher"
+              >
+                <option value="ds_yousuf_portfolio" className="bg-[#111111] text-white">
+                  Mohammed Yousuf Portfolio
+                </option>
+                <option value="all" className="bg-[#111111] text-white">
+                  [All Platform Datasets]
+                </option>
+              </select>
+            </div>
+          )}
+
+          {/* Super Admin Control Center Button */}
+          {isSuperAdmin && onOpenSuperAdminModal && (
+            <button
+              onClick={onOpenSuperAdminModal}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-emerald-950/40 border border-emerald-800/40 text-emerald-300 text-xs font-medium hover:bg-emerald-900/50 transition-standard"
+              title="Super Admin User & Dataset Management"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="hidden sm:inline">Admin Panel</span>
+            </button>
+          )}
+
           <button
             onClick={() => onOpenEntryModal("outflow")}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-white text-black text-xs font-semibold hover:bg-[#e0e0e0] transition-standard"
@@ -137,9 +179,13 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="flex items-center gap-1.5 pl-2 border-l border-[#222222]">
               <div
                 className="flex items-center gap-1.5 bg-[#111111] px-2.5 py-1 rounded border border-[#222222] text-xs text-[#cccccc]"
-                title={`Signed in as ${user.email}`}
+                title={`Signed in as ${user.email} (${user.role})`}
               >
-                <div className="w-2 h-2 rounded-full bg-[#22C55E]"></div>
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    isSuperAdmin ? "bg-amber-400" : "bg-[#22C55E]"
+                  }`}
+                ></div>
                 <span className="font-medium max-w-[100px] truncate">{user.name}</span>
               </div>
               <button

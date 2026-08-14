@@ -20,9 +20,15 @@ import {
 } from "./formulaEngine";
 
 // Memory fallback store for edge preview & initial onboarding
-let memProperties: SeedProperty[] = [...INITIAL_PROPERTIES];
-let memTransactions: SeedTransaction[] = [...INITIAL_TRANSACTIONS];
-let memCategories: SeedCategory[] = [...INITIAL_CATEGORIES];
+let memProperties: (SeedProperty & { datasetId?: string })[] = [
+  ...INITIAL_PROPERTIES.map((p) => ({ ...p, datasetId: "ds_yousuf_portfolio" })),
+];
+let memTransactions: (SeedTransaction & { datasetId?: string })[] = [
+  ...INITIAL_TRANSACTIONS.map((t) => ({ ...t, datasetId: "ds_yousuf_portfolio" })),
+];
+let memCategories: (SeedCategory & { datasetId?: string })[] = [
+  ...INITIAL_CATEGORIES.map((c) => ({ ...c, datasetId: "ds_yousuf_portfolio" })),
+];
 let memAccountBalances = [...INITIAL_ACCOUNT_BALANCES];
 
 /**
@@ -39,16 +45,21 @@ async function isDBConnected(): Promise<boolean> {
 }
 
 /**
- * Get all properties for a user
+ * Get all properties filtered strictly by dataset ID (or user ID)
  */
 export async function getProperties(
-  userId: string = "demo_businessman_1",
-  scope?: "commercial" | "personal"
+  datasetId: string = "ds_yousuf_portfolio",
+  scope?: "commercial" | "personal",
+  isSuperAdminAll: boolean = false
 ): Promise<SeedProperty[]> {
   const dbOk = await isDBConnected();
   if (dbOk) {
-    const query: { userId: string; type?: string } = { userId };
+    const query: Record<string, unknown> = {};
+    if (!isSuperAdminAll) {
+      query.$or = [{ datasetId }, { userId: datasetId }];
+    }
     if (scope) query.type = scope;
+
     const docs = await Property.find(query).lean<{ _id: unknown } & IProperty[]>();
     if (docs && docs.length > 0) {
       return (docs as unknown as ({ _id: { toString: () => string } } & IProperty)[]).map((d) => ({
@@ -70,12 +81,14 @@ export async function getProperties(
         notes: d.notes,
       }));
     }
+    return [];
   }
 
   // Memory fallback
-  return scope
-    ? memProperties.filter((p) => p.type === scope)
-    : memProperties;
+  let list = isSuperAdminAll
+    ? memProperties
+    : memProperties.filter((p) => p.datasetId === datasetId || !datasetId);
+  return scope ? list.filter((p) => p.type === scope) : list;
 }
 
 /**
@@ -83,9 +96,9 @@ export async function getProperties(
  */
 export async function getPropertyByCode(
   propertyCode: string,
-  userId: string = "demo_businessman_1"
+  datasetId: string = "ds_yousuf_portfolio"
 ): Promise<SeedProperty | null> {
-  const props = await getProperties(userId);
+  const props = await getProperties(datasetId);
   return (
     props.find(
       (p) =>
@@ -96,15 +109,17 @@ export async function getPropertyByCode(
 }
 
 /**
- * Add a new property (Commercial Land Deal or Personal Asset)
+ * Add a new property mapped to the user's isolated dataset
  */
 export async function addProperty(
   data: Omit<SeedProperty, "id">,
-  userId: string = "demo_businessman_1"
+  datasetId: string = "ds_yousuf_portfolio",
+  userId: string = "user_default"
 ): Promise<SeedProperty> {
-  const newProp: SeedProperty = {
+  const newProp: SeedProperty & { datasetId: string } = {
     ...data,
     id: `prop-${Date.now()}`,
+    datasetId,
     propertyCode:
       data.propertyCode ||
       (data.type === "commercial"
@@ -115,7 +130,7 @@ export async function addProperty(
   const dbOk = await isDBConnected();
   if (dbOk) {
     try {
-      const doc = await Property.create({ ...newProp, userId });
+      const doc = await Property.create({ ...newProp, userId, datasetId });
       newProp.id = doc._id.toString();
     } catch (e) {
       console.warn("DB write failed, updating in-memory store", e);
@@ -127,17 +142,17 @@ export async function addProperty(
 }
 
 /**
- * Update property details
+ * Update property details within dataset
  */
 export async function updateProperty(
   propertyCode: string,
   updates: Partial<SeedProperty>,
-  userId: string = "demo_businessman_1"
+  datasetId: string = "ds_yousuf_portfolio"
 ): Promise<SeedProperty | null> {
   const dbOk = await isDBConnected();
   if (dbOk) {
     await Property.findOneAndUpdate(
-      { userId, propertyCode },
+      { propertyCode, $or: [{ datasetId }, { userId: datasetId }] },
       { $set: updates }
     );
   }
@@ -153,15 +168,19 @@ export async function updateProperty(
 }
 
 /**
- * Get transactions with optional filter
+ * Get transactions filtered strictly by dataset ID
  */
 export async function getTransactions(
-  userId: string = "demo_businessman_1",
-  filter?: { scope?: string; propertyCode?: string; type?: string }
+  datasetId: string = "ds_yousuf_portfolio",
+  filter?: { scope?: string; propertyCode?: string; type?: string },
+  isSuperAdminAll: boolean = false
 ): Promise<SeedTransaction[]> {
   const dbOk = await isDBConnected();
   if (dbOk) {
-    const query: Record<string, string> = { userId };
+    const query: Record<string, unknown> = {};
+    if (!isSuperAdminAll) {
+      query.$or = [{ datasetId }, { userId: datasetId }];
+    }
     if (filter?.scope) query.scope = filter.scope;
     if (filter?.propertyCode) query.propertyCode = filter.propertyCode;
     if (filter?.type) query.transactionType = filter.type;
@@ -183,9 +202,13 @@ export async function getTransactions(
         remarks: d.remarks,
       }));
     }
+    return [];
   }
 
-  let list = [...memTransactions];
+  let list = isSuperAdminAll
+    ? [...memTransactions]
+    : memTransactions.filter((t) => t.datasetId === datasetId || !datasetId);
+
   if (filter?.scope) list = list.filter((t) => t.scope === filter.scope);
   if (filter?.propertyCode)
     list = list.filter((t) => t.propertyCode === filter.propertyCode);
@@ -198,11 +221,12 @@ export async function getTransactions(
 }
 
 /**
- * Add a new transaction (Outflow, Inflow, Receipt, Transfer)
+ * Add transaction within dataset
  */
 export async function addTransaction(
   data: Omit<SeedTransaction, "id">,
-  userId: string = "demo_businessman_1"
+  datasetId: string = "ds_yousuf_portfolio",
+  userId: string = "user_default"
 ): Promise<SeedTransaction> {
   const prefix =
     data.transactionType === "outflow"
@@ -213,9 +237,10 @@ export async function addTransaction(
       ? "INF"
       : "TRF";
 
-  const newTx: SeedTransaction = {
+  const newTx: SeedTransaction & { datasetId: string } = {
     ...data,
     id: `tx-${Date.now()}`,
+    datasetId,
     transCode:
       data.transCode ||
       `${prefix}-${String(memTransactions.length + 1).padStart(3, "0")}`,
@@ -224,7 +249,7 @@ export async function addTransaction(
   const dbOk = await isDBConnected();
   if (dbOk) {
     try {
-      const doc = await Transaction.create({ ...newTx, userId });
+      const doc = await Transaction.create({ ...newTx, userId, datasetId });
       newTx.id = doc._id.toString();
     } catch (e) {
       console.warn("DB write failed, updating in-memory store", e);
@@ -236,15 +261,20 @@ export async function addTransaction(
 }
 
 /**
- * Get dynamic categories
+ * Get dynamic categories within dataset (or system defaults)
  */
 export async function getCategories(
-  userId: string = "demo_businessman_1",
-  scope?: "commercial" | "personal"
+  datasetId: string = "ds_yousuf_portfolio",
+  scope?: "commercial" | "personal",
+  isSuperAdminAll: boolean = false
 ): Promise<SeedCategory[]> {
   const dbOk = await isDBConnected();
   if (dbOk) {
-    const docs = await Category.find({ userId }).lean<ICategory[]>();
+    const query: Record<string, unknown> = isSuperAdminAll
+      ? {}
+      : { $or: [{ datasetId }, { userId: datasetId }, { isDefault: true }] };
+
+    const docs = await Category.find(query).lean<ICategory[]>();
     if (docs && docs.length > 0) {
       return docs.map((d) => ({
         name: d.name,
@@ -261,51 +291,47 @@ export async function getCategories(
 }
 
 /**
- * Add custom category with dynamic financial role mapping
+ * Add custom category within dataset
  */
 export async function addCategory(
   category: SeedCategory,
-  userId: string = "demo_businessman_1"
+  datasetId: string = "ds_yousuf_portfolio",
+  userId: string = "user_default"
 ): Promise<SeedCategory> {
   const dbOk = await isDBConnected();
   if (dbOk) {
     try {
-      await Category.create({ ...category, userId });
+      await Category.create({ ...category, userId, datasetId });
     } catch (e) {
       console.warn("Category DB write failed, updating in-memory store", e);
     }
   }
 
-  const existing = memCategories.findIndex(
-    (c) => c.name.toLowerCase() === category.name.toLowerCase()
-  );
-  if (existing === -1) {
-    memCategories.push(category);
-  } else {
-    memCategories[existing] = category;
-  }
+  memCategories.push({ ...category, datasetId });
   return category;
 }
 
 /**
- * Get commercial dashboard calculated metrics
+ * Calculate commercial metrics for dataset
  */
 export async function getCommercialMetrics(
-  userId: string = "demo_businessman_1"
+  datasetId: string = "ds_yousuf_portfolio",
+  isSuperAdminAll: boolean = false
 ): Promise<CommercialDashboardMetrics> {
-  const props = await getProperties(userId, "commercial");
-  const txs = await getTransactions(userId, { scope: "commercial" });
-  const cats = await getCategories(userId, "commercial");
+  const props = await getProperties(datasetId, "commercial", isSuperAdminAll);
+  const txs = await getTransactions(datasetId, { scope: "commercial" }, isSuperAdminAll);
+  const cats = await getCategories(datasetId, "commercial", isSuperAdminAll);
   return calculateCommercialMetrics(props, txs, cats);
 }
 
 /**
- * Get personal dashboard calculated metrics
+ * Calculate personal metrics for dataset
  */
 export async function getPersonalMetrics(
-  userId: string = "demo_businessman_1"
+  datasetId: string = "ds_yousuf_portfolio",
+  isSuperAdminAll: boolean = false
 ): Promise<PersonalDashboardMetrics> {
-  const props = await getProperties(userId, "personal");
-  const txs = await getTransactions(userId, { scope: "personal" });
+  const props = await getProperties(datasetId, "personal", isSuperAdminAll);
+  const txs = await getTransactions(datasetId, { scope: "personal" }, isSuperAdminAll);
   return calculatePersonalMetrics(props, txs);
 }

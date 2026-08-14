@@ -4,12 +4,20 @@ import { getSessionFromRequest } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
   const session = await getSessionFromRequest(req);
-  const userId = session?.userId || "demo_businessman_1";
   const { searchParams } = new URL(req.url);
   const scope = searchParams.get("scope") as "commercial" | "personal" | null;
+  const requestedDataset = searchParams.get("datasetId");
+
+  // Super Admin can switch dataset or view all; regular users are locked to their own dataset
+  const isSuperAdmin = session?.role === "super_admin";
+  const datasetId = isSuperAdmin
+    ? requestedDataset || session?.datasetId || "ds_yousuf_portfolio"
+    : session?.datasetId || session?.userId || "fresh_user";
+
+  const isAll = isSuperAdmin && requestedDataset === "all";
 
   try {
-    const properties = await getProperties(userId, scope || undefined);
+    const properties = await getProperties(datasetId, scope || undefined, isAll);
     return NextResponse.json({ success: true, data: properties });
   } catch (error: any) {
     return NextResponse.json(
@@ -21,11 +29,16 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const session = await getSessionFromRequest(req);
-  const userId = session?.userId || "demo_businessman_1";
+  const isSuperAdmin = session?.role === "super_admin";
+  const body = await req.json();
+
+  const datasetId = isSuperAdmin && body.datasetId
+    ? body.datasetId
+    : session?.datasetId || session?.userId || "fresh_user";
+  const userId = session?.userId || "user_default";
 
   try {
-    const body = await req.json();
-    if (!body.name || !body.agreedPurchasePrice === undefined) {
+    if (!body.name || body.agreedPurchasePrice === undefined) {
       return NextResponse.json(
         { success: false, error: "Property name and purchase price are required" },
         { status: 400 }
@@ -48,6 +61,7 @@ export async function POST(req: NextRequest) {
         notes: body.notes || "",
         milestones: body.milestones || [],
       },
+      datasetId,
       userId
     );
 

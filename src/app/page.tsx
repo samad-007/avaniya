@@ -12,6 +12,7 @@ import { NewPropertyModal } from "@/components/modals/NewPropertyModal";
 import { CategoryModal } from "@/components/modals/CategoryModal";
 import { ExportModal } from "@/components/modals/ExportModal";
 import { AuthModal } from "@/components/auth/AuthModal";
+import { SuperAdminDashboard } from "@/components/admin/SuperAdminDashboard";
 import {
   CommercialDashboardMetrics,
   PersonalDashboardMetrics,
@@ -51,8 +52,15 @@ export default function DashboardPage() {
     name: string;
     email: string;
     role: string;
+    datasetId?: string;
   } | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  // Super Admin Workspace / Dataset State
+  const [currentDatasetId, setCurrentDatasetId] = useState<string>(
+    "ds_yousuf_portfolio"
+  );
+  const [isSuperAdminModalOpen, setIsSuperAdminModalOpen] = useState(false);
 
   // Modals state
   const [isEntryModalOpen, setIsEntryModalOpen] = useState(false);
@@ -90,6 +98,34 @@ export default function DashboardPage() {
     setPersonalMetrics(pers);
   }, [properties, transactions, categories]);
 
+  // Load dataset-specific data
+  const loadDatasetData = useCallback(async (targetDataset: string) => {
+    try {
+      const q = targetDataset ? `?datasetId=${encodeURIComponent(targetDataset)}` : "";
+      const [propsRes, txsRes, catsRes] = await Promise.all([
+        fetch(`/api/properties${q}`),
+        fetch(`/api/transactions${q}`),
+        fetch(`/api/categories${q}`),
+      ]);
+
+      if (propsRes.ok && txsRes.ok && catsRes.ok) {
+        const propsData = await propsRes.json();
+        const txsData = await txsRes.json();
+        const catsData = await catsRes.json();
+
+        setProperties(propsData.data || []);
+        setTransactions(txsData.data || []);
+        setCategories(
+          catsData.data && catsData.data.length > 0
+            ? catsData.data
+            : INITIAL_CATEGORIES
+        );
+      }
+    } catch (e) {
+      console.warn("API load fallback to local data", e);
+    }
+  }, []);
+
   // Check auth and initial Fetch from API
   useEffect(() => {
     async function initSessionAndData() {
@@ -99,40 +135,23 @@ export default function DashboardPage() {
           const meData = await meRes.json();
           if (meData.success && meData.data) {
             setUser(meData.data);
-          } else {
-            setIsAuthModalOpen(true);
-          }
-        } else {
-          setIsAuthModalOpen(true);
-        }
-
-        const [propsRes, txsRes, catsRes] = await Promise.all([
-          fetch("/api/properties"),
-          fetch("/api/transactions"),
-          fetch("/api/categories"),
-        ]);
-
-        if (propsRes.ok && txsRes.ok && catsRes.ok) {
-          const propsData = await propsRes.json();
-          const txsData = await txsRes.json();
-          const catsData = await catsRes.json();
-
-          if (propsData.data && propsData.data.length > 0) {
-            setProperties(propsData.data);
-          }
-          if (txsData.data && txsData.data.length > 0) {
-            setTransactions(txsData.data);
-          }
-          if (catsData.data && catsData.data.length > 0) {
-            setCategories(catsData.data);
+            const activeDs =
+              meData.data.role === "super_admin"
+                ? "ds_yousuf_portfolio"
+                : meData.data.datasetId || "fresh_user";
+            setCurrentDatasetId(activeDs);
+            await loadDatasetData(activeDs);
+            return;
           }
         }
+        setIsAuthModalOpen(true);
+        await loadDatasetData("ds_yousuf_portfolio");
       } catch (e) {
-        console.warn("API load fallback to local seed data", e);
+        console.warn("API init error", e);
       }
     }
     initSessionAndData();
-  }, []);
+  }, [loadDatasetData]);
 
   useEffect(() => {
     recompute();
@@ -145,6 +164,11 @@ export default function DashboardPage() {
     } catch {}
     setUser(null);
     setIsAuthModalOpen(true);
+  };
+
+  const handleSwitchDataset = async (newDsId: string) => {
+    setCurrentDatasetId(newDsId);
+    await loadDatasetData(newDsId);
   };
 
   const handleOpenEntryModal = (
@@ -161,13 +185,12 @@ export default function DashboardPage() {
       const res = await fetch("/api/transactions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(txData),
+        body: JSON.stringify({ ...txData, datasetId: currentDatasetId }),
       });
       if (res.ok) {
         const json = await res.json();
         setTransactions((prev) => [json.data, ...prev]);
       } else {
-        // Local fallback
         const localTx: SeedTransaction = {
           ...txData,
           id: `tx-${Date.now()}`,
@@ -194,7 +217,7 @@ export default function DashboardPage() {
       const res = await fetch("/api/properties", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(propData),
+        body: JSON.stringify({ ...propData, datasetId: currentDatasetId }),
       });
       if (res.ok) {
         const json = await res.json();
@@ -230,7 +253,7 @@ export default function DashboardPage() {
       const res = await fetch("/api/categories", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(catData),
+        body: JSON.stringify({ ...catData, datasetId: currentDatasetId }),
       });
       if (res.ok) {
         const json = await res.json();
@@ -275,6 +298,9 @@ export default function DashboardPage() {
         user={user}
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
         onLogout={handleLogout}
+        onOpenSuperAdminModal={() => setIsSuperAdminModalOpen(true)}
+        currentDatasetId={currentDatasetId}
+        onSwitchDataset={handleSwitchDataset}
       />
 
       {/* Main Container */}
@@ -308,14 +334,28 @@ export default function DashboardPage() {
         )}
       </main>
 
+      {/* Super Admin Control Center Modal */}
+      <SuperAdminDashboard
+        isOpen={isSuperAdminModalOpen}
+        onClose={() => setIsSuperAdminModalOpen(false)}
+        currentDatasetId={currentDatasetId}
+        onSwitchDataset={handleSwitchDataset}
+      />
+
       {/* Authentication Screen / Modal */}
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
         allowClose={!!user}
-        onSuccess={(authUserData) => {
+        onSuccess={async (authUserData) => {
           setUser(authUserData);
           setIsAuthModalOpen(false);
+          const activeDs =
+            authUserData.role === "super_admin"
+              ? "ds_yousuf_portfolio"
+              : (authUserData as any).datasetId || "fresh_user";
+          setCurrentDatasetId(activeDs);
+          await loadDatasetData(activeDs);
         }}
       />
 
@@ -367,7 +407,15 @@ export default function DashboardPage() {
       />
 
       {/* Persistent System Footer */}
-      <Footer />
+      <Footer
+        propertyCount={properties.length}
+        transactionCount={transactions.length}
+        totalLiquidity={
+          appMode === "commercial"
+            ? commercialMetrics?.currentNetLiquidity
+            : personalMetrics?.netPersonalLiquidity
+        }
+      />
     </div>
   );
 }

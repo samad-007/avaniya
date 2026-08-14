@@ -17,7 +17,9 @@ export async function POST(req: NextRequest) {
     const normalizedEmail = email.toLowerCase().trim();
     let userId = `user_${normalizedEmail.replace(/[^a-zA-Z0-9]/g, "_")}`;
     let userName = normalizedEmail.split("@")[0];
-    let userRole: "admin" | "user" = "admin";
+    let userRole: "super_admin" | "admin" | "user" =
+      normalizedEmail === "samad@avaniya.com" ? "super_admin" : "user";
+    let datasetId = "";
 
     // If MongoDB is connected, authenticate against the User collection
     if (process.env.MONGODB_URI) {
@@ -26,16 +28,30 @@ export async function POST(req: NextRequest) {
         let dbUser = await User.findOne({ email: normalizedEmail });
 
         if (!dbUser) {
-          // If no user exists, check total user count; if first user, auto-provision as admin
           const totalUsers = await User.countDocuments();
           const pHash = await hashPassword(password);
+          const assignedRole =
+            totalUsers === 0 || normalizedEmail === "samad@avaniya.com"
+              ? "super_admin"
+              : "user";
+
           dbUser = await User.create({
             email: normalizedEmail,
             passwordHash: pHash,
             name: userName,
-            role: totalUsers === 0 ? "admin" : "user",
+            role: assignedRole,
+            datasetId: `ds_${userId}`,
+            status: "active",
           });
         } else {
+          // Check if user account is suspended
+          if (dbUser.status === "suspended") {
+            return NextResponse.json(
+              { success: false, error: "This account has been suspended. Please contact Super Admin." },
+              { status: 403 }
+            );
+          }
+
           // Verify password against stored bcrypt hash
           const isValid = await verifyPassword(password, dbUser.passwordHash);
           if (!isValid) {
@@ -48,7 +64,8 @@ export async function POST(req: NextRequest) {
 
         userId = dbUser._id.toString();
         userName = dbUser.name;
-        userRole = dbUser.role;
+        userRole = dbUser.role as "super_admin" | "admin" | "user";
+        datasetId = dbUser.datasetId || `ds_${userId}`;
       } catch (dbErr) {
         console.warn("MongoDB auth fallback to local session", dbErr);
       }
@@ -59,13 +76,20 @@ export async function POST(req: NextRequest) {
       email: normalizedEmail,
       name: userName,
       role: userRole,
+      datasetId,
     };
 
     const token = await signSessionToken(payload);
 
     const res = NextResponse.json({
       success: true,
-      data: { userId, email: payload.email, name: payload.name, role: payload.role },
+      data: {
+        userId,
+        email: payload.email,
+        name: payload.name,
+        role: payload.role,
+        datasetId: payload.datasetId,
+      },
     });
 
     res.cookies.set(COOKIE_NAME, token, {

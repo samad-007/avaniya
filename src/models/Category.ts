@@ -11,6 +11,7 @@ export type FinancialRole =
 
 export interface ICategory extends Document {
   userId: string;
+  datasetId?: string;
   scope: "commercial" | "personal" | "both";
   name: string;
   type: "outflow" | "inflow" | "transfer";
@@ -23,6 +24,7 @@ export interface ICategory extends Document {
 const CategorySchema = new Schema<ICategory>(
   {
     userId: { type: String, required: true, index: true },
+    datasetId: { type: String, default: "", index: true },
     scope: {
       type: String,
       enum: ["commercial", "personal", "both"],
@@ -54,7 +56,7 @@ const CategorySchema = new Schema<ICategory>(
   { timestamps: true }
 );
 
-CategorySchema.index({ userId: 1, name: 1, scope: 1 }, { unique: true });
+CategorySchema.index({ userId: 1, name: 1, scope: 1, datasetId: 1 }, { unique: true });
 
 export const Category: Model<ICategory> =
   mongoose.models.Category ||

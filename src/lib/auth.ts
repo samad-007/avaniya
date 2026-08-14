@@ -12,14 +12,15 @@ export interface SessionPayload {
   userId: string;
   email: string;
   name: string;
-  role: "admin" | "user";
+  role: "super_admin" | "admin" | "user";
+  datasetId?: string;
 }
 
 /**
- * Hash a plain text password using bcrypt with 12 salt rounds
+ * Hash a plain text password using bcrypt with 10 salt rounds
  */
 export async function hashPassword(password: string): Promise<string> {
-  return await bcrypt.hash(password, 12);
+  return await bcrypt.hash(password, 10);
 }
 
 /**
@@ -63,28 +64,8 @@ export async function verifySessionToken(
 export async function getSession(): Promise<SessionPayload | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;
-
-  if (!token) {
-    // Default fallback demo user for initial local development when unauthenticated
-    return {
-      userId: "demo_businessman_1",
-      email: "demo@realestate.in",
-      name: "Samad (Real Estate Principal)",
-      role: "admin",
-    };
-  }
-
-  const session = await verifySessionToken(token);
-  if (!session) {
-    return {
-      userId: "demo_businessman_1",
-      email: "demo@realestate.in",
-      name: "Samad (Real Estate Principal)",
-      role: "admin",
-    };
-  }
-
-  return session;
+  if (!token) return null;
+  return await verifySessionToken(token);
 }
 
 /**
@@ -94,25 +75,8 @@ export async function getSessionFromRequest(
   req: NextRequest
 ): Promise<SessionPayload | null> {
   const token = req.cookies.get(COOKIE_NAME)?.value;
-
-  if (!token) {
-    return {
-      userId: "demo_businessman_1",
-      email: "demo@realestate.in",
-      name: "Samad (Real Estate Principal)",
-      role: "admin",
-    };
-  }
-
-  const session = await verifySessionToken(token);
-  return (
-    session || {
-      userId: "demo_businessman_1",
-      email: "demo@realestate.in",
-      name: "Samad (Real Estate Principal)",
-      role: "admin",
-    }
-  );
+  if (!token) return null;
+  return await verifySessionToken(token);
 }
 
 export { COOKIE_NAME };
