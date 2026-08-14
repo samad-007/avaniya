@@ -150,22 +150,27 @@ Real-estate-tracker/
 ### C. Environment Variables Configuration
 Create a `.env.local` file in the project root:
 ```bash
-# MongoDB Atlas Connection String
-MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/real_estate_tracker?retryWrites=true&w=majority
+# MongoDB Atlas Connection String (Explicitly routes to 'production' database)
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/production?retryWrites=true&w=majority
+
+# Optional: Override target database name (defaults to 'production', test runs use 'test')
+MONGODB_DB=production
 
 # JWT Secret for Session Signing
 JWT_SECRET=your-production-secret-key-at-least-32-chars-long
 ```
 
 > [!NOTE]
-> When configuring `MONGODB_URI` on Vercel or locally, do NOT enclose the connection string in double quotes if it causes parsing errors. Ensure the URI begins with `mongodb://` or `mongodb+srv://`.
+> - Real business portfolio data (including Mohammed Yousuf's real dataset `ds_yousuf_portfolio`) is explicitly stored in the **`production`** database.
+> - The **`test`** database is preserved exclusively for automated testing and sandbox environments.
+> - When configuring `MONGODB_URI` on Vercel or locally, do NOT enclose the connection string in double quotes if it causes parsing errors. Ensure the URI begins with `mongodb://` or `mongodb+srv://`.
 
-### D. MongoDB Atlas Multi-Tenant Migration
-To seed MongoDB Atlas with the standard multi-tenant datasets (including Super Admin, Mohammed Yousuf Portfolio, and Fresh User):
+### D. MongoDB Atlas Production Migration
+To seed and update MongoDB Atlas production database with real tenant datasets (Super Admin and Mohammed Yousuf Portfolio):
 ```bash
 npm run migrate
 ```
-This script executes [`scripts/migrateToMongo.ts`](file:///Users/abdulsamad/Documents/development/projects/VibeCoded/Real-estate-tracker/scripts/migrateToMongo.ts) using `tsx`.
+This script executes [`scripts/migrateToMongo.ts`](file:///Users/abdulsamad/Documents/development/projects/VibeCoded/Real-estate-tracker/scripts/migrateToMongo.ts) targeting the `production` database on your cluster.
 
 ### E. Local Development & Build Verification
 ```bash

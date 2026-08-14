@@ -7,7 +7,7 @@
   --foreground: #ffffff;
   --card: #0a0a0a;
   --card-elevated: #111111;
-  --border: #222222;
+  --border: #262626;
   --border-focus: #444444;
 }
 
@@ -31,7 +31,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #222222;
+  background: #262626;
   border-radius: 3px;
 }
 
@@ -47,4 +47,56 @@ body {
 /* Smooth transitions */
 .transition-standard {
   transition: all 150ms ease-in-out;
+}
+
+/* Key Ingress/Egress Action Button with Hover/Tap-to-White Animation */
+.btn-action-primary {
+  background-color: #161616;
+  color: #ffffff;
+  border: 1px solid #333333;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-action-primary:hover,
+.btn-action-primary:active {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+  transform: translateY(-1px);
+}
+
+.btn-action-primary:active {
+  transform: scale(0.98);
+}
+
+/* Keyframe animations for window popups & modal panels */
+@keyframes modalEntrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes backdropEntrance {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-modal {
+  animation: modalEntrance 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-backdrop {
+  animation: backdropEntrance 180ms ease-out forwards;
 }

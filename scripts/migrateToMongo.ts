@@ -63,18 +63,22 @@ async function runMigration() {
     console.error("\n==================================================================");
     console.error("ERROR: MONGODB_URI environment variable is not defined or empty.");
     console.error("Please ensure your `.env.local` file contains:");
-    console.error("MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/real_estate_tracker?retryWrites=true&w=majority");
+    console.error("MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/production?retryWrites=true&w=majority");
     console.error("==================================================================\n");
     process.exit(1);
   }
 
-  console.log("==================================================================");
-  console.log("AVANIYA — MONGODB ATLAS MULTI-TENANT SEED & DATASET MIGRATION");
-  console.log("==================================================================");
-  console.log("Connecting to MongoDB Atlas Cluster...");
+  const targetDb = process.env.MONGODB_DB || "production";
 
-  await mongoose.connect(uri);
-  console.log("Connected to MongoDB Atlas successfully.\n");
+  console.log("==================================================================");
+  console.log(`AVANIYA — MONGODB ATLAS PRODUCTION MIGRATION -> [${targetDb.toUpperCase()}]`);
+  console.log("==================================================================");
+  console.log(`Connecting to MongoDB Atlas Cluster (Database: '${targetDb}')...`);
+
+  await mongoose.connect(uri, {
+    dbName: targetDb,
+  });
+  console.log(`Connected to '${targetDb}' database successfully.\n`);
 
   const yousufDatasetId = "ds_yousuf_portfolio";
   const superAdminEmail = "samad@avaniya.com";
@@ -84,7 +88,7 @@ async function runMigration() {
   const yousufPassword = generateSecurePassword(15);
 
   // 1. Create or Update Dataset Definition
-  console.log("[1/6] Registering Dataset Workspaces...");
+  console.log("[1/6] Registering Production Dataset Workspaces...");
   const yousufDataset = await Dataset.findOneAndUpdate(
     { datasetId: yousufDatasetId },
     {
@@ -98,7 +102,7 @@ async function runMigration() {
   console.log(`- Dataset '${yousufDatasetId}' initialized: ${yousufDataset.name}`);
 
   // 2. Migrate / Create Super Admin (Samad)
-  console.log("\n[2/6] Provisioning Super Admin Account (Developer)...");
+  console.log("\n[2/6] Provisioning Super Admin Account in Production (Developer)...");
   let superAdminUser = await User.findOne({ email: superAdminEmail });
   if (!superAdminUser) {
     const pHash = await hashPassword(superAdminPassword);
@@ -119,7 +123,7 @@ async function runMigration() {
   }
 
   // 3. Migrate / Create Client User (Mohammed Yousuf)
-  console.log("\n[3/6] Provisioning Client User (Mohammed Yousuf)...");
+  console.log("\n[3/6] Provisioning Real Client Account (Mohammed Yousuf)...");
   let yousufUser = await User.findOne({ email: yousufEmail });
   if (!yousufUser) {
     const pHash = await hashPassword(yousufPassword);
@@ -131,13 +135,13 @@ async function runMigration() {
       datasetId: yousufDatasetId,
       status: "active",
     });
-    console.log(`- Created User: ${yousufEmail}`);
+    console.log(`- Created Real User: ${yousufEmail}`);
     console.log(`  Password (15 chars): ${yousufPassword}`);
     console.log(`  Mapped Dataset: ${yousufDatasetId}`);
   } else {
     yousufUser.datasetId = yousufDatasetId;
     await yousufUser.save();
-    console.log(`- User exists: ${yousufEmail} (Mapped Dataset: ${yousufDatasetId})`);
+    console.log(`- User verified: ${yousufEmail} (Mapped Dataset: ${yousufDatasetId})`);
   }
 
   // Link users to Dataset
@@ -154,7 +158,7 @@ async function runMigration() {
   );
 
   // 4. Migrate Properties under Dataset
-  console.log("\n[4/6] Migrating Properties under Dataset 'ds_yousuf_portfolio'...");
+  console.log("\n[4/6] Migrating Properties to 'production' database under 'ds_yousuf_portfolio'...");
   for (const p of INITIAL_PROPERTIES) {
     await Property.findOneAndUpdate(
       { datasetId: yousufDatasetId, propertyCode: p.propertyCode },
@@ -181,10 +185,10 @@ async function runMigration() {
     );
   }
   const propCount = await Property.countDocuments({ datasetId: yousufDatasetId });
-  console.log(`- Migrated ${propCount} properties into dataset '${yousufDatasetId}'.`);
+  console.log(`- Migrated ${propCount} real properties into production dataset '${yousufDatasetId}'.`);
 
   // 5. Migrate Dynamic Categories under Dataset
-  console.log("\n[5/6] Migrating South Indian Real Estate Categories under Dataset...");
+  console.log("\n[5/6] Migrating South Indian Real Estate Categories to 'production'...");
   for (const c of INITIAL_CATEGORIES) {
     await Category.findOneAndUpdate(
       { datasetId: yousufDatasetId, name: c.name, scope: c.scope },
@@ -201,10 +205,10 @@ async function runMigration() {
     );
   }
   const catCount = await Category.countDocuments({ datasetId: yousufDatasetId });
-  console.log(`- Migrated ${catCount} categories into dataset '${yousufDatasetId}'.`);
+  console.log(`- Migrated ${catCount} categories into production dataset '${yousufDatasetId}'.`);
 
   // 6. Migrate Transactions & Account Balances under Dataset
-  console.log("\n[6/6] Migrating Itemized Transactions & Balances under Dataset...");
+  console.log("\n[6/6] Migrating Itemized Transactions & Balances to 'production'...");
   for (const t of INITIAL_TRANSACTIONS) {
     await Transaction.findOneAndUpdate(
       { datasetId: yousufDatasetId, transCode: t.transCode },
@@ -228,7 +232,7 @@ async function runMigration() {
     );
   }
   const txCount = await Transaction.countDocuments({ datasetId: yousufDatasetId });
-  console.log(`- Migrated ${txCount} transactions into dataset '${yousufDatasetId}'.`);
+  console.log(`- Migrated ${txCount} transactions into production dataset '${yousufDatasetId}'.`);
 
   for (const a of INITIAL_ACCOUNT_BALANCES) {
     await AccountBalance.findOneAndUpdate(
@@ -247,9 +251,9 @@ async function runMigration() {
   }
 
   console.log("\n==================================================================");
-  console.log("MIGRATION COMPLETE!");
-  console.log("All data is securely mapped under dataset 'ds_yousuf_portfolio'.");
-  console.log("Super Admin (Samad) has full management & switching capabilities.");
+  console.log("PRODUCTION MIGRATION COMPLETE!");
+  console.log(`All real data is securely saved in the '${targetDb}' database.`);
+  console.log("The 'test' database remains completely separate for testing purposes.");
   console.log("==================================================================");
 
   await mongoose.disconnect();

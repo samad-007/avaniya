@@ -217,8 +217,8 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 md:p-6 overflow-y-auto animate-in fade-in duration-200">
-      <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto">
+    <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 md:p-6 overflow-y-auto animate-backdrop">
+      <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto animate-modal">
         {/* Header */}
         <div className="p-4 md:p-5 border-b border-[#262626] flex items-center justify-between bg-[#0e0e0e] gap-3">
           <div className="flex items-center gap-3">
@@ -243,7 +243,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={handleOpenCreateModal}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white text-black text-xs sm:text-sm font-semibold hover:bg-[#e0e0e0] transition-standard"
+              className="btn-action-primary flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs sm:text-sm"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
               <span>Provision User</span>
@@ -251,7 +251,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
 
             <button
               onClick={onClose}
-              className="p-2 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] transition-standard"
+              className="p-2 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] transition-all duration-150"
             >
               <X className="w-5 h-5" />
             </button>
@@ -270,7 +270,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
 
           {/* Newly Created Credential Notification Card */}
           {createdCredential && (
-            <div className="bg-emerald-950/20 border border-emerald-800/40 rounded-xl p-4 sm:p-5 flex flex-col gap-3.5">
+            <div className="bg-emerald-950/20 border border-emerald-800/40 rounded-xl p-4 sm:p-5 flex flex-col gap-3.5 animate-modal">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-sm font-bold text-emerald-400">
                   <KeyRound className="w-4 h-4" />
@@ -316,7 +316,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                       `Email: ${createdCredential.email}\nPassword: ${createdCredential.password}\nLogin URL: https://avaniya.vercel.app`
                     )
                   }
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-500 text-black text-xs sm:text-sm font-bold hover:bg-emerald-400 transition-standard"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-500 text-black text-xs sm:text-sm font-bold hover:bg-emerald-400 active:scale-[0.98] transition-all duration-150"
                 >
                   {copied ? (
                     <Check className="w-4 h-4 stroke-[2.5]" />
@@ -374,7 +374,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
               </div>
               <button
                 onClick={loadAdminData}
-                className="flex items-center gap-1.5 text-xs text-[#A1A1AA] hover:text-white transition-standard font-medium"
+                className="flex items-center gap-1.5 text-xs text-[#A1A1AA] hover:text-white transition-all duration-150 font-medium"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
                 <span>Refresh</span>
@@ -449,7 +449,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                                 onSwitchDataset(u.datasetId);
                                 onClose();
                               }}
-                              className="px-2.5 py-1 rounded-md bg-[#161616] border border-[#2a2a2a] text-white hover:bg-[#252525] transition-standard text-xs font-semibold"
+                              className="btn-action-primary px-2.5 py-1 rounded-md text-xs font-semibold"
                               title="Switch active dashboard to view this user's dataset"
                             >
                               View Ledger
@@ -457,7 +457,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
 
                             <button
                               onClick={() => handleResetPassword(u)}
-                              className="p-1.5 rounded-md bg-[#161616] border border-[#2a2a2a] text-[#A1A1AA] hover:text-amber-400 transition-standard"
+                              className="p-1.5 rounded-md bg-[#161616] border border-[#2a2a2a] text-[#A1A1AA] hover:text-amber-400 transition-all duration-150"
                               title="Generate new 15-char password"
                             >
                               <KeyRound className="w-4 h-4" />
@@ -466,7 +466,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                             {u.role !== "super_admin" && (
                               <button
                                 onClick={() => handleDeleteUser(u)}
-                                className="p-1.5 rounded-md bg-[#161616] border border-[#2a2a2a] text-[#A1A1AA] hover:text-rose-400 transition-standard"
+                                className="p-1.5 rounded-md bg-[#161616] border border-[#2a2a2a] text-[#A1A1AA] hover:text-rose-400 transition-all duration-150"
                                 title="Delete user"
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -485,8 +485,8 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
 
         {/* Create User Modal Sub-Dialog */}
         {isCreateModalOpen && (
-          <div className="fixed inset-0 z-60 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-[#0e0e0e] border border-[#2a2a2a] rounded-xl max-w-md w-full p-6 shadow-2xl flex flex-col gap-4">
+          <div className="fixed inset-0 z-60 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 animate-backdrop">
+            <div className="bg-[#0e0e0e] border border-[#2a2a2a] rounded-xl max-w-md w-full p-6 shadow-2xl flex flex-col gap-4 animate-modal">
               <div className="flex items-center justify-between border-b border-[#222222] pb-3">
                 <h3 className="text-base font-bold text-white">
                   Provision New User &amp; Assign Dataset
@@ -588,7 +588,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                     <button
                       type="button"
                       onClick={() => handleCopyPassword(generatedPassword)}
-                      className="p-2 rounded-md bg-[#222222] text-white hover:bg-[#333333] transition-standard"
+                      className="p-2 rounded-md bg-[#222222] text-white hover:bg-[#333333] transition-all duration-150"
                       title="Copy password"
                     >
                       {copied ? (
@@ -613,7 +613,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 rounded-lg bg-white text-black text-xs sm:text-sm font-semibold hover:bg-[#e0e0e0]"
+                    className="btn-action-primary px-4 py-2 rounded-lg text-xs sm:text-sm"
                   >
                     Create &amp; Provision User
                   </button>
@@ -627,7 +627,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
         <div className="p-3.5 border-t border-[#262626] bg-[#0c0c0c] flex justify-end gap-2">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg bg-[#1a1a1a] text-white text-xs sm:text-sm font-semibold hover:bg-[#252525] border border-[#383838] transition-standard"
+            className="px-4 py-2 rounded-lg bg-[#1a1a1a] text-white text-xs sm:text-sm font-semibold hover:bg-[#252525] border border-[#383838] transition-all duration-150"
           >
             Close Dashboard
           </button>

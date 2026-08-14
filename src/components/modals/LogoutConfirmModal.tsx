@@ -19,8 +19,8 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-60 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150">
-      <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-sm w-full p-5 sm:p-6 shadow-2xl flex flex-col gap-4 my-auto">
+    <div className="fixed inset-0 z-60 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 animate-backdrop">
+      <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-sm w-full p-5 sm:p-6 shadow-2xl flex flex-col gap-4 my-auto animate-modal">
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="w-10 h-10 rounded-lg bg-rose-950/40 border border-rose-800/40 text-rose-400 flex items-center justify-center flex-shrink-0">
@@ -28,7 +28,7 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="text-[#A1A1AA] hover:text-white p-1 transition-standard"
+            className="text-[#A1A1AA] hover:text-white p-1 transition-all duration-150"
           >
             <X className="w-5 h-5" />
           </button>
@@ -56,7 +56,7 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-lg bg-[#161616] text-white text-xs sm:text-sm font-medium border border-[#2a2a2a] hover:bg-[#222222] transition-standard"
+            className="px-4 py-2 rounded-lg bg-[#161616] text-white text-xs sm:text-sm font-medium border border-[#2a2a2a] hover:bg-[#222222] transition-all duration-150"
           >
             Stay Signed In
           </button>
@@ -64,7 +64,7 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
           <button
             type="button"
             onClick={onConfirm}
-            className="px-4 py-2 rounded-lg bg-rose-600 text-white text-xs sm:text-sm font-bold hover:bg-rose-500 transition-standard flex items-center gap-1.5 shadow-sm"
+            className="px-4 py-2 rounded-lg bg-rose-600 text-white text-xs sm:text-sm font-bold hover:bg-rose-500 transition-all duration-150 flex items-center gap-1.5 shadow-sm active:scale-[0.98]"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Confirm Sign Out</span>

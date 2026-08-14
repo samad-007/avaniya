@@ -40,16 +40,31 @@ export function getSanitizedMongoUri(): string | undefined {
 }
 
 /**
- * Connect to MongoDB Atlas with pooled serverless connection.
+ * Get target database name.
+ * Defaults to "production" for real business data and "test" for automated testing.
  */
-export async function connectDB(): Promise<typeof mongoose> {
+export function getTargetDbName(): string {
+  if (process.env.MONGODB_DB) {
+    return process.env.MONGODB_DB.trim();
+  }
+  if (process.env.NODE_ENV === "test") {
+    return "test";
+  }
+  return "production";
+}
+
+/**
+ * Connect to MongoDB Atlas with pooled serverless connection pointing to the production database.
+ */
+export async function connectDB(overrideDbName?: string): Promise<typeof mongoose> {
   const MONGODB_URI = getSanitizedMongoUri();
+  const dbName = overrideDbName || getTargetDbName();
 
   if (!MONGODB_URI) {
     console.warn("MONGODB_URI is not defined in environment variables.");
   }
 
-  if (cached!.conn) {
+  if (cached!.conn && mongoose.connection.readyState === 1) {
     return cached!.conn;
   }
 
@@ -59,6 +74,7 @@ export async function connectDB(): Promise<typeof mongoose> {
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 8000,
       socketTimeoutMS: 45000,
+      dbName: dbName, // Explicitly route to "production" database on Atlas
     };
 
     cached!.promise = mongoose.connect(MONGODB_URI, opts).then((m) => {

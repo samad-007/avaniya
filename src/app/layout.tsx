@@ -17,9 +17,16 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Real Estate & Land Asset Tracker",
+  title: {
+    default: "Avaniya",
+    template: "%s | Avaniya",
+  },
   description:
-    "High-precision real estate liquidity, deal pipeline, and asset portfolio management system for Indian real estate enterprises.",
+    "Indian Real Estate Liquidity, Deal Pipeline & Asset Portfolio Management System",
+  icons: {
+    icon: "/icon",
+    apple: "/apple-icon",
+  },
 };
 
 export const viewport: Viewport = {

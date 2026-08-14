@@ -49,12 +49,12 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="sticky top-0 z-40 bg-black/95 backdrop-blur-md border-b border-[#262626] px-4 py-3">
       <div className="max-w-[1440px] mx-auto flex flex-wrap items-center justify-between gap-3">
-        {/* Brand & Generated Logo */}
+        {/* Brand & Logo */}
         <div className="flex items-center gap-3">
           <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-[#383838] bg-[#0c120e] flex items-center justify-center flex-shrink-0 shadow-sm">
             <Image
               src="/logo.jpg"
-              alt="Avaniya Real Estate Portfolio"
+              alt="Avaniya"
               width={40}
               height={40}
               className="object-cover w-full h-full"
@@ -63,9 +63,9 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
           <div>
             <div className="text-sm md:text-base font-bold text-white tracking-tight flex items-center gap-2">
-              <span>Avaniya Land &amp; Asset Portfolio</span>
+              <span>Avaniya</span>
               <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-[#161616] text-[#A1A1AA] border border-[#262626]">
-                v1.0
+                Portfolio
               </span>
             </div>
             <div className="text-xs text-[#A1A1AA] font-medium">
@@ -78,7 +78,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center bg-[#111111] p-1 rounded-lg border border-[#262626]">
           <button
             onClick={() => onModeChange("commercial")}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-md text-xs sm:text-sm font-semibold transition-standard ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-md text-xs sm:text-sm font-semibold transition-all duration-150 ${
               currentMode === "commercial"
                 ? "bg-[#262626] text-white shadow-sm font-bold"
                 : "text-[#A1A1AA] hover:text-white"
@@ -89,7 +89,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
           <button
             onClick={() => onModeChange("personal")}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-md text-xs sm:text-sm font-semibold transition-standard ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-md text-xs sm:text-sm font-semibold transition-all duration-150 ${
               currentMode === "personal"
                 ? "bg-[#262626] text-white shadow-sm font-bold"
                 : "text-[#A1A1AA] hover:text-white"
@@ -126,7 +126,7 @@ export const Header: React.FC<HeaderProps> = ({
           {isSuperAdmin && onOpenSuperAdminModal && (
             <button
               onClick={onOpenSuperAdminModal}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-950/40 border border-emerald-800/40 text-emerald-300 text-xs sm:text-sm font-semibold hover:bg-emerald-900/50 transition-standard"
+              className="btn-action-primary flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs sm:text-sm"
               title="Super Admin User & Dataset Management"
             >
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
@@ -134,32 +134,39 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
 
+          {/* Key Ingress Action: Record Outflow */}
           <button
             onClick={() => onOpenEntryModal("outflow")}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white text-black text-xs sm:text-sm font-semibold hover:bg-[#e0e0e0] transition-standard"
+            className="btn-action-primary flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs sm:text-sm"
+            title="Log Outflow or Land Expense"
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
             <span>Record Outflow</span>
           </button>
 
+          {/* Key Ingress Action: Add Inflow */}
           <button
             onClick={() => onOpenEntryModal("inflow")}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#111111] text-white border border-[#262626] text-xs sm:text-sm font-medium hover:bg-[#1a1a1a] hover:border-[#383838] transition-standard"
+            className="btn-action-primary flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs sm:text-sm"
+            title="Log Buyer Receipt or Capital Inflow"
           >
             <ArrowUpRight className="w-4 h-4 text-[#22C55E]" />
             <span>Add Inflow</span>
           </button>
 
+          {/* Key Ingress Action: New Property */}
           <button
             onClick={onOpenNewPropertyModal}
-            className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#111111] text-white border border-[#262626] text-xs sm:text-sm font-medium hover:bg-[#1a1a1a] hover:border-[#383838] transition-standard"
+            className="btn-action-primary hidden md:flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs sm:text-sm"
+            title="Create New Real Estate Asset"
           >
             <span>+ New Property</span>
           </button>
 
+          {/* Key Egress Action: Export */}
           <button
             onClick={onOpenExportModal}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#111111] text-white border border-[#262626] text-xs sm:text-sm font-medium hover:bg-[#1a1a1a] hover:border-[#383838] transition-standard"
+            className="btn-action-primary flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs sm:text-sm"
             title="Export to Excel, PDF, or CSV"
           >
             <Download className="w-4 h-4" />
@@ -168,7 +175,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={onOpenCategoryModal}
-            className="p-2 rounded-lg bg-[#111111] text-[#A1A1AA] border border-[#262626] hover:text-white hover:border-[#383838] transition-standard"
+            className="p-2 rounded-lg bg-[#111111] text-[#A1A1AA] border border-[#262626] hover:text-white hover:border-[#383838] transition-all duration-150"
             title="Dynamic Categories & Formulas"
           >
             <Settings2 className="w-4 h-4" />
@@ -190,7 +197,7 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
               <button
                 onClick={onLogout}
-                className="p-2 rounded-lg bg-[#111111] text-[#A1A1AA] border border-[#262626] hover:text-rose-400 hover:border-rose-900/50 transition-standard"
+                className="p-2 rounded-lg bg-[#111111] text-[#A1A1AA] border border-[#262626] hover:text-rose-400 hover:border-rose-900/50 transition-all duration-150"
                 title="Sign Out"
               >
                 <LogOut className="w-4 h-4" />
@@ -199,7 +206,7 @@ export const Header: React.FC<HeaderProps> = ({
           ) : (
             <button
               onClick={onOpenAuthModal}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#161616] text-white border border-[#383838] text-xs sm:text-sm font-semibold hover:bg-[#222222] transition-standard"
+              className="btn-action-primary flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs sm:text-sm"
             >
               <UserIcon className="w-4 h-4" />
               <span>Sign In</span>

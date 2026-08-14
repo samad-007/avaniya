@@ -62,8 +62,8 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
     propertyMetrics.propertyExpenses > prop.agreedPurchasePrice;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 md:p-6 overflow-y-auto animate-in fade-in duration-150">
-      <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto">
+    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 md:p-6 overflow-y-auto animate-backdrop">
+      <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto animate-modal">
         {/* Modal Header */}
         <div className="p-4 md:p-5 border-b border-[#262626] flex items-start justify-between bg-[#0e0e0e] gap-3">
           <div className="flex items-start gap-3.5">
@@ -120,7 +120,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
             {onEditProperty && (
               <button
                 onClick={() => onEditProperty(prop)}
-                className="px-3 py-2 rounded-lg bg-[#161616] text-white border border-[#2c2c2c] hover:bg-[#222222] hover:border-[#555555] text-xs font-semibold flex items-center gap-1.5 transition-standard shadow-sm"
+                className="btn-action-primary px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5"
                 title="Edit Valuation, Price & Details"
               >
                 <Pencil className="w-3.5 h-3.5 text-[#22C55E]" />
@@ -130,7 +130,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
 
             <button
               onClick={onClose}
-              className="p-2 rounded-lg text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] transition-standard"
+              className="p-2 rounded-lg text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] transition-all duration-150"
             >
               <X className="w-5 h-5" />
             </button>
@@ -336,9 +336,10 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
               </div>
 
               <div className="flex items-center gap-2">
+                {/* Key Action: Log Outflow (Hover-to-White) */}
                 <button
                   onClick={() => onOpenEntryModal("outflow", prop.propertyCode)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white text-black text-xs sm:text-sm font-semibold hover:bg-[#e0e0e0] transition-standard"
+                  className="btn-action-primary flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm"
                 >
                   <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
                   <span>Log Outflow</span>
@@ -348,7 +349,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                     onClick={() =>
                       onOpenEntryModal("inflow", prop.propertyCode)
                     }
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#161616] text-white border border-[#333333] text-xs sm:text-sm font-medium hover:bg-[#222222] transition-standard"
+                    className="btn-action-primary flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm"
                   >
                     <ArrowUpRight className="w-3.5 h-3.5 text-[#22C55E]" />
                     <span>Log Receipt</span>
@@ -450,7 +451,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
           {onEditProperty ? (
             <button
               onClick={() => onEditProperty(prop)}
-              className="px-3.5 py-2 rounded-lg bg-[#161616] text-[#E4E4E7] hover:text-white text-xs sm:text-sm font-semibold border border-[#2a2a2a] hover:bg-[#222222] flex items-center gap-1.5 transition-standard"
+              className="btn-action-primary px-3.5 py-2 rounded-lg text-xs sm:text-sm flex items-center gap-1.5"
             >
               <Pencil className="w-3.5 h-3.5 text-[#22C55E]" />
               <span>Edit Property Valuations</span>
@@ -461,7 +462,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
 
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg bg-[#1a1a1a] text-white text-xs sm:text-sm font-semibold hover:bg-[#252525] border border-[#383838] transition-standard"
+            className="px-4 py-2 rounded-lg bg-[#1a1a1a] text-white text-xs sm:text-sm font-semibold hover:bg-[#252525] border border-[#383838] transition-all duration-150"
           >
             Close Ledger
           </button>

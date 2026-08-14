@@ -23,6 +23,7 @@ import {
   Receipt,
   FileCheck2,
   Pencil,
+  Plus,
 } from "lucide-react";
 
 interface CommercialViewProps {
@@ -74,7 +75,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
         <div className="flex items-center gap-1">
           <button
             onClick={() => setActiveTab("deals")}
-            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-standard ${
+            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all duration-150 ${
               activeTab === "deals"
                 ? "border-white text-white"
                 : "border-transparent text-[#A1A1AA] hover:text-white"
@@ -84,7 +85,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
           </button>
           <button
             onClick={() => setActiveTab("outflows")}
-            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-standard ${
+            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all duration-150 ${
               activeTab === "outflows"
                 ? "border-white text-white"
                 : "border-transparent text-[#A1A1AA] hover:text-white"
@@ -94,7 +95,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
           </button>
           <button
             onClick={() => setActiveTab("inflows")}
-            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-standard ${
+            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all duration-150 ${
               activeTab === "inflows"
                 ? "border-white text-white"
                 : "border-transparent text-[#A1A1AA] hover:text-white"
@@ -104,7 +105,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
           </button>
           <button
             onClick={() => setActiveTab("capital")}
-            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-standard ${
+            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all duration-150 ${
               activeTab === "capital"
                 ? "border-white text-white"
                 : "border-transparent text-[#A1A1AA] hover:text-white"
@@ -114,7 +115,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
           </button>
           <button
             onClick={() => setActiveTab("transfers")}
-            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-standard ${
+            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all duration-150 ${
               activeTab === "transfers"
                 ? "border-white text-white"
                 : "border-transparent text-[#A1A1AA] hover:text-white"
@@ -126,10 +127,10 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
 
         {/* View Toggle (Cards vs Table for Deals) */}
         {activeTab === "deals" && (
-          <div className="flex items-center gap-1 bg-[#111111] p-1 rounded-md border border-[#262626]">
+          <div className="flex items-center gap-1 bg-[#111111] p-1 rounded-lg border border-[#262626]">
             <button
               onClick={() => setLayoutVariant("cards")}
-              className={`p-1.5 rounded text-xs transition-standard ${
+              className={`p-1.5 rounded-md text-xs transition-all duration-150 ${
                 layoutVariant === "cards"
                   ? "bg-[#262626] text-white"
                   : "text-[#A1A1AA] hover:text-white"
@@ -140,7 +141,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
             </button>
             <button
               onClick={() => setLayoutVariant("table")}
-              className={`p-1.5 rounded text-xs transition-standard ${
+              className={`p-1.5 rounded-md text-xs transition-all duration-150 ${
                 layoutVariant === "table"
                   ? "bg-[#262626] text-white"
                   : "text-[#A1A1AA] hover:text-white"
@@ -165,14 +166,16 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Filter properties or location..."
-                className="w-full pl-9 pr-3 py-2 rounded-lg bg-[#0e0e0e] border border-[#262626] text-sm text-white placeholder-[#71717A] outline-none focus:border-[#555555] transition-standard"
+                className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-[#0e0e0e] border border-[#262626] text-sm text-white placeholder-[#71717A] outline-none focus:border-[#555555] transition-all duration-150"
               />
             </div>
+            {/* Key Ingress Button: Add New Land Deal (Hover-to-White) */}
             <button
               onClick={onOpenNewDealModal}
-              className="px-4 py-2 rounded-lg bg-white text-black text-xs sm:text-sm font-semibold hover:bg-[#e0e0e0] transition-standard flex items-center gap-1.5"
+              className="btn-action-primary px-4 py-2 rounded-lg text-xs sm:text-sm flex items-center gap-1.5"
             >
-              <span>+ Add New Land Deal</span>
+              <Plus className="w-4 h-4 stroke-[2.5]" />
+              <span>Add New Land Deal</span>
             </button>
           </div>
 
@@ -199,7 +202,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                   <div
                     key={pm.property.id}
                     onClick={() => onSelectProperty(pm)}
-                    className="bg-[#0a0a0a] border border-[#262626] rounded-xl p-4 sm:p-5 flex flex-col justify-between gap-4 cursor-pointer hover:border-[#444444] hover:bg-[#0e0e0e] transition-standard group shadow-md"
+                    className="bg-[#0a0a0a] border border-[#262626] rounded-xl p-4 sm:p-5 flex flex-col justify-between gap-4 cursor-pointer hover:border-[#444444] hover:bg-[#0e0e0e] transition-all duration-150 group shadow-md"
                   >
                     {/* Card Header */}
                     <div className="flex items-start justify-between gap-2.5">
@@ -239,7 +242,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                               e.stopPropagation();
                               onEditProperty(pm.property);
                             }}
-                            className="p-1.5 rounded-md bg-[#161616] text-[#A1A1AA] hover:text-white hover:bg-[#252525] border border-[#2a2a2a] transition-standard"
+                            className="btn-action-primary p-2 rounded-lg"
                             title="Edit Property Data Points"
                           >
                             <Pencil className="w-3.5 h-3.5 text-[#22C55E]" />

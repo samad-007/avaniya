@@ -122,8 +122,8 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto animate-in fade-in duration-150">
-      <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-5 sm:p-6 shadow-2xl my-auto flex flex-col gap-5">
+    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto animate-backdrop">
+      <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-5 sm:p-6 shadow-2xl my-auto flex flex-col gap-5 animate-modal">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#262626] pb-3.5">
           <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
@@ -131,7 +131,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
           </h2>
           <button
             onClick={onClose}
-            className="p-1 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] transition-standard"
+            className="p-1 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] transition-all duration-150"
           >
             <X className="w-5 h-5" />
           </button>
@@ -143,7 +143,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
             <button
               type="button"
               onClick={() => setType("commercial")}
-              className={`py-2.5 rounded-md flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-standard ${
+              className={`py-2.5 rounded-md flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-all duration-150 ${
                 type === "commercial"
                   ? "bg-[#262626] text-white shadow-sm"
                   : "text-[#A1A1AA] hover:text-white"
@@ -155,7 +155,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
             <button
               type="button"
               onClick={() => setType("personal")}
-              className={`py-2.5 rounded-md flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-standard ${
+              className={`py-2.5 rounded-md flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-all duration-150 ${
                 type === "personal"
                   ? "bg-[#262626] text-white shadow-sm"
                   : "text-[#A1A1AA] hover:text-white"
@@ -352,19 +352,19 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
             />
           </div>
 
-          {/* Buttons */}
+          {/* Buttons (Key Action: Create Property with Hover-to-White) */}
           <div className="flex items-center gap-2.5 pt-2.5 border-t border-[#262626]">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 py-2.5 rounded-lg bg-white text-black font-semibold text-xs sm:text-sm hover:bg-[#e0e0e0] transition-standard disabled:opacity-50"
+              className="btn-action-primary flex-1 py-2.5 rounded-lg text-xs sm:text-sm disabled:opacity-50"
             >
               {isSubmitting ? "Creating Property..." : "Create Property"}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-lg bg-[#161616] text-white border border-[#2a2a2a] text-xs sm:text-sm font-medium hover:bg-[#222222] transition-standard"
+              className="px-4 py-2.5 rounded-lg bg-[#161616] text-white border border-[#2a2a2a] text-xs sm:text-sm font-medium hover:bg-[#222222] transition-all duration-150"
             >
               Cancel
             </button>

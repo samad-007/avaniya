@@ -107,8 +107,8 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto animate-in fade-in duration-150">
-      <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-5 sm:p-6 shadow-2xl my-auto flex flex-col gap-5">
+    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto animate-backdrop">
+      <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-5 sm:p-6 shadow-2xl my-auto flex flex-col gap-5 animate-modal">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#262626] pb-3.5">
           <div className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
@@ -125,7 +125,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] transition-standard"
+            className="p-1 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] transition-all duration-150"
           >
             <X className="w-5 h-5" />
           </button>
@@ -142,7 +142,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
               value={amount || ""}
               onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
               placeholder="0"
-              className="w-full bg-[#111111] border border-[#262626] rounded-lg p-3 text-2xl font-mono font-bold text-white outline-none focus:border-[#555555] transition-standard"
+              className="w-full bg-[#111111] border border-[#262626] rounded-lg p-3 text-2xl font-mono font-bold text-white outline-none focus:border-[#555555] transition-all duration-150"
               required
             />
             {/* Verbal Converter Display */}
@@ -165,7 +165,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   type="button"
                   key={idx}
                   onClick={() => handleAddPreset(chip.val)}
-                  className="px-2.5 py-1.5 rounded-md bg-[#141414] border border-[#262626] text-xs font-mono font-medium text-[#D4D4D8] hover:text-white hover:bg-[#222222] hover:border-[#444444] transition-standard"
+                  className="px-2.5 py-1.5 rounded-md bg-[#141414] border border-[#262626] text-xs font-mono font-medium text-[#D4D4D8] hover:text-black hover:bg-white hover:border-white transition-all duration-150"
                 >
                   {chip.label}
                 </button>
@@ -182,7 +182,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
               <button
                 type="button"
                 onClick={() => setMode("Bank")}
-                className={`py-2.5 rounded-md flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-standard ${
+                className={`py-2.5 rounded-md flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-all duration-150 ${
                   mode === "Bank"
                     ? "bg-[#262626] text-white shadow-sm"
                     : "text-[#A1A1AA] hover:text-white"
@@ -194,7 +194,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
               <button
                 type="button"
                 onClick={() => setMode("Cash")}
-                className={`py-2.5 rounded-md flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-standard ${
+                className={`py-2.5 rounded-md flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-all duration-150 ${
                   mode === "Cash"
                     ? "bg-[#262626] text-white shadow-sm"
                     : "text-[#A1A1AA] hover:text-white"
@@ -324,19 +324,19 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
             />
           </div>
 
-          {/* Submit Action Buttons */}
+          {/* Submit Action Buttons (Key Ingress Hover-to-White) */}
           <div className="flex items-center gap-2.5 pt-2.5 border-t border-[#262626]">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 py-2.5 rounded-lg bg-white text-black font-semibold text-xs sm:text-sm hover:bg-[#e0e0e0] transition-standard disabled:opacity-50"
+              className="btn-action-primary flex-1 py-2.5 rounded-lg text-xs sm:text-sm disabled:opacity-50"
             >
               {isSubmitting ? "Saving Transaction..." : "Save Transaction"}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-lg bg-[#161616] text-white border border-[#2a2a2a] text-xs sm:text-sm font-medium hover:bg-[#222222] transition-standard"
+              className="px-4 py-2.5 rounded-lg bg-[#161616] text-white border border-[#2a2a2a] text-xs sm:text-sm font-medium hover:bg-[#222222] transition-all duration-150"
             >
               Cancel
             </button>

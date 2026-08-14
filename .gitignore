@@ -43,3 +43,10 @@ __pycache__/
 .venv/
 venv/
 env/
+
+# Excel files
+*.xlsx
+*.xls
+*.xlsm
+*.csv
+

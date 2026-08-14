@@ -101,8 +101,8 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto animate-in fade-in duration-150">
-      <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl flex flex-col gap-5 my-auto max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto animate-backdrop">
+      <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl flex flex-col gap-5 my-auto max-h-[90vh] overflow-y-auto animate-modal">
         {/* Header */}
         <div className="flex items-center justify-between pb-3.5 border-b border-[#262626]">
           <div className="flex items-center gap-3">
@@ -124,7 +124,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="text-[#A1A1AA] hover:text-white p-1 rounded-md transition-standard"
+            className="text-[#A1A1AA] hover:text-white p-1 rounded-md transition-all duration-150"
           >
             <X className="w-5 h-5" />
           </button>
@@ -376,7 +376,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
               <button
                 type="button"
                 onClick={handleAddMilestone}
-                className="text-xs text-white hover:text-[#22C55E] flex items-center gap-1.5 transition-standard font-semibold"
+                className="btn-action-primary px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add Milestone</span>
@@ -423,7 +423,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                     <button
                       type="button"
                       onClick={() => handleRemoveMilestone(idx)}
-                      className="text-[#71717A] hover:text-rose-400 p-1.5 transition-standard"
+                      className="text-[#71717A] hover:text-rose-400 p-1.5 transition-all duration-150"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -437,19 +437,19 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
             )}
           </div>
 
-          {/* Actions */}
+          {/* Actions (Key Action: Save Property Details with Hover-to-White) */}
           <div className="flex items-center justify-end gap-2.5 pt-3.5 border-t border-[#262626] mt-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-lg bg-[#141414] text-white text-xs sm:text-sm font-medium border border-[#282828] hover:bg-[#202020] transition-standard"
+              className="px-4 py-2 rounded-lg bg-[#141414] text-white text-xs sm:text-sm font-medium border border-[#282828] hover:bg-[#202020] transition-all duration-150"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSaving}
-              className="px-5 py-2 rounded-lg bg-white text-black text-xs sm:text-sm font-semibold hover:bg-[#e0e0e0] flex items-center gap-1.5 transition-standard disabled:opacity-50"
+              className="btn-action-primary px-5 py-2 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 disabled:opacity-50"
             >
               <Save className="w-4 h-4" />
               <span>{isSaving ? "Saving Changes..." : "Save Property Details"}</span>

@@ -7,14 +7,7 @@ import { SeedProperty, SeedTransaction } from "@/lib/seedData";
 import {
   Home,
   Plus,
-  Calendar,
   MapPin,
-  CheckCircle2,
-  Clock,
-  Banknote,
-  Landmark,
-  PieChart,
-  ListOrdered,
   Pencil,
 } from "lucide-react";
 
@@ -61,7 +54,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
         <div className="flex items-center gap-1">
           <button
             onClick={() => setActiveSubTab("properties")}
-            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-standard ${
+            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all duration-150 ${
               activeSubTab === "properties"
                 ? "border-white text-white font-bold"
                 : "border-transparent text-[#A1A1AA] hover:text-white"
@@ -71,7 +64,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
           </button>
           <button
             onClick={() => setActiveSubTab("outflows")}
-            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-standard ${
+            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all duration-150 ${
               activeSubTab === "outflows"
                 ? "border-white text-white font-bold"
                 : "border-transparent text-[#A1A1AA] hover:text-white"
@@ -81,7 +74,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
           </button>
           <button
             onClick={() => setActiveSubTab("inflows")}
-            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-standard ${
+            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all duration-150 ${
               activeSubTab === "inflows"
                 ? "border-white text-white font-bold"
                 : "border-transparent text-[#A1A1AA] hover:text-white"
@@ -91,7 +84,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
           </button>
           <button
             onClick={() => setActiveSubTab("categories")}
-            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-standard ${
+            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all duration-150 ${
               activeSubTab === "categories"
                 ? "border-white text-white font-bold"
                 : "border-transparent text-[#A1A1AA] hover:text-white"
@@ -101,12 +94,13 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
           </button>
         </div>
 
+        {/* Key Ingress Action: Add Personal Property (Hover-to-White) */}
         <button
           onClick={onOpenNewPropertyModal}
-          className="px-4 py-2 rounded-lg bg-white text-black text-xs sm:text-sm font-semibold hover:bg-[#e0e0e0] transition-standard flex items-center gap-1.5 whitespace-nowrap"
+          className="btn-action-primary px-4 py-2 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 whitespace-nowrap"
         >
-          <Plus className="w-4 h-4" />
-          <span>+ Add Personal Property</span>
+          <Plus className="w-4 h-4 stroke-[2.5]" />
+          <span>Add Personal Property</span>
         </button>
       </div>
 
@@ -133,7 +127,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
               <div
                 key={p.id}
                 onClick={() => onSelectProperty(pData)}
-                className="bg-[#0a0a0a] border border-[#262626] rounded-xl p-4 sm:p-5 flex flex-col justify-between gap-4 cursor-pointer hover:border-[#444444] hover:bg-[#0e0e0e] transition-standard group shadow-md"
+                className="bg-[#0a0a0a] border border-[#262626] rounded-xl p-4 sm:p-5 flex flex-col justify-between gap-4 cursor-pointer hover:border-[#444444] hover:bg-[#0e0e0e] transition-all duration-150 group shadow-md"
               >
                 {/* Header */}
                 <div className="flex items-start justify-between gap-2.5">
@@ -167,7 +161,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                           e.stopPropagation();
                           onEditProperty(p);
                         }}
-                        className="p-1.5 rounded-md bg-[#161616] text-[#A1A1AA] hover:text-white hover:bg-[#252525] border border-[#2a2a2a] transition-standard"
+                        className="btn-action-primary p-2 rounded-lg"
                         title="Edit Property Data Points"
                       >
                         <Pencil className="w-3.5 h-3.5 text-[#22C55E]" />

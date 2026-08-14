@@ -48,8 +48,8 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto animate-in fade-in duration-150">
-      <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-5 sm:p-6 shadow-2xl my-auto flex flex-col gap-5">
+    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto animate-backdrop">
+      <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-5 sm:p-6 shadow-2xl my-auto flex flex-col gap-5 animate-modal">
         <div className="flex items-center justify-between border-b border-[#262626] pb-3.5">
           <div>
             <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
@@ -170,19 +170,19 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
             </div>
           </div>
 
-          {/* Action Buttons */}
+          {/* Action Buttons (Key Ingress Action with Hover-to-White) */}
           <div className="flex items-center gap-2.5 pt-2.5 border-t border-[#262626]">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 py-2.5 rounded-lg bg-white text-black font-semibold text-xs sm:text-sm hover:bg-[#e0e0e0] transition-standard disabled:opacity-50"
+              className="btn-action-primary flex-1 py-2.5 rounded-lg text-xs sm:text-sm disabled:opacity-50"
             >
               {isSubmitting ? "Registering..." : "Register Custom Category"}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-lg bg-[#161616] text-white border border-[#2a2a2a] text-xs sm:text-sm font-medium hover:bg-[#222222] transition-standard"
+              className="px-4 py-2.5 rounded-lg bg-[#161616] text-white border border-[#2a2a2a] text-xs sm:text-sm font-medium hover:bg-[#222222] transition-all duration-150"
             >
               Cancel
             </button>
