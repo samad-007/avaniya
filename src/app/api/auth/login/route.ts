@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { signSessionToken, COOKIE_NAME, hashPassword, verifyPassword } from "@/lib/auth";
-import { connectDB } from "@/lib/db";
+import { connectDB, getSanitizedMongoUri } from "@/lib/db";
 import { User } from "@/models/User";
 
 export async function POST(req: NextRequest) {
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     let datasetId = "";
 
     // If MongoDB is connected, authenticate against the User collection
-    if (process.env.MONGODB_URI) {
+    if (getSanitizedMongoUri()) {
       try {
         await connectDB();
         let dbUser = await User.findOne({ email: normalizedEmail });

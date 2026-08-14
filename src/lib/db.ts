@@ -20,13 +20,32 @@ if (!cached) {
 }
 
 /**
+ * Sanitize and clean MongoDB connection string
+ * (removes accidental quotes, leading/trailing whitespace, etc.)
+ */
+export function getSanitizedMongoUri(): string | undefined {
+  let uri = process.env.MONGODB_URI?.trim();
+  if (!uri) return undefined;
+
+  // Strip leading/trailing single or double quotes
+  uri = uri.replace(/^["']+|["']+$/g, "").trim();
+
+  // If someone accidentally pasted "MONGODB_URI=..." into the value field
+  if (uri.startsWith("MONGODB_URI=")) {
+    uri = uri.replace(/^MONGODB_URI=/, "").trim();
+    uri = uri.replace(/^["']+|["']+$/g, "").trim();
+  }
+
+  return uri || undefined;
+}
+
+/**
  * Connect to MongoDB Atlas with pooled serverless connection.
  */
 export async function connectDB(): Promise<typeof mongoose> {
-  const MONGODB_URI = process.env.MONGODB_URI;
+  const MONGODB_URI = getSanitizedMongoUri();
 
   if (!MONGODB_URI) {
-    // In development or demo mode when MONGODB_URI is not set, allow memory/fallback mock
     console.warn("MONGODB_URI is not defined in environment variables.");
   }
 
@@ -38,7 +57,7 @@ export async function connectDB(): Promise<typeof mongoose> {
     const opts = {
       bufferCommands: false,
       maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 8000,
       socketTimeoutMS: 45000,
     };
 

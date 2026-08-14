@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { hashPassword, signSessionToken, COOKIE_NAME } from "@/lib/auth";
-import { connectDB } from "@/lib/db";
+import { connectDB, getSanitizedMongoUri } from "@/lib/db";
 import { User } from "@/models/User";
 
 export async function POST(req: NextRequest) {
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     let datasetId = `ds_${normalizedEmail.replace(/[^a-zA-Z0-9]/g, "_")}`;
 
     // If MongoDB is connected, register the user in the User collection
-    if (process.env.MONGODB_URI) {
+    if (getSanitizedMongoUri()) {
       try {
         await connectDB();
         const existing = await User.findOne({ email: normalizedEmail });

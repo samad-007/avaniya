@@ -1,4 +1,4 @@
-import { connectDB } from "./db";
+import { connectDB, getSanitizedMongoUri } from "./db";
 import { Property, IProperty } from "../models/Property";
 import { Transaction, ITransaction } from "../models/Transaction";
 import { Category, ICategory } from "../models/Category";
@@ -35,7 +35,8 @@ let memAccountBalances = [...INITIAL_ACCOUNT_BALANCES];
  * Check if MongoDB connection is active
  */
 async function isDBConnected(): Promise<boolean> {
-  if (!process.env.MONGODB_URI) return false;
+  const uri = getSanitizedMongoUri();
+  if (!uri) return false;
   try {
     const conn = await connectDB();
     return !!conn && conn.connection.readyState === 1;
