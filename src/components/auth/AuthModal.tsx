@@ -72,9 +72,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   const handleDemoLogin = () => {
     onSuccess({
-      name: "Samad (Admin)",
-      email: "samad@avaniya.com",
-      role: "admin",
+      name: "Guest Demo User",
+      email: "guest@avaniya.preview",
+      role: "viewer",
+      datasetId: "ds_demo_sandbox",
     });
     if (onClose) onClose();
   };
@@ -243,11 +244,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             className="btn-action-primary w-full py-2.5 rounded-lg text-xs sm:text-sm flex items-center justify-center gap-2"
           >
             <ShieldCheck className="w-4 h-4 text-[#22C55E]" />
-            <span>Instant Demo Access (Skip for Preview)</span>
+            <span>Explore Sandbox Demo (Synthetic Filler Data)</span>
           </button>
 
           <div className="text-xs text-[#A1A1AA] text-center leading-relaxed font-medium">
-            Data is strictly isolated per account and encrypted in transit &amp; rest.
+            Demo access opens a sandbox loaded with random filler data and zero account privileges.
           </div>
         </div>
       </div>

@@ -9,6 +9,8 @@ import {
   INITIAL_TRANSACTIONS,
   INITIAL_CATEGORIES,
   INITIAL_ACCOUNT_BALANCES,
+  DEMO_FILLER_PROPERTIES,
+  DEMO_FILLER_TRANSACTIONS,
   SeedProperty,
   SeedTransaction,
   SeedCategory,
@@ -54,6 +56,12 @@ export async function getProperties(
   scope?: "commercial" | "personal",
   isSuperAdminAll: boolean = false
 ): Promise<SeedProperty[]> {
+  // Demo Sandbox Guest Mode: Always return synthetic mock filler properties
+  if (datasetId === "ds_demo_sandbox") {
+    return scope
+      ? DEMO_FILLER_PROPERTIES.filter((p) => p.type === scope)
+      : DEMO_FILLER_PROPERTIES;
+  }
   const dbOk = await isDBConnected();
   if (dbOk) {
     const query: Record<string, unknown> = {};
@@ -215,6 +223,19 @@ export async function getTransactions(
   filter?: { scope?: string; propertyCode?: string; type?: string },
   isSuperAdminAll: boolean = false
 ): Promise<SeedTransaction[]> {
+  // Demo Sandbox Guest Mode: Always return synthetic mock filler transactions
+  if (datasetId === "ds_demo_sandbox") {
+    let demoList = [...DEMO_FILLER_TRANSACTIONS];
+    if (filter?.scope) demoList = demoList.filter((t) => t.scope === filter.scope);
+    if (filter?.propertyCode)
+      demoList = demoList.filter((t) => t.propertyCode === filter.propertyCode);
+    if (filter?.type)
+      demoList = demoList.filter((t) => t.transactionType === filter.type);
+    return demoList.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+  }
+
   const dbOk = await isDBConnected();
   if (dbOk) {
     const query: Record<string, unknown> = {};

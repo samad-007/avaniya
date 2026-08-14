@@ -64,9 +64,15 @@ export const Header: React.FC<HeaderProps> = ({
           <div>
             <div className="text-sm md:text-base font-bold text-white tracking-tight flex items-center gap-2">
               <span>Avaniya</span>
-              <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-[#161616] text-[#A1A1AA] border border-[#262626]">
-                Portfolio
-              </span>
+              {currentDatasetId === "ds_demo_sandbox" ? (
+                <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-amber-950/50 text-amber-400 border border-amber-800/40">
+                  SANDBOX DEMO
+                </span>
+              ) : (
+                <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-[#161616] text-[#A1A1AA] border border-[#262626]">
+                  Portfolio
+                </span>
+              )}
             </div>
             <div className="text-xs text-[#A1A1AA] font-medium">
               Indian Real Estate Liquidity &amp; Deal Tracking Engine
