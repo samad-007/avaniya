@@ -62,8 +62,8 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
         </div>
 
         {/* Total Combined Liquidity */}
-        <div className="bg-[#0e0e0e] border border-[#383838] rounded-lg p-3.5 flex flex-col justify-between shadow-sm">
-          <div className="flex items-center justify-between text-[#E4E4E7] text-xs font-bold uppercase tracking-wider mb-1.5">
+        <div className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-3.5 flex flex-col justify-between hover:border-[#383838] transition-standard shadow-sm">
+          <div className="flex items-center justify-between text-[#A1A1AA] text-xs font-semibold uppercase tracking-wider mb-1.5">
             <span>Total Liquidity</span>
             <Wallet className="w-4 h-4 text-white" />
           </div>

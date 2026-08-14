@@ -4,6 +4,7 @@ import React from "react";
 import { formatINR, formatDateIN } from "@/lib/formatters";
 import { PropertyFinancialMetrics } from "@/lib/formulaEngine";
 import { SeedProperty, SeedTransaction } from "@/lib/seedData";
+import { useAnimatedModal } from "@/hooks/useAnimatedModal";
 import {
   X,
   Calendar,
@@ -44,7 +45,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
   onOpenEntryModal,
   onEditProperty,
 }) => {
-  if (!isOpen) return null;
+  const { shouldRender, isClosing, handleClose } = useAnimatedModal(isOpen, onClose);
 
   const isCommercial = !!propertyMetrics;
   const prop = isCommercial
@@ -54,7 +55,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
     ? propertyMetrics?.transactions || []
     : personalPropertyData?.transactions || [];
 
-  if (!prop) return null;
+  if (!shouldRender || !prop) return null;
 
   const isExpensesHigherThanBuy =
     isCommercial &&
@@ -62,8 +63,18 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
     propertyMetrics.propertyExpenses > prop.agreedPurchasePrice;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 md:p-6 overflow-y-auto animate-backdrop">
-      <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto animate-modal">
+    <div
+      onClick={handleClose}
+      className={`fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 md:p-6 overflow-y-auto ${
+        isClosing ? "animate-backdrop-exit" : "animate-backdrop"
+      }`}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className={`bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto ${
+          isClosing ? "animate-modal-exit" : "animate-modal"
+        }`}
+      >
         {/* Modal Header */}
         <div className="p-4 md:p-5 border-b border-[#262626] flex items-start justify-between bg-[#0e0e0e] gap-3">
           <div className="flex items-start gap-3.5">
@@ -129,7 +140,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
             )}
 
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="p-2 rounded-lg text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] transition-all duration-150"
             >
               <X className="w-5 h-5" />
@@ -461,7 +472,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
           )}
 
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="px-4 py-2 rounded-lg bg-[#1a1a1a] text-white text-xs sm:text-sm font-semibold hover:bg-[#252525] border border-[#383838] transition-all duration-150"
           >
             Close Ledger

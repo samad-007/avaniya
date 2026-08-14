@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { Lock, Mail, User as UserIcon, ArrowRight, ShieldCheck, Eye, EyeOff } from "lucide-react";
+import { useAnimatedModal } from "@/hooks/useAnimatedModal";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -17,6 +18,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onSuccess,
   allowClose = false,
 }) => {
+  const { shouldRender, isClosing, handleClose } = useAnimatedModal(isOpen, onClose || (() => {}));
+
   const [tab, setTab] = useState<"login" | "signup">("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -25,7 +28,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  if (!isOpen) return null;
+  if (!shouldRender) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +56,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       }
 
       onSuccess(data.data);
-      if (onClose) onClose();
+      if (onClose) handleClose();
     } catch (err: any) {
       setErrorMsg(err.message || "An unexpected error occurred");
     } finally {
@@ -67,12 +70,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       email: "samad@avaniya.com",
       role: "admin",
     });
-    if (onClose) onClose();
+    if (onClose) handleClose();
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-backdrop">
-      <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-md w-full p-6 sm:p-8 shadow-2xl flex flex-col gap-5 my-auto animate-modal">
+    <div
+      onClick={allowClose ? handleClose : undefined}
+      className={`fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto ${
+        isClosing ? "animate-backdrop-exit" : "animate-backdrop"
+      }`}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className={`bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-md w-full p-6 sm:p-8 shadow-2xl flex flex-col gap-5 my-auto ${
+          isClosing ? "animate-modal-exit" : "animate-modal"
+        }`}
+      >
         {/* Brand Header with Logo */}
         <div className="flex flex-col items-center text-center gap-2.5">
           <div className="relative w-16 h-16 rounded-xl overflow-hidden border border-[#383838] bg-[#0c120e] p-0.5 shadow-md">

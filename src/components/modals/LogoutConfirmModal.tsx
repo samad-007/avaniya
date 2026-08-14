@@ -2,6 +2,7 @@
 
 import React from "react";
 import { LogOut, X } from "lucide-react";
+import { useAnimatedModal } from "@/hooks/useAnimatedModal";
 
 interface LogoutConfirmModalProps {
   isOpen: boolean;
@@ -16,18 +17,30 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
   onConfirm,
   userName,
 }) => {
-  if (!isOpen) return null;
+  const { shouldRender, isClosing, handleClose } = useAnimatedModal(isOpen, onClose);
+
+  if (!shouldRender) return null;
 
   return (
-    <div className="fixed inset-0 z-60 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 animate-backdrop">
-      <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-sm w-full p-5 sm:p-6 shadow-2xl flex flex-col gap-4 my-auto animate-modal">
+    <div
+      onClick={handleClose}
+      className={`fixed inset-0 z-60 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 ${
+        isClosing ? "animate-backdrop-exit" : "animate-backdrop"
+      }`}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className={`bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-sm w-full p-5 sm:p-6 shadow-2xl flex flex-col gap-4 my-auto ${
+          isClosing ? "animate-modal-exit" : "animate-modal"
+        }`}
+      >
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="w-10 h-10 rounded-lg bg-rose-950/40 border border-rose-800/40 text-rose-400 flex items-center justify-center flex-shrink-0">
             <LogOut className="w-5 h-5" />
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="text-[#A1A1AA] hover:text-white p-1 transition-all duration-150"
           >
             <X className="w-5 h-5" />
@@ -55,7 +68,7 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
         <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#262626]">
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             className="px-4 py-2 rounded-lg bg-[#161616] text-white text-xs sm:text-sm font-medium border border-[#2a2a2a] hover:bg-[#222222] transition-all duration-150"
           >
             Stay Signed In

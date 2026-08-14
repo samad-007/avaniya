@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { SeedCategory, FinancialRole } from "@/lib/seedData";
+import { useAnimatedModal } from "@/hooks/useAnimatedModal";
 import { X, ShieldCheck } from "lucide-react";
 
 interface CategoryModalProps {
@@ -17,6 +18,8 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
   categories,
   onAddCategory,
 }) => {
+  const { shouldRender, isClosing, handleClose } = useAnimatedModal(isOpen, onClose);
+
   const [name, setName] = useState("");
   const [scope, setScope] = useState<"commercial" | "personal" | "both">("both");
   const [type, setType] = useState<"outflow" | "inflow" | "transfer">("outflow");
@@ -24,7 +27,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
     useState<FinancialRole>("property_expense");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (!isOpen) return null;
+  if (!shouldRender) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +42,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
         financialRole,
       });
       setName("");
-      onClose();
+      handleClose();
     } catch (err) {
       console.error(err);
     } finally {
@@ -48,8 +51,18 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto animate-backdrop">
-      <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-5 sm:p-6 shadow-2xl my-auto flex flex-col gap-5 animate-modal">
+    <div
+      onClick={handleClose}
+      className={`fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto ${
+        isClosing ? "animate-backdrop-exit" : "animate-backdrop"
+      }`}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className={`bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-5 sm:p-6 shadow-2xl my-auto flex flex-col gap-5 ${
+          isClosing ? "animate-modal-exit" : "animate-modal"
+        }`}
+      >
         <div className="flex items-center justify-between border-b border-[#262626] pb-3.5">
           <div>
             <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
@@ -60,7 +73,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
             </div>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="p-1 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a]"
           >
             <X className="w-5 h-5" />
@@ -181,7 +194,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
             </button>
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="px-4 py-2.5 rounded-lg bg-[#161616] text-white border border-[#2a2a2a] text-xs sm:text-sm font-medium hover:bg-[#222222] transition-all duration-150"
             >
               Cancel

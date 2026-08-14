@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { X, Building2, IndianRupee, Save, Trash2, Plus, Calendar, MapPin, Tag } from "lucide-react";
 import { SeedProperty } from "@/lib/seedData";
 import { formatINRCompact } from "@/lib/formatters";
+import { useAnimatedModal } from "@/hooks/useAnimatedModal";
 
 interface EditPropertyModalProps {
   isOpen: boolean;
@@ -18,6 +19,8 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
   property,
   onSave,
 }) => {
+  const { shouldRender, isClosing, handleClose } = useAnimatedModal(isOpen, onClose);
+
   const [formData, setFormData] = useState<Partial<SeedProperty>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -43,7 +46,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
     }
   }, [property]);
 
-  if (!isOpen || !property) return null;
+  if (!shouldRender || !property) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +59,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
 
     try {
       await onSave(property.propertyCode, formData);
-      onClose();
+      handleClose();
     } catch (err: any) {
       setErrorMsg(err.message || "Failed to update property");
     } finally {
@@ -101,8 +104,18 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto animate-backdrop">
-      <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl flex flex-col gap-5 my-auto max-h-[90vh] overflow-y-auto animate-modal">
+    <div
+      onClick={handleClose}
+      className={`fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto ${
+        isClosing ? "animate-backdrop-exit" : "animate-backdrop"
+      }`}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className={`bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl flex flex-col gap-5 my-auto max-h-[90vh] overflow-y-auto ${
+          isClosing ? "animate-modal-exit" : "animate-modal"
+        }`}
+      >
         {/* Header */}
         <div className="flex items-center justify-between pb-3.5 border-b border-[#262626]">
           <div className="flex items-center gap-3">
@@ -123,7 +136,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
           </div>
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             className="text-[#A1A1AA] hover:text-white p-1 rounded-md transition-all duration-150"
           >
             <X className="w-5 h-5" />
@@ -441,7 +454,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
           <div className="flex items-center justify-end gap-2.5 pt-3.5 border-t border-[#262626] mt-2">
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="px-4 py-2 rounded-lg bg-[#141414] text-white text-xs sm:text-sm font-medium border border-[#282828] hover:bg-[#202020] transition-all duration-150"
             >
               Cancel

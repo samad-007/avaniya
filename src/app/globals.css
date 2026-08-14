@@ -72,7 +72,7 @@ body {
   transform: scale(0.98);
 }
 
-/* Keyframe animations for window popups & modal panels */
+/* Keyframe animations for window popups & modal panels (Entrance & Exit) */
 @keyframes modalEntrance {
   0% {
     opacity: 0;
@@ -81,6 +81,17 @@ body {
   100% {
     opacity: 1;
     transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes modalExit {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.96) translateY(6px);
   }
 }
 
@@ -93,10 +104,27 @@ body {
   }
 }
 
+@keyframes backdropExit {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 .animate-modal {
   animation: modalEntrance 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+.animate-modal-exit {
+  animation: modalExit 150ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 .animate-backdrop {
   animation: backdropEntrance 180ms ease-out forwards;
+}
+
+.animate-backdrop-exit {
+  animation: backdropExit 150ms ease-in forwards;
 }
