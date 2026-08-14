@@ -87,9 +87,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           entryType === "transfer"
             ? "transfer"
             : entryType === "inflow"
-            ? currentScope === "commercial"
-              ? "capital_inflow"
-              : "capital_inflow"
+            ? "capital_inflow"
             : "outflow",
         propertyCode: propertyCode || undefined,
         category: category || (entryType === "transfer" ? "Internal Transfer" : "General"),
@@ -109,11 +107,11 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 md:p-6 overflow-y-auto animate-in fade-in duration-150">
-      <div className="bg-[#0a0a0a] border border-[#222222] rounded-lg max-w-lg w-full max-h-[92vh] overflow-y-auto p-5 shadow-2xl my-auto flex flex-col gap-4">
+    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto animate-in fade-in duration-150">
+      <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-5 sm:p-6 shadow-2xl my-auto flex flex-col gap-5">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#222222] pb-3">
-          <div className="text-sm md:text-base font-bold text-white tracking-tight flex items-center gap-2">
+        <div className="flex items-center justify-between border-b border-[#262626] pb-3.5">
+          <div className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
             <span>
               {entryType === "outflow"
                 ? "Record Outflow / Expense"
@@ -121,22 +119,22 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                 ? "Record Inflow / Receipt"
                 : "Internal Liquidity Transfer"}
             </span>
-            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#161616] text-[#888888] border border-[#222222]">
+            <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-[#161616] text-[#A1A1AA] border border-[#262626]">
               {currentScope.toUpperCase()}
             </span>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded text-[#888888] hover:text-white hover:bg-[#1a1a1a]"
+            className="p-1 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] transition-standard"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-xs">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-sm">
           {/* Big Amount Input with Live Indian Verbal Conversion */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[11px] font-medium text-[#888888] uppercase tracking-wider">
+            <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
               Amount (₹ INR)
             </label>
             <input
@@ -144,16 +142,16 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
               value={amount || ""}
               onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
               placeholder="0"
-              className="w-full bg-[#111111] border border-[#222222] rounded p-3 text-xl md:text-2xl font-mono font-bold text-white outline-none focus:border-[#555555] transition-standard"
+              className="w-full bg-[#111111] border border-[#262626] rounded-lg p-3 text-2xl font-mono font-bold text-white outline-none focus:border-[#555555] transition-standard"
               required
             />
             {/* Verbal Converter Display */}
-            <div className="bg-[#111111] border border-dashed border-[#333333] rounded px-3 py-1.5 text-xs font-mono text-[#F59E0B]">
+            <div className="bg-[#111111] border border-dashed border-[#383838] rounded-md px-3.5 py-2 text-xs font-mono font-semibold text-[#F59E0B]">
               {amountToVerbalSummary(amount)}
             </div>
 
             {/* Quick Amount Increment Preset Chips */}
-            <div className="flex flex-wrap gap-1.5 mt-1">
+            <div className="flex flex-wrap gap-2 mt-1">
               {[
                 { label: "+10k", val: 10000 },
                 { label: "+50k", val: 50000 },
@@ -167,7 +165,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   type="button"
                   key={idx}
                   onClick={() => handleAddPreset(chip.val)}
-                  className="px-2 py-1 rounded bg-[#141414] border border-[#222222] text-[11px] font-mono text-[#888888] hover:text-white hover:bg-[#222222] hover:border-[#383838] transition-standard"
+                  className="px-2.5 py-1.5 rounded-md bg-[#141414] border border-[#262626] text-xs font-mono font-medium text-[#D4D4D8] hover:text-white hover:bg-[#222222] hover:border-[#444444] transition-standard"
                 >
                   {chip.label}
                 </button>
@@ -177,32 +175,32 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
 
           {/* Payment Mode (Bank vs Cash) */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[11px] font-medium text-[#888888] uppercase tracking-wider">
+            <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
               Payment Mode
             </label>
-            <div className="grid grid-cols-2 gap-2 bg-[#111111] p-1 rounded border border-[#222222]">
+            <div className="grid grid-cols-2 gap-2 bg-[#111111] p-1 rounded-lg border border-[#262626]">
               <button
                 type="button"
                 onClick={() => setMode("Bank")}
-                className={`py-2 rounded flex items-center justify-center gap-2 font-semibold text-xs transition-standard ${
+                className={`py-2.5 rounded-md flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-standard ${
                   mode === "Bank"
-                    ? "bg-[#222222] text-white shadow-sm"
-                    : "text-[#777777] hover:text-white"
+                    ? "bg-[#262626] text-white shadow-sm"
+                    : "text-[#A1A1AA] hover:text-white"
                 }`}
               >
-                <Landmark className="w-3.5 h-3.5" />
-                <span>Bank (NEFT / RTGS / Cheque)</span>
+                <Landmark className="w-4 h-4 text-[#3B82F6]" />
+                <span>Bank (NEFT / RTGS)</span>
               </button>
               <button
                 type="button"
                 onClick={() => setMode("Cash")}
-                className={`py-2 rounded flex items-center justify-center gap-2 font-semibold text-xs transition-standard ${
+                className={`py-2.5 rounded-md flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-standard ${
                   mode === "Cash"
-                    ? "bg-[#222222] text-white shadow-sm"
-                    : "text-[#777777] hover:text-white"
+                    ? "bg-[#262626] text-white shadow-sm"
+                    : "text-[#A1A1AA] hover:text-white"
                 }`}
               >
-                <Banknote className="w-3.5 h-3.5" />
+                <Banknote className="w-4 h-4 text-[#22C55E]" />
                 <span>Cash in Hand</span>
               </button>
             </div>
@@ -211,13 +209,13 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           {/* Transfer Type (Only if transfer mode) */}
           {entryType === "transfer" && (
             <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-medium text-[#888888] uppercase tracking-wider">
+              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Transfer Direction
               </label>
               <select
                 value={transferType}
                 onChange={(e) => setTransferType(e.target.value)}
-                className="w-full bg-[#111111] border border-[#222222] rounded p-2.5 text-white outline-none focus:border-[#555555]"
+                className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
               >
                 <option value="Bank Withdrawal to Cash">
                   Bank Withdrawal to Cash (Withdraw from Bank into Cash Hand)
@@ -232,13 +230,13 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           {/* Link to Property */}
           {entryType !== "transfer" && (
             <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-medium text-[#888888] uppercase tracking-wider">
+              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Link to Property / Land Deal
               </label>
               <select
                 value={propertyCode}
                 onChange={(e) => setPropertyCode(e.target.value)}
-                className="w-full bg-[#111111] border border-[#222222] rounded p-2.5 text-white outline-none focus:border-[#555555]"
+                className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
               >
                 <option value="">-- General / Unlinked --</option>
                 {properties
@@ -258,22 +256,22 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           {entryType !== "transfer" && (
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-[11px] font-medium text-[#888888] uppercase tracking-wider">
+                <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                   Category
                 </label>
                 <button
                   type="button"
                   onClick={onOpenCategoryModal}
-                  className="text-[10px] text-[#3B82F6] hover:underline flex items-center gap-1"
+                  className="text-xs text-[#3B82F6] hover:underline flex items-center gap-1 font-semibold"
                 >
-                  <Plus className="w-2.5 h-2.5" />
+                  <Plus className="w-3 h-3" />
                   <span>+ Custom Category</span>
                 </button>
               </div>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full bg-[#111111] border border-[#222222] rounded p-2.5 text-white outline-none focus:border-[#555555]"
+                className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
               >
                 {availableCategories.map((c, idx) => (
                   <option key={idx} value={c.name}>
@@ -285,21 +283,21 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           )}
 
           {/* Date & Recipient Grid */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3.5">
             <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-medium text-[#888888] uppercase tracking-wider">
+              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Date
               </label>
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full bg-[#111111] border border-[#222222] rounded p-2.5 text-white outline-none focus:border-[#555555]"
+                className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
                 required
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-medium text-[#888888] uppercase tracking-wider">
+              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Paid To / Received From
               </label>
               <input
@@ -307,14 +305,14 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                 value={recipient}
                 onChange={(e) => setRecipient(e.target.value)}
                 placeholder="Seller, Stalin, Palani..."
-                className="w-full bg-[#111111] border border-[#222222] rounded p-2.5 text-white outline-none focus:border-[#555555]"
+                className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
               />
             </div>
           </div>
 
           {/* Remarks */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[11px] font-medium text-[#888888] uppercase tracking-wider">
+            <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
               Remarks / Transaction Notes
             </label>
             <input
@@ -322,23 +320,23 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
               placeholder="e.g. Token advance paid at lawyer office"
-              className="w-full bg-[#111111] border border-[#222222] rounded p-2.5 text-white outline-none focus:border-[#555555]"
+              className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
             />
           </div>
 
           {/* Submit Action Buttons */}
-          <div className="flex items-center gap-2 pt-2 border-t border-[#222222]">
+          <div className="flex items-center gap-2.5 pt-2.5 border-t border-[#262626]">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 py-2.5 rounded bg-white text-black font-semibold text-xs hover:bg-[#e0e0e0] transition-standard disabled:opacity-50"
+              className="flex-1 py-2.5 rounded-lg bg-white text-black font-semibold text-xs sm:text-sm hover:bg-[#e0e0e0] transition-standard disabled:opacity-50"
             >
               {isSubmitting ? "Saving Transaction..." : "Save Transaction"}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded bg-[#161616] text-white border border-[#2a2a2a] text-xs font-medium hover:bg-[#222222] transition-standard"
+              className="px-4 py-2.5 rounded-lg bg-[#161616] text-white border border-[#2a2a2a] text-xs sm:text-sm font-medium hover:bg-[#222222] transition-standard"
             >
               Cancel
             </button>

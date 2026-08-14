@@ -101,7 +101,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
       await onSave({
         type,
         name,
-        propertyCode: propertyCode.trim() || undefined as any,
+        propertyCode: propertyCode.trim() || (undefined as any),
         location,
         acquisitionDate,
         sqftArea: sqftArea ? Number(sqftArea) : undefined,
@@ -122,54 +122,54 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 md:p-6 overflow-y-auto animate-in fade-in duration-150">
-      <div className="bg-[#0a0a0a] border border-[#222222] rounded-lg max-w-lg w-full max-h-[92vh] overflow-y-auto p-5 shadow-2xl my-auto flex flex-col gap-4">
+    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto animate-in fade-in duration-150">
+      <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-5 sm:p-6 shadow-2xl my-auto flex flex-col gap-5">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#222222] pb-3">
-          <h2 className="text-base font-bold text-white tracking-tight">
+        <div className="flex items-center justify-between border-b border-[#262626] pb-3.5">
+          <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
             + Add New Real Estate Property / Deal
           </h2>
           <button
             onClick={onClose}
-            className="p-1 rounded text-[#888888] hover:text-white hover:bg-[#1a1a1a]"
+            className="p-1 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] transition-standard"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-xs">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-sm">
           {/* Scope Type Toggle */}
-          <div className="grid grid-cols-2 gap-2 bg-[#111111] p-1 rounded border border-[#222222]">
+          <div className="grid grid-cols-2 gap-2 bg-[#111111] p-1 rounded-lg border border-[#262626]">
             <button
               type="button"
               onClick={() => setType("commercial")}
-              className={`py-2 rounded flex items-center justify-center gap-2 font-semibold text-xs transition-standard ${
+              className={`py-2.5 rounded-md flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-standard ${
                 type === "commercial"
-                  ? "bg-[#222222] text-white"
-                  : "text-[#777777] hover:text-white"
+                  ? "bg-[#262626] text-white shadow-sm"
+                  : "text-[#A1A1AA] hover:text-white"
               }`}
             >
-              <Building2 className="w-3.5 h-3.5" />
+              <Building2 className="w-4 h-4" />
               <span>Commercial Land Deal</span>
             </button>
             <button
               type="button"
               onClick={() => setType("personal")}
-              className={`py-2 rounded flex items-center justify-center gap-2 font-semibold text-xs transition-standard ${
+              className={`py-2.5 rounded-md flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-standard ${
                 type === "personal"
-                  ? "bg-[#222222] text-white"
-                  : "text-[#777777] hover:text-white"
+                  ? "bg-[#262626] text-white shadow-sm"
+                  : "text-[#A1A1AA] hover:text-white"
               }`}
             >
-              <Home className="w-3.5 h-3.5" />
+              <Home className="w-4 h-4" />
               <span>Personal Property Asset</span>
             </button>
           </div>
 
           {/* Property Name & Custom Code */}
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-3.5">
             <div className="col-span-2 flex flex-col gap-1.5">
-              <label className="text-[11px] font-medium text-[#888888] uppercase tracking-wider">
+              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Property / Site Name
               </label>
               <input
@@ -177,12 +177,12 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Andal Avenue, Prestige 3BHK"
-                className="w-full bg-[#111111] border border-[#222222] rounded p-2.5 text-white outline-none focus:border-[#555555]"
+                className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
                 required
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-medium text-[#888888] uppercase tracking-wider">
+              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Custom Code
               </label>
               <input
@@ -190,15 +190,15 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                 value={propertyCode}
                 onChange={(e) => setPropertyCode(e.target.value)}
                 placeholder={type === "commercial" ? "LND-006" : "APT-002"}
-                className="w-full bg-[#111111] border border-[#222222] rounded p-2.5 text-white font-mono outline-none focus:border-[#555555]"
+                className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white font-mono text-sm outline-none focus:border-[#555555]"
               />
             </div>
           </div>
 
           {/* Location & Acquisition Date */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3.5">
             <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-medium text-[#888888] uppercase tracking-wider">
+              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Location
               </label>
               <input
@@ -206,31 +206,31 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="e.g. OMR Chennai, Kalaimal Nagar"
-                className="w-full bg-[#111111] border border-[#222222] rounded p-2.5 text-white outline-none focus:border-[#555555]"
+                className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-medium text-[#888888] uppercase tracking-wider">
+              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Acquisition Date
               </label>
               <input
                 type="date"
                 value={acquisitionDate}
                 onChange={(e) => setAcquisitionDate(e.target.value)}
-                className="w-full bg-[#111111] border border-[#222222] rounded p-2.5 text-white outline-none focus:border-[#555555]"
+                className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
               />
             </div>
           </div>
 
           {/* Sq.ft and Rate Calculator */}
-          <div className="bg-[#050505] border border-[#222222] rounded p-3 flex flex-col gap-2">
-            <div className="flex items-center gap-1 text-[11px] text-[#F59E0B] font-medium">
-              <Calculator className="w-3.5 h-3.5" />
+          <div className="bg-[#050505] border border-[#262626] rounded-lg p-3.5 flex flex-col gap-2.5">
+            <div className="flex items-center gap-1.5 text-xs text-[#F59E0B] font-semibold">
+              <Calculator className="w-4 h-4" />
               <span>Square Feet Land Rate Calculator (Optional)</span>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-[10px] text-[#777777] uppercase">
+                <label className="text-xs text-[#A1A1AA] uppercase font-medium">
                   Area (sq.ft)
                 </label>
                 <input
@@ -243,11 +243,11 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                     )
                   }
                   placeholder="e.g. 1122"
-                  className="w-full bg-[#111111] border border-[#222222] rounded p-2 text-white font-mono text-xs"
+                  className="w-full bg-[#111111] border border-[#262626] rounded-md p-2 text-white font-mono text-sm mt-1"
                 />
               </div>
               <div>
-                <label className="text-[10px] text-[#777777] uppercase">
+                <label className="text-xs text-[#A1A1AA] uppercase font-medium">
                   Rate per sq.ft (₹)
                 </label>
                 <input
@@ -260,7 +260,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                     )
                   }
                   placeholder="e.g. 9100"
-                  className="w-full bg-[#111111] border border-[#222222] rounded p-2 text-white font-mono text-xs"
+                  className="w-full bg-[#111111] border border-[#262626] rounded-md p-2 text-white font-mono text-sm mt-1"
                 />
               </div>
             </div>
@@ -268,7 +268,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
 
           {/* Agreed Purchase Price */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[11px] font-medium text-[#888888] uppercase tracking-wider">
+            <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
               Agreed Purchase Price (₹ INR)
             </label>
             <input
@@ -278,19 +278,19 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                 setAgreedPurchasePrice(parseFloat(e.target.value) || 0)
               }
               placeholder="0"
-              className="w-full bg-[#111111] border border-[#222222] rounded p-2.5 text-lg font-mono font-bold text-white outline-none focus:border-[#555555]"
+              className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-xl font-mono font-bold text-white outline-none focus:border-[#555555]"
               required
             />
-            <div className="text-[11px] font-mono text-[#F59E0B]">
+            <div className="text-xs font-mono text-[#F59E0B] font-medium">
               {amountToVerbalSummary(agreedPurchasePrice)}
             </div>
           </div>
 
           {/* Commercial Target Sale & Selling Price */}
           {type === "commercial" && (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3.5">
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-medium text-[#888888] uppercase tracking-wider">
+                <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                   Target Sale Price (₹)
                 </label>
                 <input
@@ -300,11 +300,11 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                     setTargetSalePrice(parseFloat(e.target.value) || 0)
                   }
                   placeholder="e.g. 13464000"
-                  className="w-full bg-[#111111] border border-[#222222] rounded p-2.5 text-white font-mono outline-none focus:border-[#555555]"
+                  className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white font-mono text-sm outline-none focus:border-[#555555]"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-medium text-[#888888] uppercase tracking-wider">
+                <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                   Agreed Selling Price (₹)
                 </label>
                 <input
@@ -314,7 +314,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                     setAgreedSellingPrice(parseFloat(e.target.value) || 0)
                   }
                   placeholder="e.g. 12150000"
-                  className="w-full bg-[#111111] border border-[#222222] rounded p-2.5 text-white font-mono outline-none focus:border-[#555555]"
+                  className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white font-mono text-sm outline-none focus:border-[#555555]"
                 />
               </div>
             </div>
@@ -322,49 +322,49 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
 
           {/* Status */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[11px] font-medium text-[#888888] uppercase tracking-wider">
+            <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
               Deal / Acquisition Status
             </label>
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value as any)}
-              className="w-full bg-[#111111] border border-[#222222] rounded p-2.5 text-white outline-none focus:border-[#555555]"
+              className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
             >
-              <option value="open">Open / Under Token Advance</option>
+              <option value="open">Open (Token / Advance Paid)</option>
               <option value="in_progress">In Progress (Partially Paid)</option>
               <option value="registered">Registered / Sale Deed Transferred</option>
-              <option value="sold">Sold (Buyer Inflows Pending/Settled)</option>
+              <option value="sold">Sold (Buyer Receivables Collecting/Settled)</option>
               <option value="closed">Closed Deal</option>
             </select>
           </div>
 
           {/* Notes */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[11px] font-medium text-[#888888] uppercase tracking-wider">
-              Notes & Deal Details
+            <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
+              Notes &amp; Deal Details
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="e.g. 1122 sq.ft @ ₹9,100/sqft buy price..."
               rows={2}
-              className="w-full bg-[#111111] border border-[#222222] rounded p-2.5 text-white outline-none focus:border-[#555555] resize-none"
+              className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555] resize-none"
             />
           </div>
 
           {/* Buttons */}
-          <div className="flex items-center gap-2 pt-2 border-t border-[#222222]">
+          <div className="flex items-center gap-2.5 pt-2.5 border-t border-[#262626]">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 py-2.5 rounded bg-white text-black font-semibold text-xs hover:bg-[#e0e0e0] transition-standard disabled:opacity-50"
+              className="flex-1 py-2.5 rounded-lg bg-white text-black font-semibold text-xs sm:text-sm hover:bg-[#e0e0e0] transition-standard disabled:opacity-50"
             >
               {isSubmitting ? "Creating Property..." : "Create Property"}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded bg-[#161616] text-white border border-[#2a2a2a] text-xs font-medium hover:bg-[#222222] transition-standard"
+              className="px-4 py-2.5 rounded-lg bg-[#161616] text-white border border-[#2a2a2a] text-xs sm:text-sm font-medium hover:bg-[#222222] transition-standard"
             >
               Cancel
             </button>

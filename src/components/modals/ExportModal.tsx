@@ -47,41 +47,41 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 md:p-6 overflow-y-auto animate-in fade-in duration-150">
-      <div className="bg-[#0a0a0a] border border-[#222222] rounded-lg max-w-lg w-full max-h-[92vh] overflow-y-auto p-5 shadow-2xl my-auto flex flex-col gap-4">
+    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto animate-in fade-in duration-150">
+      <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-5 sm:p-6 shadow-2xl my-auto flex flex-col gap-5">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#222222] pb-3">
+        <div className="flex items-center justify-between border-b border-[#262626] pb-3.5">
           <div>
-            <h2 className="text-base font-bold text-white tracking-tight flex items-center gap-2">
-              <Download className="w-4 h-4" />
+            <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
+              <Download className="w-5 h-5" />
               <span>Export Real Estate Portfolios</span>
             </h2>
-            <div className="text-xs text-[#888888] mt-0.5">
+            <div className="text-xs text-[#A1A1AA] mt-0.5 font-medium">
               Take out your entire data in offline-compatible spreadsheets or
               documents
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded text-[#888888] hover:text-white hover:bg-[#1a1a1a]"
+            className="p-1 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a]"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Options */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3.5">
           {/* Excel Export Card */}
-          <div className="bg-[#111111] border border-[#222222] rounded-lg p-4 flex items-center justify-between gap-3 hover:border-[#383838] transition-standard">
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded bg-emerald-950/40 border border-emerald-800/40 flex items-center justify-center text-emerald-400">
+          <div className="bg-[#111111] border border-[#262626] rounded-xl p-4 flex items-center justify-between gap-3.5 hover:border-[#383838] transition-standard">
+            <div className="flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-lg bg-emerald-950/40 border border-emerald-800/40 flex items-center justify-center text-emerald-400 flex-shrink-0">
                 <FileSpreadsheet className="w-5 h-5" />
               </div>
               <div>
-                <div className="text-xs font-bold text-white">
+                <div className="text-sm font-bold text-white">
                   Multi-Tab Excel Workbook (.xlsx)
                 </div>
-                <div className="text-[11px] text-[#888888] mt-0.5 leading-relaxed">
+                <div className="text-xs text-[#A1A1AA] mt-1 leading-relaxed font-medium">
                   Interactive sheets (`Dashboard`, `Land_Master`, `Outflows`,
                   `Deal_Inflows`, `Capital_Inflows`, `Transfers`) with live SUMIFS
                   formulas and Indian Rupee formatting.
@@ -91,23 +91,23 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
             <button
               onClick={() => handleDownload("excel")}
               disabled={downloading === "excel"}
-              className="px-3 py-1.5 rounded bg-white text-black font-semibold text-xs hover:bg-[#e0e0e0] transition-standard whitespace-nowrap disabled:opacity-50"
+              className="px-3.5 py-2 rounded-lg bg-white text-black font-semibold text-xs sm:text-sm hover:bg-[#e0e0e0] transition-standard whitespace-nowrap disabled:opacity-50 flex-shrink-0"
             >
               {downloading === "excel" ? "Generating..." : "Download .xlsx"}
             </button>
           </div>
 
           {/* PDF Export Card */}
-          <div className="bg-[#111111] border border-[#222222] rounded-lg p-4 flex items-center justify-between gap-3 hover:border-[#383838] transition-standard">
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded bg-rose-950/40 border border-rose-800/40 flex items-center justify-center text-rose-400">
+          <div className="bg-[#111111] border border-[#262626] rounded-xl p-4 flex items-center justify-between gap-3.5 hover:border-[#383838] transition-standard">
+            <div className="flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-lg bg-rose-950/40 border border-rose-800/40 flex items-center justify-center text-rose-400 flex-shrink-0">
                 <FileText className="w-5 h-5" />
               </div>
               <div>
-                <div className="text-xs font-bold text-white">
+                <div className="text-sm font-bold text-white">
                   Executive PDF Deal Statement (.pdf)
                 </div>
-                <div className="text-[11px] text-[#888888] mt-0.5 leading-relaxed">
+                <div className="text-xs text-[#A1A1AA] mt-1 leading-relaxed font-medium">
                   Print-ready executive summary of property deals, liquidity
                   breakdowns, and pending buyer/seller statements.
                 </div>
@@ -116,23 +116,23 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
             <button
               onClick={() => handleDownload("pdf")}
               disabled={downloading === "pdf"}
-              className="px-3 py-1.5 rounded bg-[#1c1c1c] text-white border border-[#333333] font-medium text-xs hover:bg-[#252525] transition-standard whitespace-nowrap disabled:opacity-50"
+              className="px-3.5 py-2 rounded-lg bg-[#1c1c1c] text-white border border-[#333333] font-medium text-xs sm:text-sm hover:bg-[#252525] transition-standard whitespace-nowrap disabled:opacity-50 flex-shrink-0"
             >
               {downloading === "pdf" ? "Generating..." : "Download .pdf"}
             </button>
           </div>
 
           {/* CSV Export Card */}
-          <div className="bg-[#111111] border border-[#222222] rounded-lg p-4 flex items-center justify-between gap-3 hover:border-[#383838] transition-standard">
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded bg-blue-950/40 border border-blue-800/40 flex items-center justify-center text-blue-400">
+          <div className="bg-[#111111] border border-[#262626] rounded-xl p-4 flex items-center justify-between gap-3.5 hover:border-[#383838] transition-standard">
+            <div className="flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-lg bg-blue-950/40 border border-blue-800/40 flex items-center justify-center text-blue-400 flex-shrink-0">
                 <Database className="w-5 h-5" />
               </div>
               <div>
-                <div className="text-xs font-bold text-white">
+                <div className="text-sm font-bold text-white">
                   Raw Transactions Ledger (.csv)
                 </div>
-                <div className="text-[11px] text-[#888888] mt-0.5 leading-relaxed">
+                <div className="text-xs text-[#A1A1AA] mt-1 leading-relaxed font-medium">
                   Normalized universal accounting CSV export for easy import
                   into Tally or auditor software.
                 </div>
@@ -141,7 +141,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
             <button
               onClick={() => handleDownload("csv")}
               disabled={downloading === "csv"}
-              className="px-3 py-1.5 rounded bg-[#1c1c1c] text-white border border-[#333333] font-medium text-xs hover:bg-[#252525] transition-standard whitespace-nowrap disabled:opacity-50"
+              className="px-3.5 py-2 rounded-lg bg-[#1c1c1c] text-white border border-[#333333] font-medium text-xs sm:text-sm hover:bg-[#252525] transition-standard whitespace-nowrap disabled:opacity-50 flex-shrink-0"
             >
               {downloading === "csv" ? "Exporting..." : "Download .csv"}
             </button>
@@ -149,10 +149,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
         </div>
 
         {/* Footer */}
-        <div className="p-2 border-t border-[#222222] flex justify-end">
+        <div className="pt-2 border-t border-[#262626] flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-1.5 rounded bg-[#161616] text-white text-xs font-medium hover:bg-[#222222] transition-standard"
+            className="px-4 py-2 rounded-lg bg-[#161616] text-white text-xs sm:text-sm font-medium hover:bg-[#222222] transition-standard"
           >
             Close
           </button>

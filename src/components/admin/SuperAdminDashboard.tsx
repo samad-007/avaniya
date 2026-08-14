@@ -9,15 +9,9 @@ import {
   Copy,
   Check,
   RefreshCw,
-  FolderLock,
-  Database,
   Trash2,
-  Lock,
-  Mail,
-  UserCheck,
   AlertCircle,
   X,
-  ExternalLink,
 } from "lucide-react";
 import { generateSecurePassword } from "@/lib/passwordGenerator";
 
@@ -63,7 +57,6 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
   const [newEmail, setNewEmail] = useState("");
   const [newRole, setNewRole] = useState<"admin" | "user">("user");
   const [newDatasetId, setNewDatasetId] = useState("");
-  const [customDatasetName, setCustomDatasetName] = useState("");
   const [generatedPassword, setGeneratedPassword] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -105,7 +98,6 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
     setNewEmail("");
     setNewRole("user");
     setNewDatasetId("new");
-    setCustomDatasetName("");
     const pw = generateSecurePassword(15);
     setGeneratedPassword(pw);
     setCreatedCredential(null);
@@ -226,23 +218,23 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 md:p-6 overflow-y-auto animate-in fade-in duration-200">
-      <div className="bg-[#0a0a0a] border border-[#222222] rounded-xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto">
+      <div className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto">
         {/* Header */}
-        <div className="p-4 md:p-5 border-b border-[#222222] flex items-center justify-between bg-[#0e0e0e] gap-3">
+        <div className="p-4 md:p-5 border-b border-[#262626] flex items-center justify-between bg-[#0e0e0e] gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-emerald-950/40 border border-emerald-800/40 text-emerald-400 flex items-center justify-center font-bold">
-              <ShieldCheck className="w-5 h-5" />
+            <div className="w-11 h-11 rounded-lg bg-emerald-950/40 border border-emerald-800/40 text-emerald-400 flex items-center justify-center font-bold">
+              <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base md:text-lg font-bold text-white tracking-tight">
                   Super Admin &amp; Tenant Control Center
                 </h2>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950/40 text-emerald-400 border border-emerald-800/30">
+                <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-emerald-950/40 text-emerald-400 border border-emerald-800/30">
                   DEVELOPER ACCESS ONLY
                 </span>
               </div>
-              <p className="text-xs text-[#888888]">
+              <p className="text-xs text-[#A1A1AA] font-medium mt-0.5">
                 Manage client accounts, dataset mappings, and 15-character secure credentials
               </p>
             </div>
@@ -251,15 +243,15 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={handleOpenCreateModal}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-white text-black text-xs font-semibold hover:bg-[#e0e0e0] transition-standard"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white text-black text-xs sm:text-sm font-semibold hover:bg-[#e0e0e0] transition-standard"
             >
-              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+              <Plus className="w-4 h-4 stroke-[2.5]" />
               <span>Provision User</span>
             </button>
 
             <button
               onClick={onClose}
-              className="p-1.5 rounded-md text-[#888888] hover:text-white hover:bg-[#1a1a1a] transition-standard"
+              className="p-2 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] transition-standard"
             >
               <X className="w-5 h-5" />
             </button>
@@ -270,7 +262,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
         <div className="p-4 md:p-6 overflow-y-auto flex-1 flex flex-col gap-5">
           {/* Error Banner */}
           {errorMsg && (
-            <div className="bg-rose-950/30 border border-rose-800/40 text-rose-300 text-xs px-3 py-2 rounded-md flex items-center gap-2">
+            <div className="bg-rose-950/30 border border-rose-800/40 text-rose-300 text-xs sm:text-sm px-3.5 py-2.5 rounded-md flex items-center gap-2 font-medium">
               <AlertCircle className="w-4 h-4 text-rose-400" />
               <span>{errorMsg}</span>
             </div>
@@ -278,40 +270,40 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
 
           {/* Newly Created Credential Notification Card */}
           {createdCredential && (
-            <div className="bg-emerald-950/20 border border-emerald-800/40 rounded-lg p-4 flex flex-col gap-3">
+            <div className="bg-emerald-950/20 border border-emerald-800/40 rounded-xl p-4 sm:p-5 flex flex-col gap-3.5">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
+                <div className="flex items-center gap-2 text-sm font-bold text-emerald-400">
                   <KeyRound className="w-4 h-4" />
                   <span>Secure User Credentials Generated Successfully</span>
                 </div>
                 <button
                   onClick={() => setCreatedCredential(null)}
-                  className="text-xs text-[#888888] hover:text-white"
+                  className="text-xs text-[#A1A1AA] hover:text-white"
                 >
                   Dismiss
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-mono bg-[#050505] p-3 rounded border border-emerald-900/30">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm font-mono bg-[#050505] p-3.5 rounded-lg border border-emerald-900/30">
                 <div>
-                  <span className="text-[#888888] text-[10px] block">Email</span>
+                  <span className="text-[#A1A1AA] text-xs block mb-0.5">Email</span>
                   <span className="text-white font-semibold">
                     {createdCredential.email}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[#888888] text-[10px] block">
+                  <span className="text-[#A1A1AA] text-xs block mb-0.5">
                     15-Char Password (No Ambiguous Chars)
                   </span>
-                  <span className="text-emerald-400 font-bold bg-[#111111] px-2 py-0.5 rounded border border-emerald-800/30">
+                  <span className="text-emerald-400 font-bold bg-[#111111] px-2.5 py-1 rounded border border-emerald-800/30 inline-block">
                     {createdCredential.password}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[#888888] text-[10px] block">
+                  <span className="text-[#A1A1AA] text-xs block mb-0.5">
                     Mapped Dataset ID
                   </span>
-                  <span className="text-white">
+                  <span className="text-white font-semibold">
                     {createdCredential.datasetId}
                   </span>
                 </div>
@@ -324,12 +316,12 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                       `Email: ${createdCredential.email}\nPassword: ${createdCredential.password}\nLogin URL: https://avaniya.vercel.app`
                     )
                   }
-                  className="flex items-center gap-1.5 px-3 py-1 rounded bg-emerald-500 text-black text-xs font-semibold hover:bg-emerald-400 transition-standard"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-500 text-black text-xs sm:text-sm font-bold hover:bg-emerald-400 transition-standard"
                 >
                   {copied ? (
-                    <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                    <Check className="w-4 h-4 stroke-[2.5]" />
                   ) : (
-                    <Copy className="w-3.5 h-3.5" />
+                    <Copy className="w-4 h-4" />
                   )}
                   <span>{copied ? "Copied to Clipboard!" : "Copy Full Client Onboarding Card"}</span>
                 </button>
@@ -338,71 +330,71 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
           )}
 
           {/* Stats Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="bg-[#050505] border border-[#222222] rounded-lg p-3">
-              <div className="text-[10px] uppercase text-[#888888] tracking-wider">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+            <div className="bg-[#050505] border border-[#262626] rounded-xl p-3.5">
+              <div className="text-xs uppercase text-[#A1A1AA] tracking-wider font-semibold">
                 Total Users
               </div>
-              <div className="text-xl font-bold font-mono text-white mt-0.5">
+              <div className="text-2xl font-bold font-mono text-white mt-1">
                 {users.length}
               </div>
             </div>
-            <div className="bg-[#050505] border border-[#222222] rounded-lg p-3">
-              <div className="text-[10px] uppercase text-[#888888] tracking-wider">
+            <div className="bg-[#050505] border border-[#262626] rounded-xl p-3.5">
+              <div className="text-xs uppercase text-[#A1A1AA] tracking-wider font-semibold">
                 Active Datasets
               </div>
-              <div className="text-xl font-bold font-mono text-emerald-400 mt-0.5">
+              <div className="text-2xl font-bold font-mono text-emerald-400 mt-1">
                 {new Set(users.map((u) => u.datasetId)).size}
               </div>
             </div>
-            <div className="bg-[#050505] border border-[#222222] rounded-lg p-3">
-              <div className="text-[10px] uppercase text-[#888888] tracking-wider">
+            <div className="bg-[#050505] border border-[#262626] rounded-xl p-3.5">
+              <div className="text-xs uppercase text-[#A1A1AA] tracking-wider font-semibold">
                 Total Land Deals
               </div>
-              <div className="text-xl font-bold font-mono text-white mt-0.5">
+              <div className="text-2xl font-bold font-mono text-white mt-1">
                 {users.reduce((sum, u) => sum + u.propertyCount, 0)}
               </div>
             </div>
-            <div className="bg-[#050505] border border-[#222222] rounded-lg p-3">
-              <div className="text-[10px] uppercase text-[#888888] tracking-wider">
+            <div className="bg-[#050505] border border-[#262626] rounded-xl p-3.5">
+              <div className="text-xs uppercase text-[#A1A1AA] tracking-wider font-semibold">
                 Total Transactions
               </div>
-              <div className="text-xl font-bold font-mono text-white mt-0.5">
+              <div className="text-2xl font-bold font-mono text-white mt-1">
                 {users.reduce((sum, u) => sum + u.transactionCount, 0)}
               </div>
             </div>
           </div>
 
           {/* User & Dataset Management Table */}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
-              <div className="text-xs font-semibold text-white uppercase tracking-wider flex items-center gap-2">
-                <Users className="w-4 h-4 text-[#888888]" />
+              <div className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <Users className="w-4 h-4 text-[#A1A1AA]" />
                 <span>Tenant &amp; Dataset Access Matrix</span>
               </div>
               <button
                 onClick={loadAdminData}
-                className="flex items-center gap-1 text-xs text-[#888888] hover:text-white transition-standard"
+                className="flex items-center gap-1.5 text-xs text-[#A1A1AA] hover:text-white transition-standard font-medium"
               >
-                <RefreshCw className="w-3 h-3" />
+                <RefreshCw className="w-3.5 h-3.5" />
                 <span>Refresh</span>
               </button>
             </div>
 
-            <div className="border border-[#222222] rounded-lg overflow-x-auto bg-[#050505]">
-              <table className="w-full text-left text-xs border-collapse">
+            <div className="border border-[#262626] rounded-xl overflow-x-auto bg-[#050505]">
+              <table className="w-full text-left text-sm border-collapse">
                 <thead>
-                  <tr className="bg-[#111111] border-b border-[#222222] text-[#888888] uppercase text-[10px] tracking-wider">
-                    <th className="py-2.5 px-3">User / Entity</th>
-                    <th className="py-2.5 px-3">Email</th>
-                    <th className="py-2.5 px-3">Role</th>
-                    <th className="py-2.5 px-3">Mapped Dataset</th>
-                    <th className="py-2.5 px-3 text-right">Properties</th>
-                    <th className="py-2.5 px-3 text-right">Transactions</th>
-                    <th className="py-2.5 px-3 text-right">Actions</th>
+                  <tr className="bg-[#111111] border-b border-[#262626] text-[#D4D4D8] uppercase text-xs font-bold tracking-wider">
+                    <th className="py-3 px-3.5">User / Entity</th>
+                    <th className="py-3 px-3.5">Email</th>
+                    <th className="py-3 px-3.5">Role</th>
+                    <th className="py-3 px-3.5">Mapped Dataset</th>
+                    <th className="py-3 px-3.5 text-right">Properties</th>
+                    <th className="py-3 px-3.5 text-right">Transactions</th>
+                    <th className="py-3 px-3.5 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#161616]">
+                <tbody className="divide-y divide-[#181818]">
                   {users.map((u) => {
                     const isViewing =
                       currentDatasetId === u.datasetId ||
@@ -415,49 +407,49 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                           isViewing ? "bg-[#111612]" : ""
                         }`}
                       >
-                        <td className="py-2.5 px-3 font-medium text-white">
+                        <td className="py-3 px-3.5 font-bold text-white">
                           <div className="flex items-center gap-2">
                             <span>{u.name}</span>
                             {isViewing && (
-                              <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-950/50 text-emerald-400 border border-emerald-800/30">
+                              <span className="text-xs px-2 py-0.5 rounded bg-emerald-950/50 text-emerald-400 border border-emerald-800/30 font-mono font-semibold">
                                 ACTIVE VIEW
                               </span>
                             )}
                           </div>
                         </td>
-                        <td className="py-2.5 px-3 font-mono text-[#aaaaaa]">
+                        <td className="py-3 px-3.5 font-mono text-[#D4D4D8]">
                           {u.email}
                         </td>
-                        <td className="py-2.5 px-3">
+                        <td className="py-3 px-3.5">
                           <span
-                            className={`text-[10px] font-mono px-2 py-0.5 rounded font-medium border ${
+                            className={`text-xs font-mono px-2.5 py-0.5 rounded font-semibold border ${
                               u.role === "super_admin"
                                 ? "bg-amber-950/30 text-amber-400 border-amber-800/40"
                                 : u.role === "admin"
                                 ? "bg-blue-950/30 text-blue-400 border-blue-800/40"
-                                : "bg-[#161616] text-[#888888] border-[#222222]"
+                                : "bg-[#161616] text-[#A1A1AA] border-[#2a2a2a]"
                             }`}
                           >
                             {u.role.toUpperCase()}
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 font-mono text-[#22C55E]">
+                        <td className="py-3 px-3.5 font-mono text-[#22C55E] font-semibold">
                           {u.datasetId || "Default"}
                         </td>
-                        <td className="py-2.5 px-3 text-right font-mono text-white">
+                        <td className="py-3 px-3.5 text-right font-mono text-white font-bold">
                           {u.propertyCount}
                         </td>
-                        <td className="py-2.5 px-3 text-right font-mono text-white">
+                        <td className="py-3 px-3.5 text-right font-mono text-white font-bold">
                           {u.transactionCount}
                         </td>
-                        <td className="py-2.5 px-3 text-right">
+                        <td className="py-3 px-3.5 text-right">
                           <div className="flex items-center justify-end gap-1.5">
                             <button
                               onClick={() => {
                                 onSwitchDataset(u.datasetId);
                                 onClose();
                               }}
-                              className="px-2 py-1 rounded bg-[#161616] border border-[#2a2a2a] text-white hover:bg-[#252525] transition-standard text-[11px]"
+                              className="px-2.5 py-1 rounded-md bg-[#161616] border border-[#2a2a2a] text-white hover:bg-[#252525] transition-standard text-xs font-semibold"
                               title="Switch active dashboard to view this user's dataset"
                             >
                               View Ledger
@@ -465,19 +457,19 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
 
                             <button
                               onClick={() => handleResetPassword(u)}
-                              className="p-1 rounded bg-[#161616] border border-[#2a2a2a] text-[#888888] hover:text-amber-400 transition-standard"
+                              className="p-1.5 rounded-md bg-[#161616] border border-[#2a2a2a] text-[#A1A1AA] hover:text-amber-400 transition-standard"
                               title="Generate new 15-char password"
                             >
-                              <KeyRound className="w-3.5 h-3.5" />
+                              <KeyRound className="w-4 h-4" />
                             </button>
 
                             {u.role !== "super_admin" && (
                               <button
                                 onClick={() => handleDeleteUser(u)}
-                                className="p-1 rounded bg-[#161616] border border-[#2a2a2a] text-[#888888] hover:text-rose-400 transition-standard"
+                                className="p-1.5 rounded-md bg-[#161616] border border-[#2a2a2a] text-[#A1A1AA] hover:text-rose-400 transition-standard"
                                 title="Delete user"
                               >
-                                <Trash2 className="w-3.5 h-3.5" />
+                                <Trash2 className="w-4 h-4" />
                               </button>
                             )}
                           </div>
@@ -493,64 +485,72 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
 
         {/* Create User Modal Sub-Dialog */}
         {isCreateModalOpen && (
-          <div className="fixed inset-0 z-60 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-60 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
             <div className="bg-[#0e0e0e] border border-[#2a2a2a] rounded-xl max-w-md w-full p-6 shadow-2xl flex flex-col gap-4">
               <div className="flex items-center justify-between border-b border-[#222222] pb-3">
-                <h3 className="text-sm font-bold text-white">
+                <h3 className="text-base font-bold text-white">
                   Provision New User &amp; Assign Dataset
                 </h3>
                 <button
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="text-[#888888] hover:text-white"
+                  className="text-[#A1A1AA] hover:text-white"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <form onSubmit={handleCreateUser} className="flex flex-col gap-3 text-xs">
-                <div className="flex flex-col gap-1">
-                  <label className="text-[11px] text-[#888888]">Full Name / Entity</label>
+              <form onSubmit={handleCreateUser} className="flex flex-col gap-3.5 text-sm">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
+                    Full Name / Entity
+                  </label>
                   <input
                     type="text"
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
                     placeholder="e.g. Mohammed Yousuf"
-                    className="bg-[#141414] border border-[#252525] rounded p-2 text-white outline-none focus:border-[#444444]"
+                    className="bg-[#141414] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#444444]"
                     required
                   />
                 </div>
 
-                <div className="flex flex-col gap-1">
-                  <label className="text-[11px] text-[#888888]">Email Address</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
+                    Email Address
+                  </label>
                   <input
                     type="email"
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
                     placeholder="yousuf@avaniya.com"
-                    className="bg-[#141414] border border-[#252525] rounded p-2 text-white outline-none focus:border-[#444444]"
+                    className="bg-[#141414] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#444444]"
                     required
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[11px] text-[#888888]">Role</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
+                      Role
+                    </label>
                     <select
                       value={newRole}
                       onChange={(e) => setNewRole(e.target.value as any)}
-                      className="bg-[#141414] border border-[#252525] rounded p-2 text-white outline-none"
+                      className="bg-[#141414] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none"
                     >
                       <option value="user">User (Client)</option>
                       <option value="admin">Admin</option>
                     </select>
                   </div>
 
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[11px] text-[#888888]">Dataset Scope</label>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
+                      Dataset Scope
+                    </label>
                     <select
                       value={newDatasetId}
                       onChange={(e) => setNewDatasetId(e.target.value)}
-                      className="bg-[#141414] border border-[#252525] rounded p-2 text-white outline-none"
+                      className="bg-[#141414] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none"
                     >
                       <option value="new">Fresh Dedicated Dataset</option>
                       <option value="ds_yousuf_portfolio">Mohammed Yousuf Portfolio</option>
@@ -564,17 +564,17 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                 </div>
 
                 {/* Autogenerated 15-Char Password Field */}
-                <div className="flex flex-col gap-1 bg-[#050505] p-3 rounded border border-[#222222]">
+                <div className="flex flex-col gap-1.5 bg-[#050505] p-3.5 rounded-lg border border-[#262626]">
                   <div className="flex items-center justify-between">
-                    <label className="text-[11px] font-mono text-emerald-400">
+                    <label className="text-xs font-mono text-emerald-400 font-semibold">
                       15-Char Secure Password (Strict standard)
                     </label>
                     <button
                       type="button"
                       onClick={handleRegeneratePassword}
-                      className="text-[10px] text-[#888888] hover:text-white flex items-center gap-1"
+                      className="text-xs text-[#A1A1AA] hover:text-white flex items-center gap-1 font-medium"
                     >
-                      <RefreshCw className="w-2.5 h-2.5" />
+                      <RefreshCw className="w-3 h-3" />
                       <span>Re-roll</span>
                     </button>
                   </div>
@@ -583,37 +583,37 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                       type="text"
                       value={generatedPassword}
                       readOnly
-                      className="w-full bg-[#111111] border border-[#333333] rounded px-2.5 py-1.5 text-emerald-400 font-mono font-bold text-xs"
+                      className="w-full bg-[#111111] border border-[#383838] rounded-md px-3 py-2 text-emerald-400 font-mono font-bold text-sm"
                     />
                     <button
                       type="button"
                       onClick={() => handleCopyPassword(generatedPassword)}
-                      className="px-2.5 py-1.5 rounded bg-[#222222] text-white hover:bg-[#333333] transition-standard"
+                      className="p-2 rounded-md bg-[#222222] text-white hover:bg-[#333333] transition-standard"
                       title="Copy password"
                     >
                       {copied ? (
-                        <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                        <Check className="w-4 h-4 stroke-[2.5]" />
                       ) : (
-                        <Copy className="w-3.5 h-3.5" />
+                        <Copy className="w-4 h-4" />
                       )}
                     </button>
                   </div>
-                  <span className="text-[9px] text-[#666666] mt-0.5">
+                  <span className="text-xs text-[#A1A1AA] mt-1 font-medium">
                     Guaranteed mix of uppercase, lowercase, numbers, &amp; symbols without ambiguous chars.
                   </span>
                 </div>
 
-                <div className="flex justify-end gap-2 mt-2">
+                <div className="flex justify-end gap-2.5 mt-2">
                   <button
                     type="button"
                     onClick={() => setIsCreateModalOpen(false)}
-                    className="px-3 py-1.5 rounded bg-[#161616] text-white text-xs border border-[#2a2a2a]"
+                    className="px-3.5 py-2 rounded-lg bg-[#161616] text-white text-xs sm:text-sm border border-[#2a2a2a] font-medium"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-1.5 rounded bg-white text-black text-xs font-semibold hover:bg-[#e0e0e0]"
+                    className="px-4 py-2 rounded-lg bg-white text-black text-xs sm:text-sm font-semibold hover:bg-[#e0e0e0]"
                   >
                     Create &amp; Provision User
                   </button>
@@ -624,10 +624,10 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
         )}
 
         {/* Footer */}
-        <div className="p-3 border-t border-[#222222] bg-[#0c0c0c] flex justify-end gap-2">
+        <div className="p-3.5 border-t border-[#262626] bg-[#0c0c0c] flex justify-end gap-2">
           <button
             onClick={onClose}
-            className="px-4 py-1.5 rounded bg-[#1a1a1a] text-white text-xs font-medium hover:bg-[#252525] border border-[#333333] transition-standard"
+            className="px-4 py-2 rounded-lg bg-[#1a1a1a] text-white text-xs sm:text-sm font-semibold hover:bg-[#252525] border border-[#383838] transition-standard"
           >
             Close Dashboard
           </button>

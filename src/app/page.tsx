@@ -421,7 +421,7 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-black flex items-center justify-center text-white">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin"></div>
-          <span className="text-xs font-mono text-[#888888]">
+          <span className="text-xs font-mono text-[#A1A1AA] font-medium">
             Verifying security session...
           </span>
         </div>
