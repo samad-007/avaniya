@@ -34,13 +34,13 @@ export async function verifyPassword(
 }
 
 /**
- * Sign a JWT session token valid for 30 days
+ * Sign a JWT session token valid for 12 hours (daily expiration)
  */
 export async function signSessionToken(payload: SessionPayload): Promise<string> {
   return await new SignJWT({ ...payload })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("30d")
+    .setExpirationTime("12h")
     .sign(JWT_SECRET);
 }
 

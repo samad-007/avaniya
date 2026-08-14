@@ -22,6 +22,7 @@ import {
   Search,
   Receipt,
   FileCheck2,
+  Pencil,
 } from "lucide-react";
 
 interface CommercialViewProps {
@@ -29,6 +30,7 @@ interface CommercialViewProps {
   transactions: SeedTransaction[];
   onSelectProperty: (propertyMetric: PropertyFinancialMetrics) => void;
   onOpenNewDealModal: () => void;
+  onEditProperty?: (property: SeedProperty) => void;
 }
 
 export const CommercialView: React.FC<CommercialViewProps> = ({
@@ -36,6 +38,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
   transactions,
   onSelectProperty,
   onOpenNewDealModal,
+  onEditProperty,
 }) => {
   const [activeTab, setActiveTab] = useState<
     "deals" | "outflows" | "inflows" | "capital" | "transfers" | "accounts"
@@ -228,17 +231,32 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                         </div>
                       </div>
 
-                      <span
-                        className={`text-[10px] px-2 py-0.5 rounded font-medium ${
-                          pm.property.status === "sold"
-                            ? "bg-green-950/40 text-green-400 border border-green-800/40"
-                            : pm.property.status === "in_progress"
-                            ? "bg-amber-950/40 text-amber-400 border border-amber-800/40"
-                            : "bg-[#181818] text-[#888888] border border-[#2a2a2a]"
-                        }`}
-                      >
-                        {pm.property.status.toUpperCase()}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        {onEditProperty && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onEditProperty(pm.property);
+                            }}
+                            className="p-1 rounded bg-[#161616] text-[#888888] hover:text-white hover:bg-[#252525] border border-[#2a2a2a] transition-standard"
+                            title="Edit Property Data Points"
+                          >
+                            <Pencil className="w-3 h-3 text-[#22C55E]" />
+                          </button>
+                        )}
+                        <span
+                          className={`text-[10px] px-2 py-0.5 rounded font-medium ${
+                            pm.property.status === "sold"
+                              ? "bg-green-950/40 text-green-400 border border-green-800/40"
+                              : pm.property.status === "in_progress"
+                              ? "bg-amber-950/40 text-amber-400 border border-amber-800/40"
+                              : "bg-[#181818] text-[#888888] border border-[#2a2a2a]"
+                          }`}
+                        >
+                          {pm.property.status.toUpperCase()}
+                        </span>
+                      </div>
                     </div>
 
                     {/* Financial Matrix (Agreed Buy, Expenses, Target Price, Selling Price) */}

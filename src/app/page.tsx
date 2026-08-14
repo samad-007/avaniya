@@ -9,6 +9,7 @@ import { PersonalView } from "@/components/dashboard/PersonalView";
 import { PropertyLedgerModal } from "@/components/dashboard/PropertyLedgerModal";
 import { QuickEntryModal } from "@/components/modals/QuickEntryModal";
 import { NewPropertyModal } from "@/components/modals/NewPropertyModal";
+import { EditPropertyModal } from "@/components/modals/EditPropertyModal";
 import { CategoryModal } from "@/components/modals/CategoryModal";
 import { ExportModal } from "@/components/modals/ExportModal";
 import { AuthModal } from "@/components/auth/AuthModal";
@@ -70,6 +71,10 @@ export default function DashboardPage() {
     useState<string>("");
 
   const [isNewPropModalOpen, setIsNewPropModalOpen] = useState(false);
+  const [isEditPropModalOpen, setIsEditPropModalOpen] = useState(false);
+  const [editingProperty, setEditingProperty] = useState<SeedProperty | null>(
+    null
+  );
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
@@ -157,6 +162,17 @@ export default function DashboardPage() {
     recompute();
   }, [recompute]);
 
+  // Handlers
+  const handleConfirmedLogout = useCallback(async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {}
+    setUser(null);
+    setProperties([]);
+    setTransactions([]);
+    setIsLogoutModalOpen(false);
+  }, []);
+
   // Intercept browser back button & swipe back when authenticated
   useEffect(() => {
     if (!user) return;
@@ -177,16 +193,59 @@ export default function DashboardPage() {
     };
   }, [user]);
 
-  // Handlers
-  const handleConfirmedLogout = async () => {
-    try {
-      await fetch("/api/auth/logout", { method: "POST" });
-    } catch {}
-    setUser(null);
-    setProperties([]);
-    setTransactions([]);
-    setIsLogoutModalOpen(false);
-  };
+  // Automatic Inactivity Session Timeout (30 mins idle / next-day expiration)
+  useEffect(() => {
+    if (!user) return;
+
+    const INACTIVITY_LIMIT_MS = 30 * 60 * 1000; // 30 minutes of idle inactivity
+    let timeoutId: NodeJS.Timeout;
+
+    const recordActivity = () => {
+      localStorage.setItem("avaniya_last_activity", Date.now().toString());
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        handleConfirmedLogout();
+      }, INACTIVITY_LIMIT_MS);
+    };
+
+    const checkStoredActivity = () => {
+      const last = localStorage.getItem("avaniya_last_activity");
+      if (last && Date.now() - parseInt(last, 10) > INACTIVITY_LIMIT_MS) {
+        handleConfirmedLogout();
+      } else {
+        recordActivity();
+      }
+    };
+
+    const activityEvents = [
+      "mousemove",
+      "mousedown",
+      "keydown",
+      "touchstart",
+      "scroll",
+    ];
+
+    activityEvents.forEach((evt) =>
+      window.addEventListener(evt, recordActivity, { passive: true })
+    );
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        checkStoredActivity();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    checkStoredActivity();
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      activityEvents.forEach((evt) =>
+        window.removeEventListener(evt, recordActivity)
+      );
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [user, handleConfirmedLogout]);
 
   const handleSwitchDataset = async (newDsId: string) => {
     setCurrentDatasetId(newDsId);
@@ -200,6 +259,55 @@ export default function DashboardPage() {
     setEntryModalType(type);
     setEntryDefaultPropertyCode(propertyCode || "");
     setIsEntryModalOpen(true);
+  };
+
+  const handleOpenEditProperty = (prop: SeedProperty) => {
+    setEditingProperty(prop);
+    setIsEditPropModalOpen(true);
+  };
+
+  const handleUpdateProperty = async (
+    propertyCode: string,
+    updates: Partial<SeedProperty>
+  ) => {
+    try {
+      const res = await fetch(
+        `/api/properties/${encodeURIComponent(propertyCode)}?datasetId=${encodeURIComponent(
+          currentDatasetId
+        )}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updates),
+        }
+      );
+      if (res.ok) {
+        const json = await res.json();
+        setProperties((prev) =>
+          prev.map((p) =>
+            p.propertyCode.toLowerCase() === propertyCode.toLowerCase()
+              ? { ...p, ...json.data }
+              : p
+          )
+        );
+      } else {
+        setProperties((prev) =>
+          prev.map((p) =>
+            p.propertyCode.toLowerCase() === propertyCode.toLowerCase()
+              ? { ...p, ...updates }
+              : p
+          )
+        );
+      }
+    } catch {
+      setProperties((prev) =>
+        prev.map((p) =>
+          p.propertyCode.toLowerCase() === propertyCode.toLowerCase()
+            ? { ...p, ...updates }
+            : p
+        )
+      );
+    }
   };
 
   const handleSaveTransaction = async (txData: any) => {
@@ -378,6 +486,7 @@ export default function DashboardPage() {
             transactions={transactions}
             onSelectProperty={handleSelectCommercialProperty}
             onOpenNewDealModal={() => setIsNewPropModalOpen(true)}
+            onEditProperty={handleOpenEditProperty}
           />
         )}
 
@@ -389,6 +498,7 @@ export default function DashboardPage() {
             onSelectProperty={handleSelectPersonalProperty}
             onOpenNewPropertyModal={() => setIsNewPropModalOpen(true)}
             onOpenEntryModal={handleOpenEntryModal}
+            onEditProperty={handleOpenEditProperty}
           />
         )}
       </main>
@@ -435,6 +545,7 @@ export default function DashboardPage() {
         propertyMetrics={selectedPropertyMetric}
         personalPropertyData={selectedPersonalPropertyData}
         onOpenEntryModal={handleOpenEntryModal}
+        onEditProperty={handleOpenEditProperty}
       />
 
       {/* Quick Data Entry Drawer */}
@@ -459,6 +570,17 @@ export default function DashboardPage() {
         onClose={() => setIsNewPropModalOpen(false)}
         defaultType={appMode}
         onSave={handleSaveProperty}
+      />
+
+      {/* Edit Property Modal (Edit Any & Every Data Point) */}
+      <EditPropertyModal
+        isOpen={isEditPropModalOpen}
+        onClose={() => {
+          setIsEditPropModalOpen(false);
+          setEditingProperty(null);
+        }}
+        property={editingProperty}
+        onSave={handleUpdateProperty}
       />
 
       {/* Dynamic Category Engine Modal */}

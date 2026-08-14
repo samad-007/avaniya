@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   Clock,
   AlertCircle,
+  Pencil,
 } from "lucide-react";
 
 interface PropertyLedgerModalProps {
@@ -32,6 +33,7 @@ interface PropertyLedgerModalProps {
     type: "outflow" | "inflow" | "transfer",
     propertyCode?: string
   ) => void;
+  onEditProperty?: (property: SeedProperty) => void;
 }
 
 export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
@@ -40,6 +42,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
   propertyMetrics,
   personalPropertyData,
   onOpenEntryModal,
+  onEditProperty,
 }) => {
   if (!isOpen) return null;
 
@@ -113,12 +116,25 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-md text-[#888888] hover:text-white hover:bg-[#1a1a1a] transition-standard"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            {onEditProperty && (
+              <button
+                onClick={() => onEditProperty(prop)}
+                className="px-2.5 py-1.5 rounded-md bg-[#161616] text-white border border-[#2c2c2c] hover:bg-[#222222] hover:border-[#444444] text-xs font-medium flex items-center gap-1.5 transition-standard shadow-sm"
+                title="Edit Valuation, Price & Details"
+              >
+                <Pencil className="w-3 h-3 text-[#22C55E]" />
+                <span className="hidden sm:inline">Edit Property</span>
+              </button>
+            )}
+
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-md text-[#888888] hover:text-white hover:bg-[#1a1a1a] transition-standard"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Modal Scrollable Body */}
@@ -430,7 +446,19 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-3 border-t border-[#222222] bg-[#0c0c0c] flex justify-end gap-2">
+        <div className="p-3 border-t border-[#222222] bg-[#0c0c0c] flex justify-between items-center gap-2">
+          {onEditProperty ? (
+            <button
+              onClick={() => onEditProperty(prop)}
+              className="px-3 py-1.5 rounded bg-[#161616] text-[#cccccc] hover:text-white text-xs font-medium border border-[#2a2a2a] hover:bg-[#222222] flex items-center gap-1.5 transition-standard"
+            >
+              <Pencil className="w-3 h-3 text-[#22C55E]" />
+              <span>Edit Property Valuations</span>
+            </button>
+          ) : (
+            <div></div>
+          )}
+
           <button
             onClick={onClose}
             className="px-4 py-1.5 rounded bg-[#1a1a1a] text-white text-xs font-medium hover:bg-[#252525] border border-[#333333] transition-standard"

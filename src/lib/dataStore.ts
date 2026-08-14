@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { connectDB, getSanitizedMongoUri } from "./db";
 import { Property, IProperty } from "../models/Property";
 import { Transaction, ITransaction } from "../models/Transaction";
@@ -146,20 +147,58 @@ export async function addProperty(
  * Update property details within dataset
  */
 export async function updateProperty(
-  propertyCode: string,
+  propertyCodeOrId: string,
   updates: Partial<SeedProperty>,
   datasetId: string = "ds_yousuf_portfolio"
 ): Promise<SeedProperty | null> {
   const dbOk = await isDBConnected();
   if (dbOk) {
-    await Property.findOneAndUpdate(
-      { propertyCode, $or: [{ datasetId }, { userId: datasetId }] },
-      { $set: updates }
-    );
+    try {
+      const query: Record<string, unknown> = {
+        $or: [
+          { propertyCode: propertyCodeOrId },
+          { _id: mongoose.isValidObjectId(propertyCodeOrId) ? propertyCodeOrId : null },
+        ],
+      };
+      if (datasetId) {
+        query.$and = [{ $or: [{ datasetId }, { userId: datasetId }] }];
+      }
+
+      const updated = await Property.findOneAndUpdate(
+        query,
+        { $set: updates },
+        { new: true }
+      ).lean<IProperty & { _id: unknown }>();
+
+      if (updated) {
+        return {
+          id: updated._id.toString(),
+          type: updated.type,
+          propertyCode: updated.propertyCode,
+          name: updated.name,
+          location: updated.location,
+          acquisitionDate: updated.acquisitionDate
+            ? new Date(updated.acquisitionDate).toISOString().split("T")[0]
+            : "",
+          sqftArea: updated.sqftArea,
+          ratePerSqft: updated.ratePerSqft,
+          agreedPurchasePrice: updated.agreedPurchasePrice,
+          targetSalePrice: updated.targetSalePrice,
+          agreedSellingPrice: updated.agreedSellingPrice,
+          status: updated.status,
+          milestones: updated.milestones,
+          notes: updated.notes,
+        };
+      }
+    } catch (e) {
+      console.warn("DB update failed, falling back to memory store", e);
+    }
   }
 
   const idx = memProperties.findIndex(
-    (p) => p.propertyCode.toLowerCase() === propertyCode.toLowerCase()
+    (p) =>
+      p.propertyCode.toLowerCase() === propertyCodeOrId.toLowerCase() ||
+      p.id === propertyCodeOrId
   );
   if (idx !== -1) {
     memProperties[idx] = { ...memProperties[idx], ...updates };

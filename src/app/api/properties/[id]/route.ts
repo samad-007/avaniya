@@ -8,10 +8,11 @@ export async function GET(
 ) {
   const { id } = await context.params;
   const session = await getSessionFromRequest(req);
-  const userId = session?.userId || "demo_businessman_1";
+  const datasetId =
+    session?.datasetId || session?.userId || "ds_yousuf_portfolio";
 
   try {
-    const property = await getPropertyByCode(id, userId);
+    const property = await getPropertyByCode(id, datasetId);
     if (!property) {
       return NextResponse.json(
         { success: false, error: "Property not found" },
@@ -19,7 +20,7 @@ export async function GET(
       );
     }
 
-    const txs = await getTransactions(userId, { propertyCode: property.propertyCode });
+    const txs = await getTransactions(datasetId, { propertyCode: property.propertyCode });
     return NextResponse.json({ success: true, data: { property, transactions: txs } });
   } catch (error: any) {
     return NextResponse.json(
@@ -35,14 +36,20 @@ export async function PATCH(
 ) {
   const { id } = await context.params;
   const session = await getSessionFromRequest(req);
-  const userId = session?.userId || "demo_businessman_1";
+  const url = new URL(req.url);
+  const queryDs = url.searchParams.get("datasetId");
+
+  const datasetId =
+    session?.role === "super_admin" && queryDs
+      ? queryDs
+      : session?.datasetId || session?.userId || "ds_yousuf_portfolio";
 
   try {
     const updates = await req.json();
-    const updated = await updateProperty(id, updates, userId);
+    const updated = await updateProperty(id, updates, datasetId);
     if (!updated) {
       return NextResponse.json(
-        { success: false, error: "Property not found" },
+        { success: false, error: "Property not found or access denied" },
         { status: 404 }
       );
     }

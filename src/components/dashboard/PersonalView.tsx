@@ -15,6 +15,7 @@ import {
   Landmark,
   PieChart,
   ListOrdered,
+  Pencil,
 } from "lucide-react";
 
 interface PersonalViewProps {
@@ -31,6 +32,7 @@ interface PersonalViewProps {
     type: "outflow" | "inflow" | "transfer",
     propertyCode?: string
   ) => void;
+  onEditProperty?: (property: SeedProperty) => void;
 }
 
 export const PersonalView: React.FC<PersonalViewProps> = ({
@@ -39,6 +41,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
   onSelectProperty,
   onOpenNewPropertyModal,
   onOpenEntryModal,
+  onEditProperty,
 }) => {
   const [activeSubTab, setActiveSubTab] = useState<
     "properties" | "outflows" | "inflows" | "categories"
@@ -64,7 +67,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                 : "border-transparent text-[#888888] hover:text-white"
             }`}
           >
-            1. My Properties & Assets ({metrics.properties.length})
+            1. My Properties &amp; Assets ({metrics.properties.length})
           </button>
           <button
             onClick={() => setActiveSubTab("outflows")}
@@ -156,9 +159,24 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                     </div>
                   </div>
 
-                  <span className="text-[10px] px-2 py-0.5 rounded font-medium bg-amber-950/40 text-amber-400 border border-amber-800/40">
-                    {p.status.toUpperCase()}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    {onEditProperty && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEditProperty(p);
+                        }}
+                        className="p-1 rounded bg-[#161616] text-[#888888] hover:text-white hover:bg-[#252525] border border-[#2a2a2a] transition-standard"
+                        title="Edit Property Data Points"
+                      >
+                        <Pencil className="w-3 h-3 text-[#22C55E]" />
+                      </button>
+                    )}
+                    <span className="text-[10px] px-2 py-0.5 rounded font-medium bg-amber-950/40 text-amber-400 border border-amber-800/40">
+                      {p.status.toUpperCase()}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Financial Summary */}
