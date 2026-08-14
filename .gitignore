@@ -43,7 +43,7 @@ __pycache__/
 .venv/
 venv/
 env/
-reprovision_users.ts
+scripts/
 
 # Excel files
 *.xlsx
