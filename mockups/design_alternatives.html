@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design Options & South Indian Real Estate Expense Engine</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    
+    :root {
+      --bg: #000000;
+      --card: #0a0a0a;
+      --border: #222222;
+      --text-main: #ffffff;
+      --text-muted: #888888;
+      --accent-green: #22c55e;
+      --accent-gold: #f59e0b;
+      --accent-blue: #3b82f6;
+      --highlight-bg: #111111;
+    }
+
+    body.theme-a {
+      --bg: #000000;
+      --card: #0a0a0a;
+      --border: #222222;
+      --text-main: #ffffff;
+      --text-muted: #888888;
+      --accent-green: #22c55e;
+      --accent-gold: #f59e0b;
+      --accent-blue: #3b82f6;
+      --highlight-bg: #141414;
+    }
+
+    body.theme-b {
+      --bg: #060907;
+      --card: #0c130f;
+      --border: #1a2b20;
+      --text-main: #f0fdf4;
+      --text-muted: #7d9685;
+      --accent-green: #10b981;
+      --accent-gold: #d97706;
+      --accent-blue: #0284c7;
+      --highlight-bg: #132219;
+    }
+
+    body.theme-c {
+      --bg: #060913;
+      --card: #0e1526;
+      --border: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-green: #10b981;
+      --accent-gold: #fbbf24;
+      --accent-blue: #38bdf8;
+      --highlight-bg: #18233c;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      padding: 20px;
+      line-height: 1.5;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .max-w {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .logo-box {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-img {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      object-fit: cover;
+    }
+
+    .title-text {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle-text {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .theme-switcher {
+      display: flex;
+      background: var(--highlight-bg);
+      border: 1px solid var(--border);
+      padding: 4px;
+      border-radius: 8px;
+      gap: 4px;
+    }
+
+    .theme-btn {
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .theme-btn.active {
+      background: var(--card);
+      color: var(--text-main);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .grid-kpi {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      transition: all 0.2s ease;
+    }
+
+    .card-kpi {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 85px;
+    }
+
+    .kpi-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .kpi-val {
+      font-size: 18px;
+      font-weight: 700;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      margin-top: 4px;
+    }
+
+    .kpi-sub {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .kpi-green { color: var(--accent-green); }
+    .kpi-gold { color: var(--accent-gold); }
+    .kpi-blue { color: var(--accent-blue); }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .badge-open {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-gold);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .badge-sold {
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--accent-green);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      background: var(--highlight-bg);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--accent-green);
+      border-radius: 3px;
+    }
+
+    .sub-matrix {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      background: var(--highlight-bg);
+      padding: 10px;
+      border-radius: 6px;
+      margin: 12px 0;
+      font-size: 11px;
+    }
+
+    .sub-label {
+      font-size: 9px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .sub-val {
+      font-weight: 700;
+      font-family: ui-monospace, monospace;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+    }
+
+    th {
+      background: var(--highlight-bg);
+      color: var(--text-muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .table-container {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow-x: auto;
+      background: var(--card);
+      margin-bottom: 28px;
+    }
+
+    .font-mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .callout {
+      background: var(--highlight-bg);
+      border-left: 3px solid var(--accent-green);
+      padding: 12px 16px;
+      border-radius: 0 6px 6px 0;
+      font-size: 12px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body class="theme-b">
+  <div class="max-w">
+    <!-- Header -->
+    <header>
+      <div class="logo-box">
+        <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQABLAEsAAD/4QCARXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAIdpAAQAAAABAAAATgAAAAAAAAEsAAAAAQAAASwAAAABAAOgAQADAAAAAQABAACgAgAEAAAAAQAAAMigAwAEAAAAAQAAAMgAAAAA/+0AOFBob3Rvc2hvcCAzLjAAOEJJTQQEAAAAAAAAOEJJTQQlAAAAAAAQ1B2M2Y8AsgTpgAmY7PhCfv/AABEIAMgAyAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2wBDAAICAgICAgMCAgMFAwMDBQYFBQUFBggGBgYGBggKCAgICAgICgoKCgoKCgoMDAwMDAwODg4ODg8PDw8PDw8PDw//2wBDAQICAgQEBAcEBAcQCwkLEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBD/3QAEAA3/2gAMAwEAAhEDEQA/APyGXg1OtQr1qdRW0TKJOhqcdaiUDNTL1qiyZamFRKDU6CgCRakHWmj0qQCgybHKMVIOaRR2qQLx700IO1OFKFp22qsAh6Uzt9akxmkx2oaAhx6VGc1PimMKkCuajOcVORULdaRUXqQMSagfNWW6VA45oNSsx5qE/pU7DiomGaAK7HA4qBjU7DioCO1KRDKzEkmmc+lSNxTMj1qCLH//0PyHUVYHA4qBeTU6+9bxM4lhKnWoVxU64zTLuTLg81YTrUC+gqdelBMtiYYqQc8CohUwpmQ8Y/GpQB3pgIqUe9UgFHFPHSkHXmn0xjT0pp6U+mnFAER46dqYf5VIRioyM+1SxEZ61Ew71MT2qI1IFduuRUJFWGxULCg2TKrdahbip2xUBxQBA3PNQPjNTtmq7c96TE9iBvyqOpXPrUWagi5//9H8iF96nXpVZTVhK2iZpllPSrC1WWrCkVRVydanX0quDkYFTrQDLC9alBqEVIMUzEmGOtSDnmoQcVICO1NMCYHinioQadnnA5JOMDrk027asa8iQnPSmgMc7QTtGTgdB6mvoXwj+z3rt7on/CbfEO8j8HeGIhve4vSI53Xt5cbYxu7FsE9geK7i71T4Xap8DPHb/C3TpYbbSTa20l9cptmvC08Z3gn59voCF/3RXzuI4jpqcYUVzJtJvor+fX5Hp08sk4tzdtL26s+PjUbHFKTTSc19Czyxh55NRMT3qSozUgRE1CxqZsYquaDZbEDc9agY1O3XFV2I6UAQtxVdutTtioGApMTZAxpmR605qj/CoJP/0vyFXAqdeBVYH0qdTW0TNMtKanVqqKfSpwcc1RRbQ+lTqc981UU+tTK3pQBbB4qUHiqyn8ql3Y4oM5RJg2eKlB55qqDg5zUoanckkkl2Iz4+6Ca++PEEnw3/AGStI8MS6P4cfxn8QPE+mpqUF3flUs7KN+MhRnlWyMAbiOd4HFfn9cNiCTP90/yr9Hf2lfhJ8RPiv48+EmhfDzTjdTnwja+dcSAi1tUeRh5kz9FA6gdT0ANfLZ/ODr0qdeVqbUm9bJ2ta/8AkehhlVVGpLDr39LHyZqOr+Jfi1rj+LPiRq0ms3UTjyrbHl2cGecRwjgAe/J6kk16D4QhV/2ePi/MihRFfWYwOAP30Yrc+Gv7LXijxP8ACW4+JPw51U3fii01G+tLrT7hv9F1BLWTavlHjy5AOmeD04pngnTNVsf2ZfjZFr1jLpuoQ39iJradSkkLmaLKsCAeK4sZmGHqRjSoP4ZxVu1n+R5eSZTjqGKq1sXPmU46P9D5FzwKYTmmb+goJ4r7a5oISc1GxzSls1HnApDSGsars1SOfXpULHFBqRsagbjmpC2agY/rQMib2qBjxUzGoGNTImTIjUf40rE5puDUkpn/0/x/U1OrVWU1MprQyTLStzmp1PPFVA1TKxrQsthuamU96qKeamBoGWlapgaphvSpVb86AaLSnnmpM4FVlbHWnbsGgzcT6Y+C/wCzvd/EnTZ/HHjnUY/CXw/sAzXWq3LKnmqh2uluGPJz8pY8A8Dc3y17h8Wv2p/EfxLtF+GXwZkn8OfD+xhWxl1N8pf6jDGuzbHnDRRlR14Zu5H3a8z+Itwbj9ir4X2rMTH/AG1fFkz8rYuLjGR0OM8ZrzLwcwfTpUPaX+gr5HBYZYuf1vEauLaiuis7fNvueNxjn1XAQhhsLo5Wu+up77pOo6v4c/YLtNa8M6hNpWoWPi4PBdQOUkjZZsAgjr6EHgjggjiu+8P/AB60n42+ENW+A/xymh8I+Jdfiht4NfijUWmoPBIrxGToEkLKAQSFIJClSQK81+C+i+MPjv8AAu3/AGffC+ltYadYazLquseIrw7LG1jD744YgOZZWHJGQF4zxyL/AO0Z8MvC3g7xnN8PLSNrq1t7O1eR5sF3llQlpB/dyegHTpXlUcLh61aeGnpUUpSTW610/wCGPVzvPMTgIUsVy3otKMl1vbofMvxW+EHjf4Na7/YfjGz8tZcm2uo8tbXKD+KN/X1U4Ydx3ry7J619xaBrmveIP2JfiDbeJ7+TWV8M6vY22nSXZEstvC1xANiyMN2AGIHPAJA44r4ZLV9Zk+MqVYSVa3NFtNrrbqd2KoxTjKns1cVjioi2etIXzUTNXrmKFJIqFjQW/CoiwoEITUDHPFOY5OahY+negY1jVds1ISKhY1DZDuRscA4qPd70rVHgetIizP/U/HkGpVNVlbNSg4rQxVy2pxUqE9KqqalU1SZUblwe9SA96qKamDHiqLLQPFPDYNVg3eng0AWt1PDVV3V6l8NPhdrXxFup5Ucabo9irSXV/MMRIEGSqk4DPjtnA6kiufE4qnRjz1HZGlOjKo+WKPYfG8+/9kT4bwf3dXvT+c89YnwX+Gmp/FufUIb69/sDwJojGbWtYZgmY0GWt4WPG4qPmboo69gfSvD3w6v/AIq/s/fD7wvazC1sotSvp7u6JGIbZZp8v7k9F7Z5PANcx478Z6d42tbX4T/D+P8As34Z+G3Ef7s4OrXMZyXdv4og3OT99vmPbHxWX4ipUpvC0HZ80uZ9lzP8X07bmfEGHwtCpHMMZqopKK7ux9JfFr4geDPFn7IEUXwns5NC8LWfiO00y1jUmM3FvbzjdI4HJErfMQxJPVueBhftf3it+0dfQHgSaXZEfVQf8a8fsp9n7E1na9NvixMY/wCu4rsf2w77Z+0SLjPH2KzUn2KkGufIcPGljHCOy9p/6UjzvEOTqZapPq4v8GZHglc/sSfGRz28Qad/6VW1fDu7B619weCXx+xL8ZImOP8AiodN3H0H2u2zXiXxu/Z98X/BW6tLy7I1jw3qsaS2Or2w3W0qyLuCORkJJjtkgjlSR09zJsZThVq0puzlN289Ee7UpSdKnJLRRR4SWx0qMtUe6mFq+pOMcxqJmNIWqMsOlAATiomPegnJqJmGfWk2LXYCagJpST1qEmoM2ISabk01mpu4+lAJn//V/HBT0qUGqympFbFaGBaDVMrVVDc08NzQUuxdDdqeGHeqqvjg08NVJlJlsGpA2KqB8U8N71Qz0b4Y+H9N8V+O9J0DV95s7p28wRnaxVFLYz2zjB746V9xfEDT/AV94Dh0u6jv38LaezJJDoeXRfKOCJliyzBSDkc88t618ZfA1s/FTQv9+X/0W1V7DxN4u8H+NfEWp+C9Ra1k/tS6823kO61uB5hOHT1/2hz7ivh84y6rica/ZzacIppXtu3f0fmetTzSjhMKpVlpJ2v9x9IaZ8ZPgKPh63wws7nXI9Cw8bNBbSiYpI5kdDIBnDFiD7cVzukeB/hX43P2L4E+LbrSvEFmuRpmtB1ivEHO1FkAI+qZx3AHNcyY/hx8YJVigYfD3xvjOw4FleufTGFbP4N7NTbD4Ia7C0mtfGDUbTwl4e0WUE3UMoa5mdeQbdhym7+Hq2eimuOnCjQT5ZzhUvflet36bSuZV3WxM4qVOFSi+u1kdZDbeKx8JIv2cl8OX7eN01sX6w+Sfs32cPv837Rny9nbOa9J+Ifh/wCE/wDwkb69+1f4yudU8Z6iqbNK8NI5j06BR8qMIgWbHTc5BPYHrXn3i/8AaZ8S69p8fhH4dzXWheH441hOr3DGTU7iNRgmPcfk3d3Ylj7V514H0fUvE2qv4Z+E+kvr+qTtuu9QnJ8mNmPMlzcNyTnkqDk9ua6KOAqKDrYmXs1q3Z2eur16eiPLzDPYuosLgKftpefwq2h9S6T8Vv2KfDHww134SSy+J49A8S3ENxdPLZz+c0sDI6bZCOOUGfWvsr4FeGfg3D8ILvw9ZprH/CvdYdIobXxWPJic3B2gWqz7ZFV2I24wCxBTk5r8+45PhB8Ab3frX/F4fih1jtUwdM0yTryDlVwe5DPx0TqfPNa8a/E74jfE/wACeJfilrrXk58RaaLbT7cmOws1+0KcRx5wX7bjlj3JrycTkjrwlKlKUYL3rt6trql09WevTz6nQq08PXcXVlpaOyOD/aO8AaH8LfjT4m8CeGWl/svTZozAJm3yIk0aybC3faWwCecDnmvD819O/toyFv2mfGrHnMlt/wCk8dfLe7NfomVzlLDU5Sd20vyOLERSqSS7seT3qMn1pM546VGzV2NmHkhzN6VCTSE85qNmPSpMwY1ExpSTjmoWNANCMTTfxprGmbqAsf/W/GYNUymqoPNSA1oYIthuakB9aqqc1KDQMsq3Ip4OOarA45p+aALIapA1VN3Ga6PV/Cvibw9aWl/rml3Fhb343W8k0ZRZRgHKk9eCD+NRKrFSUW9XsXGDabS0R3XwWuYbX4naJNPIsSK0uWchQP3bdzxXouofBHxRcaxqWpad4l0iGK/uprgLI+4gSOWGffBFfPN74V16PQrfxDf6ZPHpF422G6ZD5MrDPCv0J+U8e1Z+i+Dr3xNqUWkeHtNm1K+mzsggQySNtGTgD0Aya8bE4RyqyxVKtyq1nomtLnY1CdJUK9Lm1vqfRcv7PHjDV0+z6h4n0SSHtl8EH1B7GvSUt/H/AMPvC50jx9/Z/wARvBqDbNBHcI99bRj+KPfguqjoM7h2IFfGNj4K1HU9dXwvp2mTXOrvKYFtI0LTGVc5QKO4wc/Sm6x4Qv8Awpq0ukeINNl0zUbbb5kFwhjkTcAwyp55BBFc9TK5VpKnWrKXW1lf1VtV6l4epToR/c0uVert/kfUMfw9+ATWX/CfXPjmb/hCi2To4/4/fO6/Z8/6zHttzj+LHzV61FF8T/id4OXw38NDpfwu8DMu2CGW5WLULyI/xSeXlo1YdRnc3diK+F5PAniSHw7F47m0S5TQ55PIj1AxH7O0gJGwSdM5BH14qvoXgDX/ABdJfN4Z0e51Z9PhNzc/ZozJ5MI4Mj46L71E8qi17R17uLtd2dvLtfzeprTxKjeMaVr6tLS/mfZOhfss/EzQLf7Ho3jHwvbwtycyZZj6sx5JrstG/Zh+JP8Awk/h/W9e8beGp7TRtStL5khn2ORBIrtjPcgED3r4Bsvh9repeHLzxdZ6NcT6JpzrHc3qRk28LuQFV36AksAM+op3iT4da/4MntrbxZolzpL3sQngFzGY/NiPAdM8Fc9xTng6070/rSu7q1o/M4aeEwkKirxw65t76n0B+1xqFtqX7Q/i28tJknike2IeNg6n9wnQqSDXzcTWtaeDfEZ8N3Hiqy0m4fQrRxFNeiM/Z0kOAFMnTPI496s6R4L8X+INKvdd0LR7q/07TAWuriGJnjhAUsd7DgYUZPtXsYadKjRjDnVo2jfzX6hUjOc20t9TnScVHuxTN9NJruOa3YcW9KjY03OOajJoAUnioiaCcVCT60AKTRhajJpu80Csf//X/F0GpBxUAapAfWtDAnU4qZGG7JqqDTg1Ay0GyfapA1VQ1PzQGh638GfA4+IXxB0zQrgH7BG32i8bstvFywJ/2jhR9a+rNV1W8+P+h+PfCNzZSW8mhXH2/wAOs0LR74IF8soMgZ34PHpIPQY+avh98VtL+G3gTxBa+H0nTxnrLxxw3XlqYLe3QjkMTktyxxtxnFXfDH7THxa0jxBpt/4g1yXU9LgnRrq28qMGSHOHAIUHOORyOa+OzHAYutXlXhFe7blvvpq7eux7+FxFCnTVOT33+f8AkejfAq8/4Wd8N/FfwBvnAvBG2p6MX6iaM7njB7fOAfozelaPwSWX4MfDPxj8ddUi8rU9r6Jo0cgwxu5DtkbH+wwwfZGHWvD5viRonhn4zJ8TvhtBPDp8N4LpbedRHJsl4uYcKSNrZbbzxkccV2P7QPx00b4rtpGi+C7KbTfD2ledctDOixGW9nY7nKoWGAOhzklmz2p1MvryrezUbUptSl5Nbx+bt+JMcTTVPmb9+Oi8+z+R6L+zLpUvgzwp4z/aJv7aS+utDt5LPSUCl3m1G6G13AAJJG9QTjgMxPetL9ofT7/4pfCjwb+0VNavbaskK6P4giMZiK3MRIjmKkDCsxOPQMg9ccbrn7Tt/wCFPBvhLwN8ALu70G00a3k/tG4uIIhJdXUhBZgDvG3duOeDyB0FaHgn9rDV9X0nxT4M/aEvbvxH4f8AEGntBA9vbxNNa3GflcKNgI53dcgqMdTWEcFjVX+vcivfa+vLtbt577luvQ5PYc3Tfpfe/wCh9X/Brxj8PvDP7HnhTT/ivai58LeJdVu9KvHbpbiaaQpMccgI6j5hyv3u1Ufgp8FNd+B/j34t6PdOb3RdQ8JXFxpV+mDHc2pkyvzDjeoIDAexHBFfFGu/Gfwrqv7MehfA62trs61peqy3sszxqLZonaQjDbs7sMMjbXrXwP8A2yj4A+FetfCb4jwXmq2psp7fRrqACWWBZUKC3l3sp8pScowyVGVxjGOCeSYuNOcqS+KbvHy5rqS/XyNVjqLkoye0dH8tix8NHJ/YK+Ku3vq2n/8Ao61rT+EDWX7Unwbf4EeIr1IvHXg3/SfDt5cH/W2OQrwMepEY4I5O3YR9014X4O+M3hfw3+zN40+C99b3b674lvrW5tpUjU2ypDJCzB3LAg4jOMKe1YX7OHxQ8P8Awa+MGlfEPxPBcXGn2MF5E6WqK8pNxA0a4VioxlhnnpXqVcrrOjWlFNTU3KP4fmcsMVDngm/dasz0j9pfxtpek/2T+zZ8OZTJ4Y8EEJdyIedQ1Zv9a7Y67HJGOm8n+6MfRmm67P8As42/w1+EcOmyXNvrQa88VyLC0ir9vXylVmCkDy26452JjuDXw54D8b+AdP8AjV/wsLxva3VxoMepXWpLbwRK8zu0jSW6spYKAGKlue3eut8Uftd/HbV9f1PUNG8RyaZpt1cyva2qwxHyYCx8tMlSSQuM8nmpxmS1ZqGHpx9yKu2+sn106rf1ZdHHQjzVZPVvp0SOC+NXw7l+FnxI1fwlgm0jk86zc/x2svzRkfTlT7qa8pLV7/8AFf4w6L8W/BPhaTXIrgeOtEV7e8uPKQW91CxPzbgchshWxtABLY46/PTHPvX02WyquhH26tJaP5dfmeTi4wVR+zeg4tUZag+3FRkiu45wJqMmlJqLNAh27NHPpUZajf7UDP/Q/FUHFPDc1BnmngmtDAsA56U8GoAak3etA9CYU4thT9KhDYpw60Bodef7Ds9Snv5JLeazGTFCjCQktwAUQ5AHJ+uKI5PDki/ZXmj3RC5dZgciQY/dow7HoVPrkGuQAXOcV0ui2nhy4sNRfV7v7LcxBfsyZwZCUlZsfKwJDKg5Kj5uucVlUnyq5wxy3mes2WNWudLjgmhtTat/qfs/kEGT7o8zzNvbr97nPSpdXj0ZdNtJbC4g89cI6oyktlR87YOQAR0b5gSe2K2LrQfAls2qCLWkBiCiy/eB/OIJZyxQEKCowuSuWPsRWbDonhxL/XYbjUInitFZrJknj23Hznb82QCduCQOc9q544uLV7P7jeOVOLilPa5Il34cSeGS3aCYQBoCrlY952jbN+9+Rjuz14PFTF9AwF+0WgjW6Xc+IyZkMq5AXO+MBc8jKEVo3Oh/DwSvDb6oD5hs/LkadSIklMgn80IrAtGEU4ViPnHfgT2ehfDC4vzbvrDfZ3ubgRzmVYx9mW3SWDerou12djG2SBuU4pfXF/K/uMnkaf2znJdRsLOe8iCWcoeAmEhIJAJNwAAMeRnGeDz61Ws7/Q7PSAt9Gs9y7XAKLGrPgogjPmFgUAYkjAOcEVvaLonw9udKu7nWNbNhfQy3whgGHEscVuGt8OAQN8x2kngqDjnGegtfCnwmeYR3fi4BTFCA6j5ftKswuEbcgIRgoMTgFcsASRlg5YyKduV/caRyePKlzee5z9q/hpLpft0lk1u08f2Yx4LCLa2/zh19OH53dOKxDrGmwrOIUtZt1mpV3hRSbjeAcJzsIUkFc443V2K+EPhv5Mbw+KLe6n+zRiWNpxbItyM+e6yPEd0a5Xy1UEv83PykVetvC3whlnt4bzxObSN108mRSk2fODm7GFzsKBQF3AYYjcMHIj67Hs/uIjkcb6yOHvbvRG1B00/yF2RDymkSNYDKVTOW/i/i+/xupt62i3NiTBNaR3SSRGXEiorfuz5gi3EZXf2XjPTiuu0/wx8LnksYtV8RfZIrm3iLyiRJAk7zxq6ui5ZFWMsSSMjGeQDXnOuQeH0j059EZ3aW333G5w+2XeRtGAMcAHHPWtaWIU5WSYPKFBJqe3/DG15ugmZjG9r9hEk/n7iBMRk+X5PfG3GNvfO7iuKDfKCeCaYVX0pM11JFYbDqnfW47dzTCe1ITxTT14pnToG71phPam5ppbigQGk5phNNyKAP/9H8Tu9PFQ5p45rQwJs+tOyahBp4NA9CUGnhuagzT80Dv3JgaXINQ5pc4oEScelO68VFnmlzigCXIHajjoRUe6l3UAkPNHHpTN1G6gBxwe1GFA6U0nPtTd1A7jiB1IoJxTC1JuoEP3U0tTC3Wm570BfW4/d2phNNJppNAri5ppNJnNMJ7UDHZFJx6Uwmk3UCP//S/EgdaePeo+9KCK0MLEuacDUWadQO73JQaAeaizinZFAXsTA0Aiowe1LuoHclLClBFRZpcigLkhNGajyKXOaAuP3UucDNRZo3UAiTdSZPemZ96TNAc3ccTRnjNNz2ppJ6UBzDySaYTSE0maBXHFqZmgnNNJxQO/UXNMyM0E+lNoEKTmm8elJuz0pMN60DR//T/EQdcU76Un8VOHUVTIaDmlyad60lMkBmnUo60UAGaMmgUUylEdzS80naloHyic0vPWl7UdqA5RvOaXnvS96VutBNhoJpPrTu1NNAmJSc04dKQ9aAa1EPXFNOakb71RmgUVqNJPSkNO70h70h2G5pOad3opNlNEeKMH3p5/rS0rgoo//Z" alt="Logo" class="logo-img" />
+        <div>
+          <div class="title-text">Avaniya Real Estate & Land Asset Portfolio</div>
+          <div class="subtitle-text">Design Direction Review & South Indian Land Expense Structure</div>
+        </div>
+      </div>
+
+      <div class="theme-switcher">
+        <button id="btn-theme-a" class="theme-btn">Option A: True Black</button>
+        <button id="btn-theme-b" class="theme-btn active">Option B: Luxury Emerald (Recommended)</button>
+        <button id="btn-theme-c" class="theme-btn">Option C: Midnight Navy</button>
+      </div>
+    </header>
+
+    <div class="callout">
+      <strong>Theme Selection Notice:</strong> Option B (Luxury Obsidian & Emerald Gold) brings subtle depth and high legibility specifically crafted for high-net-worth real estate & land business portfolios while maintaining True Black energy savings. Click between the buttons above to test live.
+    </div>
+
+    <!-- Live KPI Strip Mockup -->
+    <div class="section-title">Portfolio Liquidity Overview (Live Formula Engine)</div>
+    <div class="grid-kpi">
+      <div class="card card-kpi">
+        <div class="kpi-label">Net Bank Liquidity</div>
+        <div class="kpi-val kpi-blue">₹ 29,24,297</div>
+        <div class="kpi-sub">Bank Reserves</div>
+      </div>
+      <div class="card card-kpi">
+        <div class="kpi-label">Cash in Hand</div>
+        <div class="kpi-val kpi-green">₹ 19,93,500</div>
+        <div class="kpi-sub">Liquid Site Cash</div>
+      </div>
+      <div class="card card-kpi">
+        <div class="kpi-label">Total Combined Liquidity</div>
+        <div class="kpi-val">₹ 49,17,797</div>
+        <div class="kpi-sub">Capital: ₹ 1.74 Cr</div>
+      </div>
+      <div class="card card-kpi">
+        <div class="kpi-label">Pending to Sellers</div>
+        <div class="kpi-val kpi-gold">₹ 4,11,27,598</div>
+        <div class="kpi-sub">5 Land Deals</div>
+      </div>
+      <div class="card card-kpi">
+        <div class="kpi-label">Buyer Receivables</div>
+        <div class="kpi-val kpi-green">₹ 1,21,50,000</div>
+        <div class="kpi-sub">Agreed Sales Pipeline</div>
+      </div>
+      <div class="card card-kpi">
+        <div class="kpi-label">Realized Profit</div>
+        <div class="kpi-val">₹ 18,94,800</div>
+        <div class="kpi-sub">Settled Deal Gains</div>
+      </div>
+    </div>
+
+    <!-- Visual Deal Pipeline Cards -->
+    <div class="section-title">Commercial Land Deal Cards (With Agreed Price, Expenses, Target, & Selling Price)</div>
+    <div class="grid-3">
+      <!-- Card 1: Kalaimal Nagar (Sold Deal with High Expenses Breakdown) -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+          <div>
+            <div style="font-weight: 700; font-size: 15px;">Kalaimal Nagar</div>
+            <div style="font-size: 11px; color: var(--text-muted);">LND-002 • 1,122 sq.ft @ ₹9,100/sqft</div>
+          </div>
+          <span class="badge badge-sold">SOLD</span>
+        </div>
+
+        <!-- 4-Metric Grid including Agreed Price, Expenses, Target Price, Selling Price -->
+        <div class="sub-matrix">
+          <div>
+            <div class="sub-label">1. Agreed Buy Price</div>
+            <div class="sub-val">₹ 1,02,10,200</div>
+          </div>
+          <div>
+            <div class="sub-label">2. Property Expenses</div>
+            <div class="sub-val kpi-gold">₹ 45,000</div>
+          </div>
+          <div>
+            <div class="sub-label">3. Target Sale Exit</div>
+            <div class="sub-val kpi-blue">₹ 1,34,64,000</div>
+          </div>
+          <div>
+            <div class="sub-label">4. Agreed Selling Price</div>
+            <div class="sub-val kpi-green">₹ 1,21,50,000</div>
+          </div>
+        </div>
+
+        <div style="font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; margin-top: 4px;">
+          <span>Total Project Outlay: <strong class="font-mono" style="color: var(--text-main);">₹ 1,02,55,200</strong></span>
+          <span class="kpi-green font-mono"><strong>+ ₹ 18,94,800 Gain</strong></span>
+        </div>
+
+        <div class="progress-track">
+          <div class="progress-bar" style="width: 100%;"></div>
+        </div>
+      </div>
+
+      <!-- Card 2: Andal Avenue (Active Pipeline) -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+          <div>
+            <div style="font-weight: 700; font-size: 15px;">Andal Avenue</div>
+            <div style="font-size: 11px; color: var(--text-muted);">LND-001 • Commercial Land Parcel</div>
+          </div>
+          <span class="badge badge-open">IN PROGRESS</span>
+        </div>
+
+        <div class="sub-matrix">
+          <div>
+            <div class="sub-label">1. Agreed Buy Price</div>
+            <div class="sub-val">₹ 2,85,00,000</div>
+          </div>
+          <div>
+            <div class="sub-label">2. Property Expenses</div>
+            <div class="sub-val kpi-gold">₹ 40,000</div>
+          </div>
+          <div>
+            <div class="sub-label">3. Target Sale Exit</div>
+            <div class="sub-val kpi-blue">₹ 3,30,00,000</div>
+          </div>
+          <div>
+            <div class="sub-label">4. Pending to Seller</div>
+            <div class="sub-val kpi-gold">₹ 1,85,00,000</div>
+          </div>
+        </div>
+
+        <div style="font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; margin-top: 4px;">
+          <span>Total Outflow Paid: <strong class="font-mono" style="color: var(--text-main);">₹ 1,00,40,000</strong></span>
+          <span class="font-mono">35% Funded</span>
+        </div>
+
+        <div class="progress-track">
+          <div class="progress-bar" style="width: 35%;"></div>
+        </div>
+      </div>
+
+      <!-- Card 3: Revathi Nagar -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+          <div>
+            <div style="font-weight: 700; font-size: 15px;">Revathi Nagar</div>
+            <div style="font-size: 11px; color: var(--text-muted);">LND-005 • Registered Plot</div>
+          </div>
+          <span class="badge badge-sold">REGISTERED</span>
+        </div>
+
+        <div class="sub-matrix">
+          <div>
+            <div class="sub-label">1. Agreed Buy Price</div>
+            <div class="sub-val">₹ 26,73,000</div>
+          </div>
+          <div>
+            <div class="sub-label">2. Stamp & Legal Exp.</div>
+            <div class="sub-val kpi-gold">₹ 90,000</div>
+          </div>
+          <div>
+            <div class="sub-label">3. Target Sale Exit</div>
+            <div class="sub-val kpi-blue">₹ 37,62,000</div>
+          </div>
+          <div>
+            <div class="sub-label">4. Total Paid So Far</div>
+            <div class="sub-val kpi-green">₹ 9,71,201</div>
+          </div>
+        </div>
+
+        <div style="font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; margin-top: 4px;">
+          <span>Pending Outflow: <strong class="font-mono kpi-gold">₹ 17,91,799</strong></span>
+          <span class="font-mono">36% Paid</span>
+        </div>
+
+        <div class="progress-track">
+          <div class="progress-bar" style="width: 36%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comprehensive South Indian Land & Real Estate Expense Structure -->
+    <div class="section-title">South Indian Real Estate Comprehensive Expense Categorization Engine</div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Expense Category</th>
+            <th>Domain / Authority</th>
+            <th>Financial Role in Engine</th>
+            <th>Typical Range (South India / TN)</th>
+            <th>Mathematical Treatment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Sub-Registrar Stamp Duty (7%)</strong></td>
+            <td>Registration Dept / SRO</td>
+            <td><code>property_expense</code></td>
+            <td>7% of guideline / agreement value</td>
+            <td>Added to Total Project Outlay</td>
+          </tr>
+          <tr>
+            <td><strong>Registration Fee (4%)</strong></td>
+            <td>Registration Dept / SRO</td>
+            <td><code>property_expense</code></td>
+            <td>4% of guideline / agreement value</td>
+            <td>Added to Total Project Outlay</td>
+          </tr>
+          <tr>
+            <td><strong>Patta / Chitta Transfer & Mutation</strong></td>
+            <td>Revenue Dept / Tahsildar</td>
+            <td><code>property_expense</code></td>
+            <td>₹100 online + VAO verification</td>
+            <td>Added to Total Project Outlay</td>
+          </tr>
+          <tr>
+            <td><strong>DTCP / CMDA Layout Scrutiny Fees</strong></td>
+            <td>Town & Country Planning</td>
+            <td><code>property_expense</code></td>
+            <td>₹25 - ₹750 per sq.meter</td>
+            <td>Added to Total Project Outlay</td>
+          </tr>
+          <tr>
+            <td><strong>Open Space Reservation (OSR) Charges</strong></td>
+            <td>Planning Authority / Local Body</td>
+            <td><code>property_expense</code></td>
+            <td>10% land value / guideline cess</td>
+            <td>Added to Total Project Outlay</td>
+          </tr>
+          <tr>
+            <td><strong>Land Surveyor & FMB Sketch Verification</strong></td>
+            <td>Govt Surveyor / Firka Surveyor</td>
+            <td><code>property_expense</code></td>
+            <td>₹5,000 - ₹25,000 per field survey</td>
+            <td>Added to Total Project Outlay</td>
+          </tr>
+          <tr>
+            <td><strong>Advocate Title Opinion & 30-Yr EC Search</strong></td>
+            <td>Legal Practitioner</td>
+            <td><code>property_expense</code></td>
+            <td>₹15,000 - ₹50,000 per title doc</td>
+            <td>Added to Total Project Outlay</td>
+          </tr>
+          <tr>
+            <td><strong>Perimeter Fencing & Boundary Stone Fixing</strong></td>
+            <td>Site Security / Contractor</td>
+            <td><code>property_expense</code></td>
+            <td>₹150 - ₹350 per running foot</td>
+            <td>Added to Total Project Outlay</td>
+          </tr>
+          <tr>
+            <td><strong>EB Transformer & High Tension Line Setup</strong></td>
+            <td>TANGEDCO / Electricity Board</td>
+            <td><code>property_expense</code></td>
+            <td>₹2,50,000 - ₹8,00,000</td>
+            <td>Added to Total Project Outlay</td>
+          </tr>
+          <tr>
+            <td><strong>Borewell Drilling & Motor Setup</strong></td>
+            <td>Water Contractor</td>
+            <td><code>property_expense</code></td>
+            <td>₹1,50,000 - ₹4,00,000</td>
+            <td>Added to Total Project Outlay</td>
+          </tr>
+          <tr>
+            <td><strong>Brokerage / Mandi Mediator Commission</strong></td>
+            <td>Real Estate Agent / Mediator</td>
+            <td><code>property_expense</code></td>
+            <td>1% - 2% of total transaction</td>
+            <td>Added to Total Project Outlay</td>
+          </tr>
+          <tr>
+            <td><strong>Token / Agreement Purchase Advance</strong></td>
+            <td>Land Seller (Direct Principal)</td>
+            <td><code>purchase_principal</code></td>
+            <td>As agreed in sale agreement</td>
+            <td>Directly reduces Pending Seller Outflow</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Comparison Summary -->
+    <div class="section-title">Design Direction Comparison & Recommendations</div>
+    <div class="grid-3">
+      <div class="card">
+        <div style="font-weight: 700; font-size: 14px; margin-bottom: 6px;">Option A: True Black Baseline</div>
+        <div style="font-size: 12px; color: var(--text-muted); line-height: 1.6;">
+          • Background: <code>#000000</code> Pure Black<br>
+          • Surface: <code>#0A0A0A</code> Wire Borders<br>
+          • Contrast: Maximum stark contrast<br>
+          • Strengths: Strict compliance with default AGENTS.md, OLED power saving.<br>
+          • Trade-offs: Can feel slightly clinical/monochromatic over long working sessions.
+        </div>
+      </div>
+
+      <div class="card" style="border-color: var(--accent-green);">
+        <div style="font-weight: 700; font-size: 14px; margin-bottom: 6px; color: var(--accent-green);">Option B: Luxury Obsidian & Emerald (Recommended)</div>
+        <div style="font-size: 12px; color: var(--text-muted); line-height: 1.6;">
+          • Background: <code>#060907</code> Deep Obsidian<br>
+          • Surface: <code>#0C130F</code> with Slate Emerald <code>#1A2B20</code> borders<br>
+          • Accents: <code>#10B981</code> Emerald Cash & <code>#D97706</code> Gold Receivables<br>
+          • Strengths: Sophisticated real estate wealth aesthetic, preserves true dark-mode comfort, premium visual hierarchy.<br>
+          • Trade-offs: Requires user authorization to override default pure `#000000`.
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="font-weight: 700; font-size: 14px; margin-bottom: 6px; color: var(--accent-blue);">Option C: Midnight Navy & Platinum</div>
+        <div style="font-size: 12px; color: var(--text-muted); line-height: 1.6;">
+          • Background: <code>#060913</code> Deep Navy<br>
+          • Surface: <code>#0E1526</code> with <code>#1E293B</code> borders<br>
+          • Accents: <code>#38BDF8</code> Sky Blue & <code>#10B981</code> Emerald<br>
+          • Strengths: Institutional fintech banking aesthetic.<br>
+          • Trade-offs: Less warm than Option B for Indian real estate land business.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function selectTheme(themeName, activeBtn) {
+      document.body.className = themeName;
+      var buttons = document.querySelectorAll('.theme-btn');
+      for (var i = 0; i < buttons.length; i++) {
+        buttons[i].classList.remove('active');
+      }
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+      }
+    }
+
+    document.getElementById('btn-theme-a').addEventListener('click', function() {
+      selectTheme('theme-a', this);
+    });
+    document.getElementById('btn-theme-b').addEventListener('click', function() {
+      selectTheme('theme-b', this);
+    });
+    document.getElementById('btn-theme-c').addEventListener('click', function() {
+      selectTheme('theme-c', this);
+    });
+  </script>
+</body>
+</html>
