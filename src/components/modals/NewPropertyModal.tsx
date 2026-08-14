@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { amountToVerbalSummary } from "@/lib/formatters";
 import { SeedProperty } from "@/lib/seedData";
-import { useAnimatedModal } from "@/hooks/useAnimatedModal";
 import { X, Building2, Home, Calculator } from "lucide-react";
 
 interface NewPropertyModalProps {
@@ -19,8 +18,6 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
   defaultType = "commercial",
   onSave,
 }) => {
-  const { shouldRender, isClosing, handleClose } = useAnimatedModal(isOpen, onClose);
-
   const [type, setType] = useState<"commercial" | "personal">(defaultType);
   const [name, setName] = useState("");
   const [propertyCode, setPropertyCode] = useState("");
@@ -39,7 +36,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (!shouldRender) return null;
+  if (!isOpen) return null;
 
   // Auto-calculate Agreed Purchase Price when sq.ft & rate are provided
   const handleSqftOrRateChange = (
@@ -116,7 +113,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
         notes,
         milestones: defaultMilestones,
       });
-      handleClose();
+      onClose();
     } catch (err) {
       console.error(err);
     } finally {
@@ -126,16 +123,16 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
 
   return (
     <div
-      onClick={handleClose}
-      className={`fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto ${
-        isClosing ? "animate-backdrop-exit" : "animate-backdrop"
-      }`}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto animate-backdrop"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-5 sm:p-6 shadow-2xl my-auto flex flex-col gap-5 ${
-          isClosing ? "animate-modal-exit" : "animate-modal"
-        }`}
+        className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-5 sm:p-6 shadow-2xl my-auto flex flex-col gap-5 animate-modal"
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#262626] pb-3.5">
@@ -143,7 +140,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
             + Add New Real Estate Property / Deal
           </h2>
           <button
-            onClick={handleClose}
+            onClick={onClose}
             className="p-1 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] transition-all duration-150"
           >
             <X className="w-5 h-5" />
@@ -376,7 +373,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
             </button>
             <button
               type="button"
-              onClick={handleClose}
+              onClick={onClose}
               className="px-4 py-2.5 rounded-lg bg-[#161616] text-white border border-[#2a2a2a] text-xs sm:text-sm font-medium hover:bg-[#222222] transition-all duration-150"
             >
               Cancel

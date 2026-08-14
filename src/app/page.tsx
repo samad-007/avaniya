@@ -45,14 +45,13 @@ export default function DashboardPage() {
   const [personalMetrics, setPersonalMetrics] =
     useState<PersonalDashboardMetrics | null>(null);
 
-  // User Auth State
+  // User Auth State: Defaults to null so page refresh immediately lands on Login screen
   const [user, setUser] = useState<{
     name: string;
     email: string;
     role: string;
     datasetId?: string;
   } | null>(null);
-  const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
@@ -130,34 +129,6 @@ export default function DashboardPage() {
     }
   }, []);
 
-  // Check auth and initial Fetch from API
-  useEffect(() => {
-    async function initSessionAndData() {
-      try {
-        const meRes = await fetch("/api/auth/me");
-        if (meRes.ok) {
-          const meData = await meRes.json();
-          if (meData.success && meData.data) {
-            setUser(meData.data);
-            const activeDs =
-              meData.data.role === "super_admin"
-                ? "ds_yousuf_portfolio"
-                : meData.data.datasetId || "fresh_user";
-            setCurrentDatasetId(activeDs);
-            await loadDatasetData(activeDs);
-            setIsAuthChecking(false);
-            return;
-          }
-        }
-      } catch (e) {
-        console.warn("API init error", e);
-      } finally {
-        setIsAuthChecking(false);
-      }
-    }
-    initSessionAndData();
-  }, [loadDatasetData]);
-
   useEffect(() => {
     recompute();
   }, [recompute]);
@@ -177,13 +148,10 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!user) return;
 
-    // Push state so back gesture / button can be captured
     window.history.pushState({ dashboard: true }, "");
 
     const handlePopState = () => {
-      // Re-push state to keep user on the dashboard URL
       window.history.pushState({ dashboard: true }, "");
-      // Prompt explicit logout confirmation modal
       setIsLogoutModalOpen(true);
     };
 
@@ -193,11 +161,11 @@ export default function DashboardPage() {
     };
   }, [user]);
 
-  // Automatic Inactivity Session Timeout (30 mins idle / next-day expiration)
+  // Automatic Inactivity Session Timeout (30 mins idle)
   useEffect(() => {
     if (!user) return;
 
-    const INACTIVITY_LIMIT_MS = 30 * 60 * 1000; // 30 minutes of idle inactivity
+    const INACTIVITY_LIMIT_MS = 30 * 60 * 1000;
     let timeoutId: NodeJS.Timeout;
 
     const recordActivity = () => {
@@ -415,21 +383,7 @@ export default function DashboardPage() {
     setIsLedgerModalOpen(true);
   };
 
-  // Initial Auth Loading Screen (Clean, dark, zero data flicker)
-  if (isAuthChecking) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center text-white">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-white animate-spin"></div>
-          <span className="text-xs font-mono text-[#A1A1AA] font-medium">
-            Verifying security session...
-          </span>
-        </div>
-      </div>
-    );
-  }
-
-  // Clean Login Landing Screen (When unauthenticated)
+  // Clean Login Landing Screen (When unauthenticated or after refresh)
   if (!user) {
     return (
       <div className="min-h-screen bg-black text-white flex flex-col justify-between font-sans">
@@ -541,7 +495,11 @@ export default function DashboardPage() {
       {/* Property Deep-Dive Ledger Modal */}
       <PropertyLedgerModal
         isOpen={isLedgerModalOpen}
-        onClose={() => setIsLedgerModalOpen(false)}
+        onClose={() => {
+          setIsLedgerModalOpen(false);
+          setSelectedPropertyMetric(null);
+          setSelectedPersonalPropertyData(null);
+        }}
         propertyMetrics={selectedPropertyMetric}
         personalPropertyData={selectedPersonalPropertyData}
         onOpenEntryModal={handleOpenEntryModal}

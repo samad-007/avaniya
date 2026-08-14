@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { X, FileSpreadsheet, FileText, Database, Download } from "lucide-react";
-import { useAnimatedModal } from "@/hooks/useAnimatedModal";
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -10,10 +9,9 @@ interface ExportModalProps {
 }
 
 export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
-  const { shouldRender, isClosing, handleClose } = useAnimatedModal(isOpen, onClose);
   const [downloading, setDownloading] = useState<string | null>(null);
 
-  if (!shouldRender) return null;
+  if (!isOpen) return null;
 
   const handleDownload = async (type: "excel" | "pdf" | "csv") => {
     setDownloading(type);
@@ -50,16 +48,16 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
 
   return (
     <div
-      onClick={handleClose}
-      className={`fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto ${
-        isClosing ? "animate-backdrop-exit" : "animate-backdrop"
-      }`}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto animate-backdrop"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-5 sm:p-6 shadow-2xl my-auto flex flex-col gap-5 ${
-          isClosing ? "animate-modal-exit" : "animate-modal"
-        }`}
+        className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-5 sm:p-6 shadow-2xl my-auto flex flex-col gap-5 animate-modal"
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#262626] pb-3.5">
@@ -74,7 +72,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
             </div>
           </div>
           <button
-            onClick={handleClose}
+            onClick={onClose}
             className="p-1 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a]"
           >
             <X className="w-5 h-5" />
@@ -163,7 +161,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
         {/* Footer */}
         <div className="pt-2 border-t border-[#262626] flex justify-end">
           <button
-            onClick={handleClose}
+            onClick={onClose}
             className="px-4 py-2 rounded-lg bg-[#161616] text-white text-xs sm:text-sm font-medium hover:bg-[#222222] transition-all duration-150"
           >
             Close

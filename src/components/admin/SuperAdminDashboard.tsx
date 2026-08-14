@@ -14,7 +14,6 @@ import {
   X,
 } from "lucide-react";
 import { generateSecurePassword } from "@/lib/passwordGenerator";
-import { useAnimatedModal } from "@/hooks/useAnimatedModal";
 
 interface AdminUser {
   id: string;
@@ -47,8 +46,6 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
   currentDatasetId,
   onSwitchDataset,
 }) => {
-  const { shouldRender, isClosing, handleClose } = useAnimatedModal(isOpen, onClose);
-
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [datasets, setDatasets] = useState<DatasetOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -95,6 +92,8 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
       loadAdminData();
     }
   }, [isOpen]);
+
+  if (!isOpen) return null;
 
   const handleOpenCreateModal = () => {
     setNewName("");
@@ -217,20 +216,18 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
     }
   };
 
-  if (!shouldRender) return null;
-
   return (
     <div
-      onClick={handleClose}
-      className={`fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 md:p-6 overflow-y-auto ${
-        isClosing ? "animate-backdrop-exit" : "animate-backdrop"
-      }`}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+      className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 md:p-6 overflow-y-auto animate-backdrop"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto ${
-          isClosing ? "animate-modal-exit" : "animate-modal"
-        }`}
+        className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto animate-modal"
       >
         {/* Header */}
         <div className="p-4 md:p-5 border-b border-[#262626] flex items-center justify-between bg-[#0e0e0e] gap-3">
@@ -263,7 +260,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
             </button>
 
             <button
-              onClick={handleClose}
+              onClick={onClose}
               className="p-2 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] transition-all duration-150"
             >
               <X className="w-5 h-5" />
@@ -460,7 +457,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                             <button
                               onClick={() => {
                                 onSwitchDataset(u.datasetId);
-                                handleClose();
+                                onClose();
                               }}
                               className="btn-action-primary px-2.5 py-1 rounded-md text-xs font-semibold"
                               title="Switch active dashboard to view this user's dataset"
@@ -498,8 +495,18 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
 
         {/* Create User Modal Sub-Dialog */}
         {isCreateModalOpen && (
-          <div className="fixed inset-0 z-60 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 animate-backdrop">
-            <div className="bg-[#0e0e0e] border border-[#2a2a2a] rounded-xl max-w-md w-full p-6 shadow-2xl flex flex-col gap-4 animate-modal">
+          <div
+            onMouseDown={(e) => {
+              if (e.target === e.currentTarget) {
+                setIsCreateModalOpen(false);
+              }
+            }}
+            className="fixed inset-0 z-60 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 animate-backdrop"
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="bg-[#0e0e0e] border border-[#2a2a2a] rounded-xl max-w-md w-full p-6 shadow-2xl flex flex-col gap-4 animate-modal"
+            >
               <div className="flex items-center justify-between border-b border-[#222222] pb-3">
                 <h3 className="text-base font-bold text-white">
                   Provision New User &amp; Assign Dataset
@@ -639,7 +646,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
         {/* Footer */}
         <div className="p-3.5 border-t border-[#262626] bg-[#0c0c0c] flex justify-end gap-2">
           <button
-            onClick={handleClose}
+            onClick={onClose}
             className="px-4 py-2 rounded-lg bg-[#1a1a1a] text-white text-xs sm:text-sm font-semibold hover:bg-[#252525] border border-[#383838] transition-all duration-150"
           >
             Close Dashboard
