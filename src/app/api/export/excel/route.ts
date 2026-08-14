@@ -5,12 +5,29 @@ import { getSessionFromRequest } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
   const session = await getSessionFromRequest(req);
-  const userId = session?.userId || "demo_businessman_1";
+  if (!session) {
+    return NextResponse.json(
+      { success: false, error: "Unauthorized. Please sign in to export data." },
+      { status: 401 }
+    );
+  }
+
+  const { searchParams } = new URL(req.url);
+  const requestedDataset = searchParams.get("datasetId");
+  const isSuperAdmin = session.role === "super_admin";
+
+  const datasetId = isSuperAdmin && requestedDataset
+    ? requestedDataset
+    : session.datasetId || session.userId || "ds_yousuf_portfolio";
+
+  const isAll = isSuperAdmin && requestedDataset === "all";
 
   try {
-    const properties = await getProperties(userId);
-    const transactions = await getTransactions(userId);
-    const categories = await getCategories(userId);
+    const [properties, transactions, categories] = await Promise.all([
+      getProperties(datasetId, undefined, isAll),
+      getTransactions(datasetId, undefined, isAll),
+      getCategories(datasetId, undefined, isAll),
+    ]);
 
     const buffer = await generateExcelWorkbook(properties, transactions, categories);
 
@@ -19,12 +36,14 @@ export async function GET(req: NextRequest) {
       headers: {
         "Content-Type":
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "Content-Disposition": `attachment; filename="Real_Estate_Land_Tracker_${new Date().toISOString().split("T")[0]}.xlsx"`,
+        "Content-Disposition": `attachment; filename="Avaniya_Real_Estate_Tracker_${new Date().toISOString().split("T")[0]}.xlsx"`,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMsg =
+      error instanceof Error ? error.message : "Failed to generate Excel export";
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: errorMsg },
       { status: 500 }
     );
   }

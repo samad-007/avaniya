@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { formatINR, formatINRCompact, formatDateIN } from "@/lib/formatters";
 import {
   CommercialDashboardMetrics,
@@ -47,25 +47,48 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
   const [layoutVariant, setLayoutVariant] = useState<"cards" | "table">("cards");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredMetrics = metrics.propertyMetrics.filter(
-    (pm) =>
-      pm.property.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      pm.property.propertyCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (pm.property.location &&
-        pm.property.location.toLowerCase().includes(searchQuery.toLowerCase()))
+  const filteredMetrics = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return metrics.propertyMetrics;
+    return metrics.propertyMetrics.filter(
+      (pm) =>
+        pm.property.name.toLowerCase().includes(q) ||
+        pm.property.propertyCode.toLowerCase().includes(q) ||
+        (pm.property.location &&
+          pm.property.location.toLowerCase().includes(q))
+    );
+  }, [metrics.propertyMetrics, searchQuery]);
+
+  const outflows = useMemo(
+    () =>
+      transactions.filter(
+        (t) => t.scope === "commercial" && t.transactionType === "outflow"
+      ),
+    [transactions]
   );
 
-  const outflows = transactions.filter(
-    (t) => t.scope === "commercial" && t.transactionType === "outflow"
+  const dealInflows = useMemo(
+    () =>
+      transactions.filter(
+        (t) => t.scope === "commercial" && t.transactionType === "deal_inflow"
+      ),
+    [transactions]
   );
-  const dealInflows = transactions.filter(
-    (t) => t.scope === "commercial" && t.transactionType === "deal_inflow"
+
+  const capitalInflows = useMemo(
+    () =>
+      transactions.filter(
+        (t) => t.scope === "commercial" && t.transactionType === "capital_inflow"
+      ),
+    [transactions]
   );
-  const capitalInflows = transactions.filter(
-    (t) => t.scope === "commercial" && t.transactionType === "capital_inflow"
-  );
-  const transfers = transactions.filter(
-    (t) => t.scope === "commercial" && t.transactionType === "transfer"
+
+  const transfers = useMemo(
+    () =>
+      transactions.filter(
+        (t) => t.scope === "commercial" && t.transactionType === "transfer"
+      ),
+    [transactions]
   );
 
   return (

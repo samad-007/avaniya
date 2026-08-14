@@ -9,6 +9,7 @@ import { generateSecurePassword } from "@/lib/passwordGenerator";
 
 /**
  * Super Admin: Get all users with dataset mappings and portfolio record counts
+ * Uses O(1) aggregation pipelines to avoid N+1 database roundtrips
  */
 export async function GET(req: NextRequest) {
   try {
@@ -21,36 +22,56 @@ export async function GET(req: NextRequest) {
     }
 
     await connectDB();
-    const users = await User.find({}).sort({ createdAt: -1 }).lean();
 
-    // Enrich users with dataset counts
-    const enrichedUsers = await Promise.all(
-      users.map(async (u) => {
-        const dId = u.datasetId || `ds_${u._id.toString()}`;
-        const [propertyCount, transactionCount] = await Promise.all([
-          Property.countDocuments({
-            $or: [{ datasetId: dId }, { userId: u._id.toString() }],
-          }),
-          Transaction.countDocuments({
-            $or: [{ datasetId: dId }, { userId: u._id.toString() }],
-          }),
-        ]);
+    const [users, datasets, propertyAgg, transactionAgg] = await Promise.all([
+      User.find({}).sort({ createdAt: -1 }).lean(),
+      Dataset.find({}).lean(),
+      Property.aggregate([
+        {
+          $group: {
+            _id: "$datasetId",
+            count: { $sum: 1 },
+          },
+        },
+      ]),
+      Transaction.aggregate([
+        {
+          $group: {
+            _id: "$datasetId",
+            count: { $sum: 1 },
+          },
+        },
+      ]),
+    ]);
 
-        return {
-          id: u._id.toString(),
-          name: u.name,
-          email: u.email,
-          role: u.role,
-          datasetId: dId,
-          status: u.status || "active",
-          propertyCount,
-          transactionCount,
-          createdAt: u.createdAt,
-        };
-      })
-    );
+    const propCountMap = new Map<string, number>();
+    for (const item of propertyAgg) {
+      if (item._id) propCountMap.set(item._id, item.count);
+    }
 
-    const datasets = await Dataset.find({}).lean();
+    const txCountMap = new Map<string, number>();
+    for (const item of transactionAgg) {
+      if (item._id) txCountMap.set(item._id, item.count);
+    }
+
+    // Enrich users in memory with zero extra DB roundtrips
+    const enrichedUsers = users.map((u) => {
+      const dId = u.datasetId || `ds_${u._id.toString()}`;
+      const propertyCount = propCountMap.get(dId) || 0;
+      const transactionCount = txCountMap.get(dId) || 0;
+
+      return {
+        id: u._id.toString(),
+        name: u.name,
+        email: u.email,
+        role: u.role,
+        datasetId: dId,
+        status: u.status || "active",
+        propertyCount,
+        transactionCount,
+        createdAt: u.createdAt,
+      };
+    });
 
     return NextResponse.json({
       success: true,
@@ -63,9 +84,11 @@ export async function GET(req: NextRequest) {
         })),
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMsg =
+      error instanceof Error ? error.message : "Failed to load admin controls";
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: errorMsg },
       { status: 500 }
     );
   }
@@ -151,9 +174,11 @@ export async function POST(req: NextRequest) {
         generatedPassword: plainPassword,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMsg =
+      error instanceof Error ? error.message : "Failed to create user";
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: errorMsg },
       { status: 500 }
     );
   }
@@ -216,9 +241,11 @@ export async function PUT(req: NextRequest) {
         generatedPassword: generatedNewPassword || undefined,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMsg =
+      error instanceof Error ? error.message : "Failed to update user";
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: errorMsg },
       { status: 500 }
     );
   }
@@ -258,9 +285,11 @@ export async function DELETE(req: NextRequest) {
     await User.findByIdAndDelete(userId);
 
     return NextResponse.json({ success: true, message: "User deleted successfully" });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMsg =
+      error instanceof Error ? error.message : "Failed to delete user";
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: errorMsg },
       { status: 500 }
     );
   }

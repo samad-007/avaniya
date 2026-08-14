@@ -8,20 +8,21 @@ export async function GET(req: NextRequest) {
   const scope = searchParams.get("scope") as "commercial" | "personal" | null;
   const requestedDataset = searchParams.get("datasetId");
 
-  // Super Admin can switch dataset or view all; regular users are locked to their own dataset
   const isSuperAdmin = session?.role === "super_admin";
-  const datasetId = isSuperAdmin
-    ? requestedDataset || session?.datasetId || "ds_yousuf_portfolio"
-    : session?.datasetId || session?.userId || "fresh_user";
+  const datasetId = isSuperAdmin && requestedDataset
+    ? requestedDataset
+    : session?.datasetId || session?.userId || "ds_yousuf_portfolio";
 
   const isAll = isSuperAdmin && requestedDataset === "all";
 
   try {
     const properties = await getProperties(datasetId, scope || undefined, isAll);
     return NextResponse.json({ success: true, data: properties });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMsg =
+      error instanceof Error ? error.message : "Failed to fetch properties";
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: errorMsg },
       { status: 500 }
     );
   }
@@ -29,46 +30,58 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const session = await getSessionFromRequest(req);
-  const isSuperAdmin = session?.role === "super_admin";
+  if (!session) {
+    return NextResponse.json(
+      { success: false, error: "Authentication required to create properties" },
+      { status: 401 }
+    );
+  }
+
+  const isSuperAdmin = session.role === "super_admin";
   const body = await req.json();
 
   const datasetId = isSuperAdmin && body.datasetId
     ? body.datasetId
-    : session?.datasetId || session?.userId || "fresh_user";
-  const userId = session?.userId || "user_default";
+    : session.datasetId || session.userId || "ds_yousuf_portfolio";
+  const userId = session.userId || "user_default";
 
   try {
-    if (!body.name || body.agreedPurchasePrice === undefined) {
+    const trimmedName = body.name ? String(body.name).trim() : "";
+    const purchasePrice = parseFloat(body.agreedPurchasePrice);
+
+    if (!trimmedName || isNaN(purchasePrice) || purchasePrice < 0) {
       return NextResponse.json(
-        { success: false, error: "Property name and purchase price are required" },
+        { success: false, error: "Valid property name and non-negative purchase price are required" },
         { status: 400 }
       );
     }
 
     const newProp = await addProperty(
       {
-        type: body.type || "commercial",
-        propertyCode: body.propertyCode,
-        name: body.name,
-        location: body.location || "",
+        type: body.type === "personal" ? "personal" : "commercial",
+        propertyCode: body.propertyCode ? String(body.propertyCode).trim() : undefined,
+        name: trimmedName,
+        location: body.location ? String(body.location).trim() : "",
         acquisitionDate: body.acquisitionDate || new Date().toISOString().split("T")[0],
-        sqftArea: parseFloat(body.sqftArea) || 0,
-        ratePerSqft: parseFloat(body.ratePerSqft) || 0,
-        agreedPurchasePrice: parseFloat(body.agreedPurchasePrice) || 0,
-        targetSalePrice: parseFloat(body.targetSalePrice) || 0,
-        agreedSellingPrice: parseFloat(body.agreedSellingPrice) || 0,
+        sqftArea: Math.max(0, parseFloat(body.sqftArea) || 0),
+        ratePerSqft: Math.max(0, parseFloat(body.ratePerSqft) || 0),
+        agreedPurchasePrice: Math.round(purchasePrice),
+        targetSalePrice: Math.max(0, Math.round(parseFloat(body.targetSalePrice) || 0)),
+        agreedSellingPrice: Math.max(0, Math.round(parseFloat(body.agreedSellingPrice) || 0)),
         status: body.status || "open",
-        notes: body.notes || "",
-        milestones: body.milestones || [],
+        notes: body.notes ? String(body.notes).trim() : "",
+        milestones: Array.isArray(body.milestones) ? body.milestones : [],
       },
       datasetId,
       userId
     );
 
     return NextResponse.json({ success: true, data: newProp });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMsg =
+      error instanceof Error ? error.message : "Failed to create property";
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: errorMsg },
       { status: 500 }
     );
   }

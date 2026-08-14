@@ -30,9 +30,11 @@ export async function GET(req: NextRequest) {
       success: true,
       data: { commercial, personal },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMsg =
+      error instanceof Error ? error.message : "Failed to calculate metrics";
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: errorMsg },
       { status: 500 }
     );
   }

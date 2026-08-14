@@ -4,10 +4,17 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { Lock, Mail, User as UserIcon, ArrowRight, ShieldCheck, Eye, EyeOff } from "lucide-react";
 
+export interface AuthUserData {
+  name: string;
+  email: string;
+  role: string;
+  datasetId?: string;
+}
+
 interface AuthModalProps {
   isOpen: boolean;
   onClose?: () => void;
-  onSuccess: (user: { name: string; email: string; role: string }) => void;
+  onSuccess: (user: AuthUserData) => void;
   allowClose?: boolean;
 }
 
@@ -54,8 +61,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
       onSuccess(data.data);
       if (onClose) onClose();
-    } catch (err: any) {
-      setErrorMsg(err.message || "An unexpected error occurred");
+    } catch (err: unknown) {
+      setErrorMsg(
+        err instanceof Error ? err.message : "An unexpected error occurred"
+      );
     } finally {
       setIsLoading(false);
     }

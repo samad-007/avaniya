@@ -633,5 +633,7 @@ export function generateCSV(transactions: SeedTransaction[]): string {
     `"${(t.remarks || "").replace(/"/g, '""')}"`,
   ]);
 
-  return [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+  return (
+    "\uFEFF" + [headers.join(","), ...rows.map((r) => r.join(","))].join("\n")
+  );
 }

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { amountToVerbalSummary } from "@/lib/formatters";
-import { SeedProperty, SeedCategory } from "@/lib/seedData";
+import { SeedProperty, SeedCategory, SeedTransaction } from "@/lib/seedData";
 import { X, Banknote, Landmark, Plus } from "lucide-react";
 
 interface QuickEntryModalProps {
@@ -13,7 +13,7 @@ interface QuickEntryModalProps {
   defaultPropertyCode?: string;
   properties: SeedProperty[];
   categories: SeedCategory[];
-  onSave: (transactionData: any) => Promise<void>;
+  onSave: (transactionData: Omit<SeedTransaction, "id">) => Promise<void>;
   onOpenCategoryModal: () => void;
 }
 
@@ -39,9 +39,12 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
   );
   const [recipient, setRecipient] = useState<string>("");
   const [remarks, setRemarks] = useState<string>("");
-  const [transferType, setTransferType] = useState<string>(
-    "Bank Withdrawal to Cash"
-  );
+  const [transferType, setTransferType] = useState<
+    | "Bank Withdrawal to Cash"
+    | "Cash Deposit to Bank"
+    | "Cash to Bank"
+    | "Bank to Cash"
+  >("Bank Withdrawal to Cash");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -224,7 +227,15 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
               </label>
               <select
                 value={transferType}
-                onChange={(e) => setTransferType(e.target.value)}
+                onChange={(e) =>
+                  setTransferType(
+                    e.target.value as
+                      | "Bank Withdrawal to Cash"
+                      | "Cash Deposit to Bank"
+                      | "Cash to Bank"
+                      | "Bank to Cash"
+                  )
+                }
                 className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
               >
                 <option value="Bank Withdrawal to Cash">

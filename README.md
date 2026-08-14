@@ -106,9 +106,10 @@ Click **Export** in the top bar to generate offline files:
 - **Language**: TypeScript 5 (Strict types, zero `any`, discriminated unions)
 - **Styling**: Tailwind CSS (True Black `#000000` baseline, high-contrast zinc tokens)
 - **Typography**: IBM Plex Sans (Body) + JetBrains Mono (Financial Tabular Digits) via `next/font/google`
-- **Database**: MongoDB Atlas Cluster (M0 Free Tier, `ap-south-1` Mumbai) via Mongoose connection caching
+- **Database**: MongoDB Atlas Cluster (`ap-south-1` Mumbai) via Mongoose connection caching with compound indexes (`datasetId + date`, `datasetId + scope`, `datasetId + propertyCode`)
+- **Query Optimization**: $O(1)$ MongoDB Aggregation pipelines for tenant user & transaction matrix calculations
 - **Fallback Engine**: In-memory database mirror (`memProperties`, `memTransactions`, `memCategories`) ensures zero runtime downtime if the database connection drops.
-- **Authentication**: Stateless JSON Web Tokens (JWT) stored in HTTP-only Secure Cookies with 12-hour expiration and bcrypt password hashing.
+- **Authentication**: Stateless JSON Web Tokens (JWT) stored in HTTP-only Secure Cookies with 12-hour expiration, bcrypt password hashing, and authenticated route protection across all data endpoints.
 
 ### B. Project Directory Structure
 ```

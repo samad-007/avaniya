@@ -2,9 +2,32 @@ import { NextRequest, NextResponse } from "next/server";
 import { signSessionToken, COOKIE_NAME, hashPassword, verifyPassword } from "@/lib/auth";
 import { connectDB, getSanitizedMongoUri } from "@/lib/db";
 import { User } from "@/models/User";
+import { checkRateLimit } from "@/lib/rateLimiter";
 
 export async function POST(req: NextRequest) {
   try {
+    // Extract Client IP for Rate Limiting (max 10 requests per minute)
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("x-real-ip") ||
+      "127.0.0.1";
+
+    const rateCheck = checkRateLimit(`login_${ip}`, 10, 60 * 1000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Too many login attempts. Please wait a minute before trying again.",
+        },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(Math.ceil(rateCheck.resetInMs / 1000)),
+          },
+        }
+      );
+    }
+
     const { email, password } = await req.json();
 
     if (!email || !password) {
@@ -101,9 +124,11 @@ export async function POST(req: NextRequest) {
     });
 
     return res;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMsg =
+      error instanceof Error ? error.message : "Authentication failed";
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: errorMsg },
       { status: 500 }
     );
   }

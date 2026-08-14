@@ -80,8 +80,10 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
       } else {
         setErrorMsg(json.error || "Failed to load admin controls");
       }
-    } catch (e: any) {
-      setErrorMsg(e.message || "Failed to connect to admin API");
+    } catch (e: unknown) {
+      setErrorMsg(
+        e instanceof Error ? e.message : "Failed to connect to admin API"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -154,8 +156,10 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
 
       setIsCreateModalOpen(false);
       await loadAdminData();
-    } catch (err: any) {
-      setErrorMsg(err.message || "User creation failed");
+    } catch (err: unknown) {
+      setErrorMsg(
+        err instanceof Error ? err.message : "User creation failed"
+      );
     }
   };
 
@@ -555,7 +559,9 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                     </label>
                     <select
                       value={newRole}
-                      onChange={(e) => setNewRole(e.target.value as any)}
+                      onChange={(e) =>
+                        setNewRole(e.target.value as "admin" | "user")
+                      }
                       className="bg-[#141414] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none"
                     >
                       <option value="user">User (Client)</option>

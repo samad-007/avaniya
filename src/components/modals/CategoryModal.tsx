@@ -99,7 +99,9 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
               </label>
               <select
                 value={type}
-                onChange={(e) => setType(e.target.value as any)}
+                onChange={(e) =>
+                  setType(e.target.value as "outflow" | "inflow" | "transfer")
+                }
                 className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
               >
                 <option value="outflow">Outflow (Expense / Payment)</option>
@@ -114,7 +116,9 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
               </label>
               <select
                 value={scope}
-                onChange={(e) => setScope(e.target.value as any)}
+                onChange={(e) =>
+                  setScope(e.target.value as "commercial" | "personal" | "both")
+                }
                 className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
               >
                 <option value="both">Both Commercial &amp; Personal</option>
@@ -136,7 +140,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
             </div>
             <select
               value={financialRole}
-              onChange={(e) => setFinancialRole(e.target.value as any)}
+              onChange={(e) => setFinancialRole(e.target.value as FinancialRole)}
               className="w-full bg-[#111111] border border-[#383838] rounded-lg p-2.5 text-white font-medium text-xs sm:text-sm mt-1 outline-none focus:border-[#555555]"
             >
               <option value="property_expense">

@@ -114,7 +114,7 @@ export async function getPropertyByCode(
  * Add a new property mapped to the user's isolated dataset
  */
 export async function addProperty(
-  data: Omit<SeedProperty, "id">,
+  data: Omit<SeedProperty, "id" | "propertyCode"> & { propertyCode?: string },
   datasetId: string = "ds_yousuf_portfolio",
   userId: string = "user_default"
 ): Promise<SeedProperty> {

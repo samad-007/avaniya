@@ -61,6 +61,12 @@ const TransactionSchema = new Schema<ITransaction>(
   { timestamps: true }
 );
 
+// High-performance compound indexes for sorting and filtering
+TransactionSchema.index({ datasetId: 1, date: -1 });
+TransactionSchema.index({ datasetId: 1, scope: 1, date: -1 });
+TransactionSchema.index({ datasetId: 1, propertyCode: 1, date: -1 });
+TransactionSchema.index({ datasetId: 1, transactionType: 1, date: -1 });
+
 export const Transaction: Model<ITransaction> =
   mongoose.models.Transaction ||
   mongoose.model<ITransaction>("Transaction", TransactionSchema);

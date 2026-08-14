@@ -57,8 +57,10 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
     try {
       await onSave(property.propertyCode, formData);
       onClose();
-    } catch (err: any) {
-      setErrorMsg(err.message || "Failed to update property");
+    } catch (err: unknown) {
+      setErrorMsg(
+        err instanceof Error ? err.message : "Failed to update property"
+      );
     } finally {
       setIsSaving(false);
     }
@@ -209,7 +211,12 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    status: e.target.value as any,
+                    status: e.target.value as
+                      | "open"
+                      | "in_progress"
+                      | "registered"
+                      | "sold"
+                      | "closed",
                   })
                 }
                 className="bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555]"

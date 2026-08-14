@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { formatINR, formatINRCompact, formatDateIN } from "@/lib/formatters";
 import { PersonalDashboardMetrics } from "@/lib/formulaEngine";
 import { SeedProperty, SeedTransaction } from "@/lib/seedData";
@@ -40,11 +40,20 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
     "properties" | "outflows" | "inflows" | "categories"
   >("properties");
 
-  const personalOutflows = transactions.filter(
-    (t) => t.scope === "personal" && t.transactionType === "outflow"
+  const personalOutflows = useMemo(
+    () =>
+      transactions.filter(
+        (t) => t.scope === "personal" && t.transactionType === "outflow"
+      ),
+    [transactions]
   );
-  const personalInflows = transactions.filter(
-    (t) => t.scope === "personal" && t.transactionType === "capital_inflow"
+
+  const personalInflows = useMemo(
+    () =>
+      transactions.filter(
+        (t) => t.scope === "personal" && t.transactionType === "capital_inflow"
+      ),
+    [transactions]
   );
 
   return (

@@ -9,7 +9,11 @@ interface NewPropertyModalProps {
   isOpen: boolean;
   onClose: () => void;
   defaultType?: "commercial" | "personal";
-  onSave: (propertyData: Omit<SeedProperty, "id">) => Promise<void>;
+  onSave: (
+    propertyData: Omit<SeedProperty, "id" | "propertyCode"> & {
+      propertyCode?: string;
+    }
+  ) => Promise<void>;
 }
 
 export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
@@ -101,7 +105,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
       await onSave({
         type,
         name,
-        propertyCode: propertyCode.trim() || (undefined as any),
+        propertyCode: propertyCode.trim() || undefined,
         location,
         acquisitionDate,
         sqftArea: sqftArea ? Number(sqftArea) : undefined,
@@ -337,7 +341,16 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
             </label>
             <select
               value={status}
-              onChange={(e) => setStatus(e.target.value as any)}
+              onChange={(e) =>
+                setStatus(
+                  e.target.value as
+                    | "open"
+                    | "in_progress"
+                    | "registered"
+                    | "sold"
+                    | "closed"
+                )
+              }
               className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
             >
               <option value="open">Open (Token / Advance Paid)</option>

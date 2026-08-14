@@ -9,18 +9,20 @@ export async function GET(req: NextRequest) {
   const requestedDataset = searchParams.get("datasetId");
 
   const isSuperAdmin = session?.role === "super_admin";
-  const datasetId = isSuperAdmin
-    ? requestedDataset || session?.datasetId || "ds_yousuf_portfolio"
-    : session?.datasetId || session?.userId || "fresh_user";
+  const datasetId = isSuperAdmin && requestedDataset
+    ? requestedDataset
+    : session?.datasetId || session?.userId || "ds_yousuf_portfolio";
 
   const isAll = isSuperAdmin && requestedDataset === "all";
 
   try {
     const categories = await getCategories(datasetId, scope || undefined, isAll);
     return NextResponse.json({ success: true, data: categories });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMsg =
+      error instanceof Error ? error.message : "Failed to fetch categories";
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: errorMsg },
       { status: 500 }
     );
   }
@@ -28,16 +30,24 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const session = await getSessionFromRequest(req);
-  const isSuperAdmin = session?.role === "super_admin";
+  if (!session) {
+    return NextResponse.json(
+      { success: false, error: "Authentication required to add categories" },
+      { status: 401 }
+    );
+  }
+
+  const isSuperAdmin = session.role === "super_admin";
   const body = await req.json();
 
   const datasetId = isSuperAdmin && body.datasetId
     ? body.datasetId
-    : session?.datasetId || session?.userId || "fresh_user";
-  const userId = session?.userId || "user_default";
+    : session.datasetId || session.userId || "ds_yousuf_portfolio";
+  const userId = session.userId || "user_default";
 
   try {
-    if (!body.name || !body.financialRole) {
+    const categoryName = body.name ? String(body.name).trim() : "";
+    if (!categoryName || !body.financialRole) {
       return NextResponse.json(
         {
           success: false,
@@ -49,7 +59,7 @@ export async function POST(req: NextRequest) {
 
     const cat = await addCategory(
       {
-        name: body.name,
+        name: categoryName,
         scope: body.scope || "both",
         type: body.type || "outflow",
         financialRole: body.financialRole,
@@ -59,9 +69,11 @@ export async function POST(req: NextRequest) {
     );
 
     return NextResponse.json({ success: true, data: cat });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMsg =
+      error instanceof Error ? error.message : "Failed to create category";
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: errorMsg },
       { status: 500 }
     );
   }

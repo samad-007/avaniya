@@ -2,9 +2,31 @@ import { NextRequest, NextResponse } from "next/server";
 import { hashPassword, signSessionToken, COOKIE_NAME } from "@/lib/auth";
 import { connectDB, getSanitizedMongoUri } from "@/lib/db";
 import { User } from "@/models/User";
+import { checkRateLimit } from "@/lib/rateLimiter";
 
 export async function POST(req: NextRequest) {
   try {
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("x-real-ip") ||
+      "127.0.0.1";
+
+    const rateCheck = checkRateLimit(`register_${ip}`, 5, 60 * 1000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Too many account registration requests. Please wait a minute.",
+        },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(Math.ceil(rateCheck.resetInMs / 1000)),
+          },
+        }
+      );
+    }
+
     const { name, email, password } = await req.json();
 
     if (!email || !password || !name) {
@@ -51,7 +73,7 @@ export async function POST(req: NextRequest) {
         userId = newUser._id.toString();
         userRole = newUser.role;
         datasetId = newUser.datasetId;
-      } catch (dbErr: any) {
+      } catch (dbErr: unknown) {
         console.warn("MongoDB write failed, creating local session", dbErr);
       }
     }
@@ -86,9 +108,11 @@ export async function POST(req: NextRequest) {
     });
 
     return res;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMsg =
+      error instanceof Error ? error.message : "Registration failed";
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: errorMsg },
       { status: 500 }
     );
   }

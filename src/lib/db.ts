@@ -72,8 +72,10 @@ export async function connectDB(overrideDbName?: string): Promise<typeof mongoos
     const opts = {
       bufferCommands: false,
       maxPoolSize: 10,
-      serverSelectionTimeoutMS: 8000,
-      socketTimeoutMS: 45000,
+      minPoolSize: 0,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 30000,
+      connectTimeoutMS: 5000,
       dbName: dbName, // Explicitly route to "production" database on Atlas
     };
 

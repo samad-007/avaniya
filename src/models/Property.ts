@@ -75,6 +75,10 @@ const PropertySchema = new Schema<IProperty>(
   { timestamps: true }
 );
 
+// High performance compound indexes
+PropertySchema.index({ datasetId: 1, type: 1, status: 1 });
+PropertySchema.index({ datasetId: 1, propertyCode: 1 });
+
 export const Property: Model<IProperty> =
   mongoose.models.Property ||
   mongoose.model<IProperty>("Property", PropertySchema);
