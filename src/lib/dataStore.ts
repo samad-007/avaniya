@@ -322,6 +322,105 @@ export async function addTransaction(
 }
 
 /**
+ * Update an existing transaction within dataset
+ */
+export async function updateTransaction(
+  transIdOrCode: string,
+  updates: Partial<SeedTransaction>,
+  datasetId: string = "ds_yousuf_portfolio"
+): Promise<SeedTransaction | null> {
+  const dbOk = await isDBConnected();
+  if (dbOk) {
+    try {
+      const query: Record<string, unknown> = {
+        $or: [
+          { transCode: transIdOrCode },
+          { _id: mongoose.isValidObjectId(transIdOrCode) ? transIdOrCode : null },
+        ],
+      };
+      if (datasetId && datasetId !== "all") {
+        query.$and = [{ $or: [{ datasetId }, { userId: datasetId }] }];
+      }
+
+      const updated = await Transaction.findOneAndUpdate(
+        query,
+        { $set: updates },
+        { new: true }
+      ).lean<ITransaction & { _id: unknown }>();
+
+      if (updated) {
+        return {
+          id: updated._id.toString(),
+          scope: updated.scope,
+          transactionType: updated.transactionType,
+          transCode: updated.transCode,
+          propertyCode: updated.propertyCode,
+          date: new Date(updated.date).toISOString().split("T")[0],
+          category: updated.category,
+          mode: updated.mode,
+          transferType: updated.transferType,
+          amount: updated.amount,
+          recipientOrSource: updated.recipientOrSource,
+          remarks: updated.remarks,
+        };
+      }
+    } catch (e) {
+      console.warn("DB transaction update failed, falling back to memory store", e);
+    }
+  }
+
+  const idx = memTransactions.findIndex(
+    (t) =>
+      (t.transCode && t.transCode.toLowerCase() === transIdOrCode.toLowerCase()) ||
+      t.id === transIdOrCode
+  );
+  if (idx !== -1) {
+    memTransactions[idx] = { ...memTransactions[idx], ...updates };
+    return memTransactions[idx];
+  }
+  return null;
+}
+
+/**
+ * Delete a transaction within dataset
+ */
+export async function deleteTransaction(
+  transIdOrCode: string,
+  datasetId: string = "ds_yousuf_portfolio"
+): Promise<boolean> {
+  const dbOk = await isDBConnected();
+  if (dbOk) {
+    try {
+      const query: Record<string, unknown> = {
+        $or: [
+          { transCode: transIdOrCode },
+          { _id: mongoose.isValidObjectId(transIdOrCode) ? transIdOrCode : null },
+        ],
+      };
+      if (datasetId && datasetId !== "all") {
+        query.$and = [{ $or: [{ datasetId }, { userId: datasetId }] }];
+      }
+
+      const res = await Transaction.findOneAndDelete(query);
+      if (res) return true;
+    } catch (e) {
+      console.warn("DB transaction delete failed, falling back to memory store", e);
+    }
+  }
+
+  const idx = memTransactions.findIndex(
+    (t) =>
+      (t.transCode && t.transCode.toLowerCase() === transIdOrCode.toLowerCase()) ||
+      t.id === transIdOrCode
+  );
+  if (idx !== -1) {
+    memTransactions.splice(idx, 1);
+    return true;
+  }
+  return false;
+}
+
+/**
  * Get dynamic categories within dataset (or system defaults)
  */
 export async function getCategories(

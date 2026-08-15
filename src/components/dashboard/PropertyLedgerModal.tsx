@@ -34,6 +34,7 @@ interface PropertyLedgerModalProps {
     propertyCode?: string
   ) => void;
   onEditProperty?: (property: SeedProperty) => void;
+  onEditTransaction?: (transaction: SeedTransaction) => void;
 }
 
 export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
@@ -43,6 +44,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
   personalPropertyData,
   onOpenEntryModal,
   onEditProperty,
+  onEditTransaction,
 }) => {
   if (!isOpen) return null;
 
@@ -379,13 +381,14 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                     <th className="py-3 px-3.5">Mode</th>
                     <th className="py-3 px-3.5 text-right">Amount</th>
                     <th className="py-3 px-3.5">Recipient / Notes</th>
+                    <th className="py-3 px-3.5 text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#181818]">
                   {txs.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={6}
+                        colSpan={7}
                         className="py-8 text-center text-[#71717A] text-sm font-medium"
                       >
                         No transactions recorded for this property yet.
@@ -432,6 +435,17 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                         <td className="py-3 px-3.5 text-[#A1A1AA] max-w-[200px] truncate">
                           {t.remarks || t.recipientOrSource || "-"}
                         </td>
+                        <td className="py-3 px-3.5 text-right">
+                          {onEditTransaction && (
+                            <button
+                              onClick={() => onEditTransaction(t)}
+                              className="btn-action-primary p-1.5 rounded-md inline-flex items-center justify-center"
+                              title="Edit Transaction"
+                            >
+                              <Pencil className="w-3.5 h-3.5 text-[#22C55E]" />
+                            </button>
+                          )}
+                        </td>
                       </tr>
                     ))
                   )}
@@ -447,7 +461,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                           txs.reduce((sum, t) => sum + (t.amount || 0), 0)
                         )}
                       </td>
-                      <td></td>
+                      <td colSpan={2}></td>
                     </tr>
                   </tfoot>
                 )}

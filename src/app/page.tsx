@@ -10,6 +10,7 @@ import { PropertyLedgerModal } from "@/components/dashboard/PropertyLedgerModal"
 import { QuickEntryModal } from "@/components/modals/QuickEntryModal";
 import { NewPropertyModal } from "@/components/modals/NewPropertyModal";
 import { EditPropertyModal } from "@/components/modals/EditPropertyModal";
+import { EditTransactionModal } from "@/components/modals/EditTransactionModal";
 import { CategoryModal } from "@/components/modals/CategoryModal";
 import { ExportModal } from "@/components/modals/ExportModal";
 import { AuthModal, AuthUserData } from "@/components/auth/AuthModal";
@@ -67,6 +68,10 @@ export default function DashboardPage() {
   const [isNewPropModalOpen, setIsNewPropModalOpen] = useState(false);
   const [isEditPropModalOpen, setIsEditPropModalOpen] = useState(false);
   const [editingProperty, setEditingProperty] = useState<SeedProperty | null>(
+    null
+  );
+  const [isEditTxModalOpen, setIsEditTxModalOpen] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<SeedTransaction | null>(
     null
   );
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -308,6 +313,105 @@ export default function DashboardPage() {
     }
   };
 
+  const handleOpenEditTransaction = (tx: SeedTransaction) => {
+    setEditingTransaction(tx);
+    setIsEditTxModalOpen(true);
+  };
+
+  const handleUpdateTransaction = async (
+    transIdOrCode: string,
+    updates: Partial<SeedTransaction>
+  ) => {
+    try {
+      const res = await fetch(
+        `/api/transactions/${encodeURIComponent(transIdOrCode)}?datasetId=${encodeURIComponent(
+          currentDatasetId
+        )}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updates),
+        }
+      );
+      if (res.ok) {
+        const json = await res.json();
+        setTransactions((prev) =>
+          prev.map((t) =>
+            (t.transCode && t.transCode.toLowerCase() === transIdOrCode.toLowerCase()) ||
+            t.id === transIdOrCode
+              ? { ...t, ...json.data }
+              : t
+          )
+        );
+      } else {
+        setTransactions((prev) =>
+          prev.map((t) =>
+            (t.transCode && t.transCode.toLowerCase() === transIdOrCode.toLowerCase()) ||
+            t.id === transIdOrCode
+              ? { ...t, ...updates }
+              : t
+          )
+        );
+      }
+    } catch {
+      setTransactions((prev) =>
+        prev.map((t) =>
+          (t.transCode && t.transCode.toLowerCase() === transIdOrCode.toLowerCase()) ||
+          t.id === transIdOrCode
+            ? { ...t, ...updates }
+            : t
+        )
+      );
+    }
+  };
+
+  const handleDeleteTransaction = async (transIdOrCode: string) => {
+    try {
+      const res = await fetch(
+        `/api/transactions/${encodeURIComponent(transIdOrCode)}?datasetId=${encodeURIComponent(
+          currentDatasetId
+        )}`,
+        {
+          method: "DELETE",
+        }
+      );
+      if (res.ok) {
+        setTransactions((prev) =>
+          prev.filter(
+            (t) =>
+              !(
+                (t.transCode &&
+                  t.transCode.toLowerCase() === transIdOrCode.toLowerCase()) ||
+                t.id === transIdOrCode
+              )
+          )
+        );
+      } else {
+        setTransactions((prev) =>
+          prev.filter(
+            (t) =>
+              !(
+                (t.transCode &&
+                  t.transCode.toLowerCase() === transIdOrCode.toLowerCase()) ||
+                t.id === transIdOrCode
+              )
+          )
+        );
+      }
+    } catch {
+      setTransactions((prev) =>
+        prev.filter(
+          (t) =>
+            !(
+              (t.transCode &&
+                t.transCode.toLowerCase() === transIdOrCode.toLowerCase()) ||
+              t.id === transIdOrCode
+            )
+        )
+      );
+    }
+  };
+
   const handleSaveProperty = async (
     propData: Omit<SeedProperty, "id" | "propertyCode"> & {
       propertyCode?: string;
@@ -443,6 +547,7 @@ export default function DashboardPage() {
             onSelectProperty={handleSelectCommercialProperty}
             onOpenNewDealModal={() => setIsNewPropModalOpen(true)}
             onEditProperty={handleOpenEditProperty}
+            onEditTransaction={handleOpenEditTransaction}
           />
         )}
 
@@ -455,6 +560,7 @@ export default function DashboardPage() {
             onOpenNewPropertyModal={() => setIsNewPropModalOpen(true)}
             onOpenEntryModal={handleOpenEntryModal}
             onEditProperty={handleOpenEditProperty}
+            onEditTransaction={handleOpenEditTransaction}
           />
         )}
       </main>
@@ -506,6 +612,7 @@ export default function DashboardPage() {
         personalPropertyData={selectedPersonalPropertyData}
         onOpenEntryModal={handleOpenEntryModal}
         onEditProperty={handleOpenEditProperty}
+        onEditTransaction={handleOpenEditTransaction}
       />
 
       {/* Quick Data Entry Drawer */}
@@ -541,6 +648,20 @@ export default function DashboardPage() {
         }}
         property={editingProperty}
         onSave={handleUpdateProperty}
+      />
+
+      {/* Edit Transaction Modal (Edit / Delete Historical Transactions) */}
+      <EditTransactionModal
+        isOpen={isEditTxModalOpen}
+        onClose={() => {
+          setIsEditTxModalOpen(false);
+          setEditingTransaction(null);
+        }}
+        transaction={editingTransaction}
+        properties={properties}
+        categories={categories}
+        onSave={handleUpdateTransaction}
+        onDelete={handleDeleteTransaction}
       />
 
       {/* Dynamic Category Engine Modal */}

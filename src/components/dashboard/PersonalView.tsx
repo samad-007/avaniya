@@ -26,6 +26,7 @@ interface PersonalViewProps {
     propertyCode?: string
   ) => void;
   onEditProperty?: (property: SeedProperty) => void;
+  onEditTransaction?: (transaction: SeedTransaction) => void;
 }
 
 export const PersonalView: React.FC<PersonalViewProps> = ({
@@ -35,6 +36,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
   onOpenNewPropertyModal,
   onOpenEntryModal,
   onEditProperty,
+  onEditTransaction,
 }) => {
   const [activeSubTab, setActiveSubTab] = useState<
     "properties" | "outflows" | "inflows" | "categories"
@@ -254,6 +256,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                 <th className="py-3 px-3.5">Mode</th>
                 <th className="py-3 px-3.5 text-right">Amount (INR)</th>
                 <th className="py-3 px-3.5">Remarks</th>
+                <th className="py-3 px-3.5 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#181818]">
@@ -279,6 +282,17 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                   <td className="py-3 px-3.5 text-[#A1A1AA]">
                     {t.remarks || "-"}
                   </td>
+                  <td className="py-3 px-3.5 text-right">
+                    {onEditTransaction && (
+                      <button
+                        onClick={() => onEditTransaction(t)}
+                        className="btn-action-primary p-1.5 rounded-md inline-flex items-center justify-center"
+                        title="Edit Transaction"
+                      >
+                        <Pencil className="w-3.5 h-3.5 text-[#22C55E]" />
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -290,7 +304,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                 <td className="py-3.5 px-3.5 text-right font-mono text-[#22C55E]">
                   {formatINR(metrics.outflowsTotal)}
                 </td>
-                <td></td>
+                <td colSpan={2}></td>
               </tr>
             </tfoot>
           </table>
@@ -308,6 +322,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                 <th className="py-3 px-3.5">Payment Mode</th>
                 <th className="py-3 px-3.5 text-right">Amount (INR)</th>
                 <th className="py-3 px-3.5">Remarks</th>
+                <th className="py-3 px-3.5 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#181818]">
@@ -329,6 +344,17 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                   </td>
                   <td className="py-3 px-3.5 text-[#A1A1AA]">
                     {t.remarks || "-"}
+                  </td>
+                  <td className="py-3 px-3.5 text-right">
+                    {onEditTransaction && (
+                      <button
+                        onClick={() => onEditTransaction(t)}
+                        className="btn-action-primary p-1.5 rounded-md inline-flex items-center justify-center"
+                        title="Edit Transaction"
+                      >
+                        <Pencil className="w-3.5 h-3.5 text-[#22C55E]" />
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

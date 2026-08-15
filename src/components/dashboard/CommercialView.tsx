@@ -32,6 +32,7 @@ interface CommercialViewProps {
   onSelectProperty: (propertyMetric: PropertyFinancialMetrics) => void;
   onOpenNewDealModal: () => void;
   onEditProperty?: (property: SeedProperty) => void;
+  onEditTransaction?: (transaction: SeedTransaction) => void;
 }
 
 export const CommercialView: React.FC<CommercialViewProps> = ({
@@ -40,6 +41,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
   onSelectProperty,
   onOpenNewDealModal,
   onEditProperty,
+  onEditTransaction,
 }) => {
   const [activeTab, setActiveTab] = useState<
     "deals" | "outflows" | "inflows" | "capital" | "transfers" | "accounts"
@@ -511,6 +513,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                 <th className="py-3 px-3.5">Payment Mode</th>
                 <th className="py-3 px-3.5 text-right">Amount Paid</th>
                 <th className="py-3 px-3.5">Paid To / Notes</th>
+                <th className="py-3 px-3.5 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#181818]">
@@ -545,6 +548,17 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                   <td className="py-3 px-3.5 text-[#A1A1AA]">
                     {t.remarks || t.recipientOrSource || "-"}
                   </td>
+                  <td className="py-3 px-3.5 text-right">
+                    {onEditTransaction && (
+                      <button
+                        onClick={() => onEditTransaction(t)}
+                        className="btn-action-primary p-1.5 rounded-md inline-flex items-center justify-center"
+                        title="Edit Transaction"
+                      >
+                        <Pencil className="w-3.5 h-3.5 text-[#22C55E]" />
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -556,7 +570,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                 <td className="py-3.5 px-3.5 text-right font-mono text-[#22C55E]">
                   {formatINR(metrics.outflowsTotal)}
                 </td>
-                <td></td>
+                <td colSpan={2}></td>
               </tr>
             </tfoot>
           </table>
@@ -576,13 +590,14 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                 <th className="py-3 px-3.5">Payment Mode</th>
                 <th className="py-3 px-3.5 text-right">Amount Received</th>
                 <th className="py-3 px-3.5">Received From / Notes</th>
+                <th className="py-3 px-3.5 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#181818]">
               {dealInflows.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={7}
+                    colSpan={8}
                     className="py-8 text-center text-[#71717A] text-sm font-medium"
                   >
                     No buyer sale receipts logged yet.
@@ -614,6 +629,17 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                     <td className="py-3 px-3.5 text-[#A1A1AA]">
                       {t.remarks || t.recipientOrSource || "-"}
                     </td>
+                    <td className="py-3 px-3.5 text-right">
+                      {onEditTransaction && (
+                        <button
+                          onClick={() => onEditTransaction(t)}
+                          className="btn-action-primary p-1.5 rounded-md inline-flex items-center justify-center"
+                          title="Edit Transaction"
+                        >
+                          <Pencil className="w-3.5 h-3.5 text-[#22C55E]" />
+                        </button>
+                      )}
+                    </td>
                   </tr>
                 ))
               )}
@@ -634,6 +660,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                 <th className="py-3 px-3.5">Payment Mode</th>
                 <th className="py-3 px-3.5 text-right">Amount Injected</th>
                 <th className="py-3 px-3.5">Notes</th>
+                <th className="py-3 px-3.5 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#181818]">
@@ -665,6 +692,17 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                   <td className="py-3 px-3.5 text-[#A1A1AA]">
                     {t.remarks || "-"}
                   </td>
+                  <td className="py-3 px-3.5 text-right">
+                    {onEditTransaction && (
+                      <button
+                        onClick={() => onEditTransaction(t)}
+                        className="btn-action-primary p-1.5 rounded-md inline-flex items-center justify-center"
+                        title="Edit Transaction"
+                      >
+                        <Pencil className="w-3.5 h-3.5 text-[#22C55E]" />
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -676,7 +714,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                 <td className="py-3.5 px-3.5 text-right font-mono text-[#22C55E]">
                   {formatINR(metrics.capitalInjectedTotal)}
                 </td>
-                <td></td>
+                <td colSpan={2}></td>
               </tr>
             </tfoot>
           </table>
@@ -695,6 +733,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                 <th className="py-3 px-3.5 text-right">Amount</th>
                 <th className="py-3 px-3.5">Reference / Purpose</th>
                 <th className="py-3 px-3.5">Notes</th>
+                <th className="py-3 px-3.5 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#181818]">
@@ -718,6 +757,17 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                   <td className="py-3 px-3.5 text-[#A1A1AA]">
                     {t.remarks || "-"}
                   </td>
+                  <td className="py-3 px-3.5 text-right">
+                    {onEditTransaction && (
+                      <button
+                        onClick={() => onEditTransaction(t)}
+                        className="btn-action-primary p-1.5 rounded-md inline-flex items-center justify-center"
+                        title="Edit Transaction"
+                      >
+                        <Pencil className="w-3.5 h-3.5 text-[#22C55E]" />
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -729,7 +779,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                 <td className="py-3.5 px-3.5 text-right font-mono text-white">
                   {formatINR(metrics.transfersBankToCash)}
                 </td>
-                <td colSpan={2}></td>
+                <td colSpan={3}></td>
               </tr>
             </tfoot>
           </table>

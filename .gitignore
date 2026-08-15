@@ -43,11 +43,16 @@ __pycache__/
 .venv/
 venv/
 env/
-scripts/
 
-# Excel files
+# Local maintenance CLI scripts (strictly for local terminal use)
+scripts/
+scripts/reprovision_users.ts
+scripts/set_password.ts
+reprovision_users.ts
+set_password.ts
+
+# Excel & Data Export dumps
 *.xlsx
 *.xls
 *.xlsm
 *.csv
-
