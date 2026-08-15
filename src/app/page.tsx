@@ -607,6 +607,7 @@ export default function DashboardPage() {
             transactions={transactions}
             onSelectProperty={handleSelectCommercialProperty}
             onOpenNewDealModal={() => setIsNewPropModalOpen(true)}
+            onOpenEntryModal={handleOpenEntryModal}
             onEditProperty={handleOpenEditProperty}
             onEditTransaction={handleOpenEditTransaction}
           />

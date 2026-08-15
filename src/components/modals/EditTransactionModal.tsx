@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { X, Save, Trash2, Calendar, AlertTriangle, ArrowRightLeft, DollarSign } from "lucide-react";
 import { SeedTransaction, SeedProperty, SeedCategory } from "@/lib/seedData";
 import { formatINRCompact } from "@/lib/formatters";
@@ -51,12 +51,22 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
 
   if (!isOpen || !transaction) return null;
 
-  const filteredCategories = categories.filter(
-    (c) =>
-      c.scope === "both" ||
-      c.scope === formData.scope ||
-      (!formData.scope && c.scope === "commercial")
-  );
+  const filteredCategories = useMemo(() => {
+    return categories.filter((c) => {
+      const scopeMatches =
+        c.scope === "both" ||
+        c.scope === formData.scope ||
+        (!formData.scope && c.scope === "commercial");
+      const typeMatches =
+        formData.transactionType === "transfer"
+          ? c.type === "transfer"
+          : formData.transactionType === "deal_inflow" ||
+            formData.transactionType === "capital_inflow"
+          ? c.type === "inflow"
+          : c.type === "outflow";
+      return scopeMatches && typeMatches;
+    });
+  }, [categories, formData.scope, formData.transactionType]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -167,7 +177,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                     scope: e.target.value as "commercial" | "personal",
                   })
                 }
-                className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-[#555555]"
+                className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
               >
                 <option value="commercial">Commercial Land Business</option>
                 <option value="personal">Personal Asset Investment</option>
@@ -190,7 +200,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                       | "transfer",
                   })
                 }
-                className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-[#555555]"
+                className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
               >
                 <option value="outflow">Property Outflow / Expense</option>
                 <option value="deal_inflow">Property Sale Receipt</option>
@@ -214,7 +224,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                   onChange={(e) =>
                     setFormData({ ...formData, date: e.target.value })
                   }
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3 py-2 text-white text-sm outline-none focus:border-[#555555]"
+                  className="w-full bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
                   required
                 />
               </div>
@@ -234,7 +244,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                       amount: parseFloat(e.target.value) || 0,
                     })
                   }
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-sm font-mono font-bold outline-none focus:border-[#555555]"
+                  className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm font-mono font-bold outline-none focus:border-[#555555]"
                   placeholder="e.g. 500000"
                   required
                 />
@@ -256,7 +266,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, propertyCode: e.target.value })
                 }
-                className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-[#555555]"
+                className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
               >
                 <option value="">(None / General Liquidity)</option>
                 {properties
@@ -281,7 +291,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                   setFormData({ ...formData, category: e.target.value })
                 }
                 placeholder="Select or enter category..."
-                className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-[#555555]"
+                className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
                 required
               />
               <datalist id="category-suggestions">
@@ -306,7 +316,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                     mode: e.target.value as "Bank" | "Cash",
                   })
                 }
-                className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-[#555555]"
+                className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
               >
                 <option value="Bank">Bank Account (NEFT / RTGS / Cheque)</option>
                 <option value="Cash">Cash in Hand</option>
@@ -328,7 +338,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                         | "Cash Deposit to Bank",
                     })
                   }
-                  className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-[#555555]"
+                  className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
                 >
                   <option value="Bank Withdrawal to Cash">
                     Bank Withdrawal to Cash (-Bank / +Cash)
@@ -353,7 +363,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                     })
                   }
                   placeholder="e.g. Land Owner, Advocate, Contractor"
-                  className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-[#555555]"
+                  className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
                 />
               </div>
             )}
@@ -371,7 +381,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                 setFormData({ ...formData, remarks: e.target.value })
               }
               placeholder="e.g. Advance paid against survey no. 442/1B, Cheque #004521"
-              className="bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2 text-white text-sm outline-none focus:border-[#555555]"
+              className="bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
             />
           </div>
 

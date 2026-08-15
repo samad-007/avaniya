@@ -31,6 +31,10 @@ interface CommercialViewProps {
   transactions: SeedTransaction[];
   onSelectProperty: (propertyMetric: PropertyFinancialMetrics) => void;
   onOpenNewDealModal: () => void;
+  onOpenEntryModal?: (
+    type: "outflow" | "inflow" | "transfer",
+    propertyCode?: string
+  ) => void;
   onEditProperty?: (property: SeedProperty) => void;
   onEditTransaction?: (transaction: SeedTransaction) => void;
 }
@@ -40,6 +44,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
   transactions,
   onSelectProperty,
   onOpenNewDealModal,
+  onOpenEntryModal,
   onEditProperty,
   onEditTransaction,
 }) => {
@@ -102,7 +107,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
             onClick={() => setActiveTab("deals")}
             className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all duration-150 ${
               activeTab === "deals"
-                ? "border-white text-white"
+                ? "border-white text-white font-bold"
                 : "border-transparent text-[#A1A1AA] hover:text-white"
             }`}
           >
@@ -112,7 +117,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
             onClick={() => setActiveTab("outflows")}
             className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all duration-150 ${
               activeTab === "outflows"
-                ? "border-white text-white"
+                ? "border-white text-white font-bold"
                 : "border-transparent text-[#A1A1AA] hover:text-white"
             }`}
           >
@@ -122,7 +127,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
             onClick={() => setActiveTab("inflows")}
             className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all duration-150 ${
               activeTab === "inflows"
-                ? "border-white text-white"
+                ? "border-white text-white font-bold"
                 : "border-transparent text-[#A1A1AA] hover:text-white"
             }`}
           >
@@ -132,7 +137,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
             onClick={() => setActiveTab("capital")}
             className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all duration-150 ${
               activeTab === "capital"
-                ? "border-white text-white"
+                ? "border-white text-white font-bold"
                 : "border-transparent text-[#A1A1AA] hover:text-white"
             }`}
           >
@@ -142,7 +147,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
             onClick={() => setActiveTab("transfers")}
             className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all duration-150 ${
               activeTab === "transfers"
-                ? "border-white text-white"
+                ? "border-white text-white font-bold"
                 : "border-transparent text-[#A1A1AA] hover:text-white"
             }`}
           >
@@ -150,33 +155,76 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
           </button>
         </div>
 
-        {/* View Toggle (Cards vs Table for Deals) */}
-        {activeTab === "deals" && (
-          <div className="flex items-center gap-1 bg-[#111111] p-1 rounded-lg border border-[#262626]">
+        {/* Action Controls on Right */}
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          {activeTab === "outflows" && onOpenEntryModal && (
             <button
-              onClick={() => setLayoutVariant("cards")}
-              className={`p-1.5 rounded-md text-xs transition-all duration-150 ${
-                layoutVariant === "cards"
-                  ? "bg-[#262626] text-white"
-                  : "text-[#A1A1AA] hover:text-white"
-              }`}
-              title="Visual Pipeline Cards"
+              onClick={() => onOpenEntryModal("outflow")}
+              className="btn-action-primary px-3 py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 whitespace-nowrap"
             >
-              <LayoutGrid className="w-4 h-4" />
+              <Plus className="w-4 h-4 stroke-[2.5]" />
+              <span>Log Outflow</span>
             </button>
+          )}
+
+          {activeTab === "inflows" && onOpenEntryModal && (
             <button
-              onClick={() => setLayoutVariant("table")}
-              className={`p-1.5 rounded-md text-xs transition-all duration-150 ${
-                layoutVariant === "table"
-                  ? "bg-[#262626] text-white"
-                  : "text-[#A1A1AA] hover:text-white"
-              }`}
-              title="Dense Ledger Matrix"
+              onClick={() => onOpenEntryModal("inflow")}
+              className="btn-action-primary px-3 py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 whitespace-nowrap"
             >
-              <TableIcon className="w-4 h-4" />
+              <Plus className="w-4 h-4 stroke-[2.5] text-[#22C55E]" />
+              <span>Log Sale Receipt</span>
             </button>
-          </div>
-        )}
+          )}
+
+          {activeTab === "capital" && onOpenEntryModal && (
+            <button
+              onClick={() => onOpenEntryModal("inflow")}
+              className="btn-action-primary px-3 py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 whitespace-nowrap"
+            >
+              <Plus className="w-4 h-4 stroke-[2.5] text-[#22C55E]" />
+              <span>Log Capital Funding</span>
+            </button>
+          )}
+
+          {activeTab === "transfers" && onOpenEntryModal && (
+            <button
+              onClick={() => onOpenEntryModal("transfer")}
+              className="btn-action-primary px-3 py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 whitespace-nowrap"
+            >
+              <Plus className="w-4 h-4 stroke-[2.5]" />
+              <span>Log Transfer</span>
+            </button>
+          )}
+
+          {/* View Toggle (Cards vs Table for Deals) */}
+          {activeTab === "deals" && (
+            <div className="flex items-center gap-1 bg-[#111111] p-1 rounded-lg border border-[#262626]">
+              <button
+                onClick={() => setLayoutVariant("cards")}
+                className={`p-1.5 rounded-md text-xs transition-all duration-150 ${
+                  layoutVariant === "cards"
+                    ? "bg-[#262626] text-white"
+                    : "text-[#A1A1AA] hover:text-white"
+                }`}
+                title="Visual Pipeline Cards"
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setLayoutVariant("table")}
+                className={`p-1.5 rounded-md text-xs transition-all duration-150 ${
+                  layoutVariant === "table"
+                    ? "bg-[#262626] text-white"
+                    : "text-[#A1A1AA] hover:text-white"
+                }`}
+                title="Dense Ledger Matrix"
+              >
+                <TableIcon className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Tab 1: Land Deals Master */}

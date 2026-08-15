@@ -69,10 +69,10 @@ Switch between modes using the toggle located in the top navigation bar:
 
 ### B. The 4-Price Valuation Matrix
 Every commercial deal card displays four distinct financial metrics:
-1. **1. Agreed Buy Price**: The baseline consideration agreed with the original land seller.
-2. **2. Property Expenses**: Total spent on legal verification, stamp duty, registration, DTCP scrutiny, boundary fencing, and earth leveling (can exceed the buy price).
-3. **3. Target Sale Exit**: Target valuation if sold at projected market rates.
-4. **4. Agreed Selling Price**: The finalized contract price with the incoming buyer.
+1. **Agreed Buy Price**: The baseline consideration agreed with the original land seller.
+2. **Property Expenses**: Total spent on legal verification, stamp duty, registration, DTCP scrutiny, boundary fencing, and earth leveling (can exceed the buy price).
+3. **Target Sale Exit**: Target valuation if sold at projected market rates.
+4. **Agreed Selling Price**: The finalized contract price with the incoming buyer.
 - **Total Project Outlay**: `Agreed Buy Price + Property Expenses`
 - **Projected Profit**: `Agreed Selling Price - Total Project Outlay`
 
@@ -205,7 +205,10 @@ npm run build
 | `/api/properties/:id` | `PATCH`| Authenticated | Update valuations, status, notes, or milestones |
 | `/api/transactions` | `GET` | Authenticated | Query ledger entries filtered by scope, type, or property |
 | `/api/transactions` | `POST` | Authenticated | Log outflow, inflow receipt, or bank-to-cash transfer |
+| `/api/transactions/:id`| `PATCH`| Authenticated | Full editing of historical transaction details, dates, amounts, categories |
+| `/api/transactions/:id`| `DELETE`| Authenticated | Remove erroneous transaction and immediately recalculate liquidity |
 | `/api/categories` | `GET` | Authenticated | List registered categories with financial role mappings |
+| `/api/categories` | `POST` | Authenticated | Register dynamic custom category into zero-break financial engine |
 | `/api/export/excel` | `GET` | Authenticated | Stream multi-tab `.xlsx` workbook |
 | `/api/export/pdf` | `GET` | Authenticated | Stream formatted `.pdf` statement |
 | `/api/export/csv` | `GET` | Authenticated | Stream normalized accounting `.csv` |

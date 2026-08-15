@@ -105,14 +105,36 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
           </button>
         </div>
 
-        {/* Key Ingress Action: Add Personal Property (Hover-to-White) */}
-        <button
-          onClick={onOpenNewPropertyModal}
-          className="btn-action-primary px-4 py-2 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 whitespace-nowrap"
-        >
-          <Plus className="w-4 h-4 stroke-[2.5]" />
-          <span>Add Personal Property</span>
-        </button>
+        {/* Actions Button Group */}
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          {activeSubTab === "outflows" && (
+            <button
+              onClick={() => onOpenEntryModal("outflow")}
+              className="btn-action-primary px-3 py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 whitespace-nowrap"
+            >
+              <Plus className="w-4 h-4 stroke-[2.5]" />
+              <span>Log Outflow</span>
+            </button>
+          )}
+
+          {activeSubTab === "inflows" && (
+            <button
+              onClick={() => onOpenEntryModal("inflow")}
+              className="btn-action-primary px-3 py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 whitespace-nowrap"
+            >
+              <Plus className="w-4 h-4 stroke-[2.5] text-[#22C55E]" />
+              <span>Log Inflow Source</span>
+            </button>
+          )}
+
+          <button
+            onClick={onOpenNewPropertyModal}
+            className="btn-action-primary px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 whitespace-nowrap"
+          >
+            <Plus className="w-4 h-4 stroke-[2.5]" />
+            <span>+ Property</span>
+          </button>
+        </div>
       </div>
 
       {/* SubTab 1: My Properties & Assets */}

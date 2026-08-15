@@ -783,7 +783,7 @@ export const INITIAL_CATEGORIES: SeedCategory[] = [
     financialRole: "property_expense",
   },
 
-  // 8. Commercial Deal Inflows (Buyer Receipts)
+  // 8. Commercial Deal Inflows (Buyer Sale Receipts)
   {
     name: "Booking Token",
     scope: "commercial",
@@ -802,8 +802,134 @@ export const INITIAL_CATEGORIES: SeedCategory[] = [
     type: "inflow",
     financialRole: "sale_receipt",
   },
+  {
+    name: "Buyer Token Advance",
+    scope: "commercial",
+    type: "inflow",
+    financialRole: "sale_receipt",
+  },
+  {
+    name: "Sale Agreement Advance",
+    scope: "commercial",
+    type: "inflow",
+    financialRole: "sale_receipt",
+  },
 
-  // 9. Personal Milestone & Construction Categories
+  // 9. Commercial External Capital Funding (Inflows)
+  {
+    name: "Bank Account Funding",
+    scope: "commercial",
+    type: "inflow",
+    financialRole: "capital_infusion",
+  },
+  {
+    name: "Cash Deposit Funding",
+    scope: "commercial",
+    type: "inflow",
+    financialRole: "capital_infusion",
+  },
+  {
+    name: "Partner Investment",
+    scope: "commercial",
+    type: "inflow",
+    financialRole: "capital_infusion",
+  },
+  {
+    name: "Partner Cash Funding",
+    scope: "commercial",
+    type: "inflow",
+    financialRole: "capital_infusion",
+  },
+  {
+    name: "Business Loan",
+    scope: "commercial",
+    type: "inflow",
+    financialRole: "capital_infusion",
+  },
+  {
+    name: "Bank Funding",
+    scope: "commercial",
+    type: "inflow",
+    financialRole: "capital_infusion",
+  },
+  {
+    name: "Investment Exit",
+    scope: "commercial",
+    type: "inflow",
+    financialRole: "capital_infusion",
+  },
+  {
+    name: "Director Capital Infusion",
+    scope: "commercial",
+    type: "inflow",
+    financialRole: "capital_infusion",
+  },
+  {
+    name: "Cash Funding",
+    scope: "commercial",
+    type: "inflow",
+    financialRole: "capital_infusion",
+  },
+  {
+    name: "General Capital Inflow",
+    scope: "commercial",
+    type: "inflow",
+    financialRole: "capital_infusion",
+  },
+
+  // 10. Personal Inflow Sources
+  {
+    name: "Personal Savings",
+    scope: "personal",
+    type: "inflow",
+    financialRole: "capital_infusion",
+  },
+  {
+    name: "Salary / Professional Income",
+    scope: "personal",
+    type: "inflow",
+    financialRole: "capital_infusion",
+  },
+  {
+    name: "Rental Income",
+    scope: "personal",
+    type: "inflow",
+    financialRole: "capital_infusion",
+  },
+  {
+    name: "Fixed Deposit / Mutual Fund Return",
+    scope: "personal",
+    type: "inflow",
+    financialRole: "capital_infusion",
+  },
+  {
+    name: "Asset / Gold Sale",
+    scope: "personal",
+    type: "inflow",
+    financialRole: "capital_infusion",
+  },
+  {
+    name: "Family Gift / Support",
+    scope: "personal",
+    type: "inflow",
+    financialRole: "capital_infusion",
+  },
+  {
+    name: "General Personal Inflow",
+    scope: "personal",
+    type: "inflow",
+    financialRole: "capital_infusion",
+  },
+
+  // 11. Internal Transfers
+  {
+    name: "Internal Liquidity Transfer",
+    scope: "both",
+    type: "transfer",
+    financialRole: "internal_transfer",
+  },
+
+  // 12. Personal Milestone & Construction Categories
   {
     name: "Booking Amount / Agreement",
     scope: "personal",
