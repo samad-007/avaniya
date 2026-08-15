@@ -46,8 +46,9 @@ export default function DashboardPage() {
   const [personalMetrics, setPersonalMetrics] =
     useState<PersonalDashboardMetrics | null>(null);
 
-  // User Auth State: Defaults to null so page refresh immediately lands on Login screen
+  // User Auth State
   const [user, setUser] = useState<AuthUserData | null>(null);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
@@ -134,11 +135,46 @@ export default function DashboardPage() {
     recompute();
   }, [recompute]);
 
+  // Auto-restore session from active cookie on initial mount
+  useEffect(() => {
+    async function restoreSession() {
+      try {
+        const res = await fetch("/api/auth/me");
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && json.data) {
+            const last = localStorage.getItem("avaniya_last_activity");
+            const INACTIVITY_LIMIT_MS = 30 * 60 * 1000;
+            if (!last || Date.now() - parseInt(last, 10) <= INACTIVITY_LIMIT_MS) {
+              localStorage.setItem(
+                "avaniya_last_activity",
+                Date.now().toString()
+              );
+              setUser(json.data);
+              const activeDs =
+                json.data.role === "super_admin"
+                  ? "ds_yousuf_portfolio"
+                  : json.data.datasetId || "fresh_user";
+              setCurrentDatasetId(activeDs);
+              await loadDatasetData(activeDs);
+            }
+          }
+        }
+      } catch (e) {
+        console.warn("Session restore check failed", e);
+      } finally {
+        setIsAuthChecking(false);
+      }
+    }
+    restoreSession();
+  }, [loadDatasetData]);
+
   // Handlers
   const handleConfirmedLogout = useCallback(async () => {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
     } catch {}
+    localStorage.removeItem("avaniya_last_activity");
     setUser(null);
     setProperties([]);
     setTransactions([]);
@@ -169,7 +205,7 @@ export default function DashboardPage() {
     const INACTIVITY_LIMIT_MS = 30 * 60 * 1000;
     let timeoutId: NodeJS.Timeout;
 
-    const recordActivity = () => {
+    const resetTimer = () => {
       localStorage.setItem("avaniya_last_activity", Date.now().toString());
       if (timeoutId) clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
@@ -177,14 +213,8 @@ export default function DashboardPage() {
       }, INACTIVITY_LIMIT_MS);
     };
 
-    const checkStoredActivity = () => {
-      const last = localStorage.getItem("avaniya_last_activity");
-      if (last && Date.now() - parseInt(last, 10) > INACTIVITY_LIMIT_MS) {
-        handleConfirmedLogout();
-      } else {
-        recordActivity();
-      }
-    };
+    // Initialize activity timestamp for the active session
+    resetTimer();
 
     const activityEvents = [
       "mousemove",
@@ -194,23 +224,36 @@ export default function DashboardPage() {
       "scroll",
     ];
 
+    let lastThrottledTime = Date.now();
+    const handleUserActivity = () => {
+      const now = Date.now();
+      // Throttle localStorage writes to once every 10 seconds
+      if (now - lastThrottledTime > 10000) {
+        lastThrottledTime = now;
+        resetTimer();
+      }
+    };
+
     activityEvents.forEach((evt) =>
-      window.addEventListener(evt, recordActivity, { passive: true })
+      window.addEventListener(evt, handleUserActivity, { passive: true })
     );
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
-        checkStoredActivity();
+        const last = localStorage.getItem("avaniya_last_activity");
+        if (last && Date.now() - parseInt(last, 10) > INACTIVITY_LIMIT_MS) {
+          handleConfirmedLogout();
+        } else {
+          resetTimer();
+        }
       }
     };
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
-    checkStoredActivity();
-
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
       activityEvents.forEach((evt) =>
-        window.removeEventListener(evt, recordActivity)
+        window.removeEventListener(evt, handleUserActivity)
       );
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
@@ -489,7 +532,21 @@ export default function DashboardPage() {
     setIsLedgerModalOpen(true);
   };
 
-  // Clean Login Landing Screen (When unauthenticated or after refresh)
+  // Initial Session Verification Splash
+  if (isAuthChecking) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center font-sans">
+        <div className="flex flex-col items-center gap-3 animate-pulse">
+          <div className="w-10 h-10 rounded-lg bg-[#111111] border border-[#333333]"></div>
+          <span className="text-xs text-[#71717A] tracking-wider uppercase font-semibold">
+            Loading Avaniya Workspace...
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // Clean Login Landing Screen (When unauthenticated)
   if (!user) {
     return (
       <div className="min-h-screen bg-black text-white flex flex-col justify-between font-sans">
@@ -497,6 +554,10 @@ export default function DashboardPage() {
           isOpen={true}
           allowClose={false}
           onSuccess={async (authUserData) => {
+            localStorage.setItem(
+              "avaniya_last_activity",
+              Date.now().toString()
+            );
             setUser(authUserData);
             const activeDs =
               authUserData.role === "super_admin"
@@ -580,6 +641,10 @@ export default function DashboardPage() {
           onClose={() => setIsAuthModalOpen(false)}
           allowClose={true}
           onSuccess={async (authUserData) => {
+            localStorage.setItem(
+              "avaniya_last_activity",
+              Date.now().toString()
+            );
             setUser(authUserData);
             setIsAuthModalOpen(false);
             const activeDs =
