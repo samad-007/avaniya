@@ -103,6 +103,8 @@ Click **Export** in the top bar to generate offline files:
 
 ### A. Architecture & Tech Stack
 - **Framework**: Next.js 15 (App Router, Server Components & Route Handlers)
+- **Runtime Environment**: Bun 1.4 (via `vercel.json` `"bunVersion": "1.4.x"`) with local Node.js / Bun cross-compatibility
+- **Package Manager**: Bun 1.4 (`packageManager: bun@1.4.0`)
 - **Language**: TypeScript 5 (Strict types, zero `any`, discriminated unions)
 - **Styling**: Tailwind CSS (True Black `#000000` baseline, high-contrast zinc tokens)
 - **Typography**: IBM Plex Sans (Body) + JetBrains Mono (Financial Tabular Digits) via `next/font/google`
