@@ -26,6 +26,13 @@ export interface CommercialDashboardMetrics {
   capitalInjectedBank: number;
   capitalInjectedCash: number;
   capitalInjectedTotal: number;
+  capitalWithdrawalsBank: number;
+  capitalWithdrawalsCash: number;
+  capitalWithdrawalsTotal: number;
+  netCapitalInjected: number;
+  profitWithdrawalsBank: number;
+  profitWithdrawalsCash: number;
+  profitWithdrawalsTotal: number;
   outflowsBank: number;
   outflowsCash: number;
   outflowsTotal: number;
@@ -55,6 +62,9 @@ export interface PersonalDashboardMetrics {
   outflowsBank: number;
   outflowsCash: number;
   outflowsTotal: number;
+  withdrawalsBank: number;
+  withdrawalsCash: number;
+  withdrawalsTotal: number;
   cashToBank: number;
   bankToCash: number;
   currentBankBalance: number;
@@ -92,7 +102,7 @@ export function calculateCommercialMetrics(
     return catName.toLowerCase().startsWith("purchase");
   };
 
-  // Capital Inflows
+  // Capital Inflows (External Funding)
   const capTx = commTx.filter((t) => t.transactionType === "capital_inflow");
   const capitalInjectedBank = capTx
     .filter((t) => t.mode === "Bank")
@@ -101,6 +111,27 @@ export function calculateCommercialMetrics(
     .filter((t) => t.mode === "Cash")
     .reduce((sum, t) => sum + (t.amount || 0), 0);
   const capitalInjectedTotal = capitalInjectedBank + capitalInjectedCash;
+
+  // Capital / Investment Withdrawals (Equity Reduction / Refunds)
+  const capWthTx = commTx.filter((t) => t.transactionType === "capital_withdrawal");
+  const capitalWithdrawalsBank = capWthTx
+    .filter((t) => t.mode === "Bank")
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
+  const capitalWithdrawalsCash = capWthTx
+    .filter((t) => t.mode === "Cash")
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
+  const capitalWithdrawalsTotal = capitalWithdrawalsBank + capitalWithdrawalsCash;
+  const netCapitalInjected = capitalInjectedTotal - capitalWithdrawalsTotal;
+
+  // Profit Withdrawals (Drawings for other business / dividends)
+  const profWthTx = commTx.filter((t) => t.transactionType === "profit_withdrawal");
+  const profitWithdrawalsBank = profWthTx
+    .filter((t) => t.mode === "Bank")
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
+  const profitWithdrawalsCash = profWthTx
+    .filter((t) => t.mode === "Cash")
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
+  const profitWithdrawalsTotal = profitWithdrawalsBank + profitWithdrawalsCash;
 
   // Property Outflows
   const outTx = commTx.filter((t) => t.transactionType === "outflow");
@@ -139,18 +170,22 @@ export function calculateCommercialMetrics(
     )
     .reduce((sum, t) => sum + (t.amount || 0), 0);
 
-  // Exact formulas from Land_Business_Tracker.xlsx Dashboard:
-  // Net Bank = C10 - C11 + C12 - C13 + C14
+  // Exact formulas with withdrawal reconciliation:
+  // Net Bank = Gross Capital (Bank) - Capital Withdrawn (Bank) - Profit Withdrawn (Bank) - Outflows (Bank) + Deal Inflows (Bank) - Trf (Bank->Cash) + Trf (Cash->Bank)
   const netBankLiquidity =
     capitalInjectedBank -
+    capitalWithdrawalsBank -
+    profitWithdrawalsBank -
     outflowsBank +
     dealInflowsBank -
     transfersBankToCash +
     transfersCashToBank;
 
-  // Net Cash = D10 - D11 + D12 + D13 - D14
+  // Net Cash = Gross Capital (Cash) - Capital Withdrawn (Cash) - Profit Withdrawn (Cash) - Outflows (Cash) + Deal Inflows (Cash) + Trf (Bank->Cash) - Trf (Cash->Bank)
   const netCashLiquidity =
     capitalInjectedCash -
+    capitalWithdrawalsCash -
+    profitWithdrawalsCash -
     outflowsCash +
     dealInflowsCash +
     transfersBankToCash -
@@ -276,6 +311,13 @@ export function calculateCommercialMetrics(
     capitalInjectedBank: Math.round(capitalInjectedBank),
     capitalInjectedCash: Math.round(capitalInjectedCash),
     capitalInjectedTotal: Math.round(capitalInjectedTotal),
+    capitalWithdrawalsBank: Math.round(capitalWithdrawalsBank),
+    capitalWithdrawalsCash: Math.round(capitalWithdrawalsCash),
+    capitalWithdrawalsTotal: Math.round(capitalWithdrawalsTotal),
+    netCapitalInjected: Math.round(netCapitalInjected),
+    profitWithdrawalsBank: Math.round(profitWithdrawalsBank),
+    profitWithdrawalsCash: Math.round(profitWithdrawalsCash),
+    profitWithdrawalsTotal: Math.round(profitWithdrawalsTotal),
     outflowsBank: Math.round(outflowsBank),
     outflowsCash: Math.round(outflowsCash),
     outflowsTotal: Math.round(outflowsTotal),
@@ -331,6 +373,19 @@ export function calculatePersonalMetrics(
     .reduce((sum, t) => sum + (t.amount || 0), 0);
   const outflowsTotal = outflowsBank + outflowsCash;
 
+  const wthTx = persTx.filter(
+    (t) =>
+      t.transactionType === "profit_withdrawal" ||
+      t.transactionType === "capital_withdrawal"
+  );
+  const withdrawalsBank = wthTx
+    .filter((t) => t.mode === "Bank")
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
+  const withdrawalsCash = wthTx
+    .filter((t) => t.mode === "Cash")
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
+  const withdrawalsTotal = withdrawalsBank + withdrawalsCash;
+
   const trfTx = persTx.filter((t) => t.transactionType === "transfer");
   const cashToBank = trfTx
     .filter(
@@ -347,14 +402,14 @@ export function calculatePersonalMetrics(
     )
     .reduce((sum, t) => sum + (t.amount || 0), 0);
 
-  // Exact formulas from New Apartment Expense Tracker.xlsx Calc_Data:
-  // Current Cash = Total Cash Inflow - Total Cash Outflow - Cash to Bank + Bank to Cash
+  // Exact formulas with personal withdrawals:
+  // Current Cash = Total Cash Inflow - Total Cash Outflow - Total Cash Withdrawn - Cash to Bank + Bank to Cash
   const currentCashBalance =
-    inflowsCash - outflowsCash - cashToBank + bankToCash;
+    inflowsCash - outflowsCash - withdrawalsCash - cashToBank + bankToCash;
 
-  // Current Bank = Total Bank Inflow - Total Bank Outflow + Cash to Bank - Bank to Cash
+  // Current Bank = Total Bank Inflow - Total Bank Outflow - Total Bank Withdrawn + Cash to Bank - Bank to Cash
   const currentBankBalance =
-    inflowsBank - outflowsBank + cashToBank - bankToCash;
+    inflowsBank - outflowsBank - withdrawalsBank + cashToBank - bankToCash;
 
   const netPersonalLiquidity = currentBankBalance + currentCashBalance;
   const totalInvestmentDone = outflowsTotal;
@@ -409,6 +464,9 @@ export function calculatePersonalMetrics(
     outflowsBank: Math.round(outflowsBank),
     outflowsCash: Math.round(outflowsCash),
     outflowsTotal: Math.round(outflowsTotal),
+    withdrawalsBank: Math.round(withdrawalsBank),
+    withdrawalsCash: Math.round(withdrawalsCash),
+    withdrawalsTotal: Math.round(withdrawalsTotal),
     cashToBank: Math.round(cashToBank),
     bankToCash: Math.round(bankToCash),
     currentBankBalance: Math.round(currentBankBalance),

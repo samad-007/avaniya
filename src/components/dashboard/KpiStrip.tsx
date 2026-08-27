@@ -28,6 +28,8 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
       totalPendingReceivable,
       totalRealizedProfit,
       capitalInjectedTotal,
+      netCapitalInjected,
+      profitWithdrawalsTotal,
       propertyMetrics,
     } = commercialMetrics;
 
@@ -71,7 +73,7 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
             {formatINR(currentNetLiquidity)}
           </div>
           <div className="text-xs text-[#A1A1AA] font-medium mt-1.5">
-            Capital: {formatINR(capitalInjectedTotal)}
+            Net Cap: {formatINR(netCapitalInjected)}
           </div>
         </div>
 
@@ -113,7 +115,9 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
             {formatINR(totalRealizedProfit)}
           </div>
           <div className="text-xs text-[#A1A1AA] font-medium mt-1.5">
-            Settled Deal Gains
+            {profitWithdrawalsTotal > 0
+              ? `Drawings: -${formatINR(profitWithdrawalsTotal)}`
+              : "Settled Deal Gains"}
           </div>
         </div>
       </div>

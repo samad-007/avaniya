@@ -32,7 +32,7 @@ interface CommercialViewProps {
   onSelectProperty: (propertyMetric: PropertyFinancialMetrics) => void;
   onOpenNewDealModal: () => void;
   onOpenEntryModal?: (
-    type: "outflow" | "inflow" | "transfer",
+    type: "outflow" | "inflow" | "transfer" | "withdrawal",
     propertyCode?: string
   ) => void;
   onEditProperty?: (property: SeedProperty) => void;
@@ -82,10 +82,14 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
     [transactions]
   );
 
-  const capitalInflows = useMemo(
+  const capitalAndWithdrawals = useMemo(
     () =>
       transactions.filter(
-        (t) => t.scope === "commercial" && t.transactionType === "capital_inflow"
+        (t) =>
+          t.scope === "commercial" &&
+          (t.transactionType === "capital_inflow" ||
+            t.transactionType === "capital_withdrawal" ||
+            t.transactionType === "profit_withdrawal")
       ),
     [transactions]
   );
@@ -141,7 +145,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                 : "border-transparent text-[#A1A1AA] hover:text-white"
             }`}
           >
-            4. Capital Funding ({formatINRCompact(metrics.capitalInjectedTotal)})
+            4. Capital &amp; Withdrawals ({formatINRCompact(metrics.netCapitalInjected)})
           </button>
           <button
             onClick={() => setActiveTab("transfers")}
@@ -178,13 +182,21 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
           )}
 
           {activeTab === "capital" && onOpenEntryModal && (
-            <button
-              onClick={() => onOpenEntryModal("inflow")}
-              className="btn-action-primary px-3 py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 whitespace-nowrap"
-            >
-              <Plus className="w-4 h-4 stroke-[2.5] text-[#22C55E]" />
-              <span>Log Capital Funding</span>
-            </button>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => onOpenEntryModal("inflow")}
+                className="btn-action-primary px-3 py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 whitespace-nowrap"
+              >
+                <Plus className="w-4 h-4 stroke-[2.5] text-[#22C55E]" />
+                <span>+ Inflow</span>
+              </button>
+              <button
+                onClick={() => onOpenEntryModal("withdrawal")}
+                className="btn-action-primary px-3 py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 whitespace-nowrap text-amber-300 border border-amber-800/40"
+              >
+                <span>+ Withdraw</span>
+              </button>
+            </div>
           )}
 
           {activeTab === "transfers" && onOpenEntryModal && (
@@ -696,76 +708,174 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
         </div>
       )}
 
-      {/* Tab 4: Capital Funding */}
+      {/* Tab 4: Capital & Withdrawals */}
       {activeTab === "capital" && (
-        <div className="border border-[#262626] rounded-xl overflow-x-auto bg-[#0a0a0a]">
-          <table className="w-full text-left text-sm border-collapse">
-            <thead>
-              <tr className="bg-[#111111] border-b border-[#262626] text-[#D4D4D8] uppercase text-xs font-bold tracking-wider">
-                <th className="py-3 px-3.5">Inflow ID</th>
-                <th className="py-3 px-3.5">Date</th>
-                <th className="py-3 px-3.5">Source / Description</th>
-                <th className="py-3 px-3.5">Payment Mode</th>
-                <th className="py-3 px-3.5 text-right">Amount Injected</th>
-                <th className="py-3 px-3.5">Notes</th>
-                <th className="py-3 px-3.5 text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#181818]">
-              {capitalInflows.map((t) => (
-                <tr key={t.id} className="hover:bg-[#141414] transition-colors">
-                  <td className="py-3 px-3.5 font-mono text-[#A1A1AA] font-semibold">
-                    {t.transCode || "-"}
-                  </td>
-                  <td className="py-3 px-3.5 text-[#D4D4D8]">
-                    {formatDateIN(t.date)}
-                  </td>
-                  <td className="py-3 px-3.5 font-semibold text-white">
-                    {t.recipientOrSource || t.category}
-                  </td>
-                  <td className="py-3 px-3.5">
-                    <span
-                      className={`inline-flex items-center gap-1 font-mono text-xs font-semibold px-2 py-0.5 rounded border ${
-                        t.mode === "Cash"
-                          ? "bg-amber-950/20 text-amber-400 border-amber-800/30"
-                          : "bg-blue-950/20 text-blue-400 border-blue-800/30"
-                      }`}
-                    >
-                      {t.mode}
-                    </span>
-                  </td>
-                  <td className="py-3 px-3.5 text-right font-mono font-bold text-white">
-                    {formatINR(t.amount)}
-                  </td>
-                  <td className="py-3 px-3.5 text-[#A1A1AA]">
-                    {t.remarks || "-"}
-                  </td>
-                  <td className="py-3 px-3.5 text-right">
-                    {onEditTransaction && (
-                      <button
-                        onClick={() => onEditTransaction(t)}
-                        className="btn-action-primary p-1.5 rounded-md inline-flex items-center justify-center"
-                        title="Edit Transaction"
-                      >
-                        <Pencil className="w-3.5 h-3.5 text-[#22C55E]" />
-                      </button>
-                    )}
-                  </td>
+        <div className="flex flex-col gap-4">
+          {/* Equity & Retained Capital Summary Banner */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="bg-[#0e0e0e] border border-[#262626] rounded-xl p-3.5 flex flex-col gap-1">
+              <span className="text-[11px] font-semibold text-[#A1A1AA] uppercase tracking-wider">
+                Gross Capital Injected
+              </span>
+              <span className="text-base sm:text-lg font-bold font-mono text-white">
+                {formatINR(metrics.capitalInjectedTotal)}
+              </span>
+              <span className="text-[11px] text-[#71717A]">
+                Bank: {formatINRCompact(metrics.capitalInjectedBank)} | Cash: {formatINRCompact(metrics.capitalInjectedCash)}
+              </span>
+            </div>
+
+            <div className="bg-[#0e0e0e] border border-amber-900/30 rounded-xl p-3.5 flex flex-col gap-1">
+              <span className="text-[11px] font-semibold text-amber-400 uppercase tracking-wider">
+                Capital Principal Returned
+              </span>
+              <span className="text-base sm:text-lg font-bold font-mono text-amber-400">
+                -{formatINR(metrics.capitalWithdrawalsTotal)}
+              </span>
+              <span className="text-[11px] text-[#71717A]">
+                Equity reductions &amp; partner refunds
+              </span>
+            </div>
+
+            <div className="bg-[#0e0e0e] border border-rose-900/30 rounded-xl p-3.5 flex flex-col gap-1">
+              <span className="text-[11px] font-semibold text-rose-400 uppercase tracking-wider">
+                Profit &amp; Drawings Withdrawn
+              </span>
+              <span className="text-base sm:text-lg font-bold font-mono text-rose-400">
+                -{formatINR(metrics.profitWithdrawalsTotal)}
+              </span>
+              <span className="text-[11px] text-[#71717A]">
+                Reallocated to other ventures/dividends
+              </span>
+            </div>
+
+            <div className="bg-[#0e0e0e] border border-[#333333] rounded-xl p-3.5 flex flex-col gap-1">
+              <span className="text-[11px] font-semibold text-white uppercase tracking-wider">
+                Net Retained Capital In Business
+              </span>
+              <span className="text-base sm:text-lg font-bold font-mono text-[#22C55E]">
+                {formatINR(metrics.netCapitalInjected - metrics.profitWithdrawalsTotal)}
+              </span>
+              <span className="text-[11px] text-[#71717A]">
+                Retained net capital equity
+              </span>
+            </div>
+          </div>
+
+          {/* Unified Ledger Table */}
+          <div className="border border-[#262626] rounded-xl overflow-x-auto bg-[#0a0a0a]">
+            <table className="w-full text-left text-sm border-collapse">
+              <thead>
+                <tr className="bg-[#111111] border-b border-[#262626] text-[#D4D4D8] uppercase text-xs font-bold tracking-wider">
+                  <th className="py-3 px-3.5">Entry ID</th>
+                  <th className="py-3 px-3.5">Date</th>
+                  <th className="py-3 px-3.5">Type / Flow</th>
+                  <th className="py-3 px-3.5">Category / Party</th>
+                  <th className="py-3 px-3.5">Payment Mode</th>
+                  <th className="py-3 px-3.5 text-right">Amount</th>
+                  <th className="py-3 px-3.5">Notes</th>
+                  <th className="py-3 px-3.5 text-right">Action</th>
                 </tr>
-              ))}
-            </tbody>
-            <tfoot>
-              <tr className="bg-[#0e0e0e] border-t-2 border-[#262626] font-bold text-white text-sm">
-                <td colSpan={4} className="py-3.5 px-3.5">
-                  Total External Capital Injected
-                </td>
-                <td className="py-3.5 px-3.5 text-right font-mono text-[#22C55E]">
-                  {formatINR(metrics.capitalInjectedTotal)}
-                </td>
-                <td colSpan={2}></td>
-              </tr>
-            </tfoot>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-[#181818]">
+                {capitalAndWithdrawals.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={8}
+                      className="py-8 text-center text-[#71717A] text-sm font-medium"
+                    >
+                      No capital funding or withdrawal transactions logged yet.
+                    </td>
+                  </tr>
+                ) : (
+                  capitalAndWithdrawals.map((t) => {
+                    const isCapitalInflow = t.transactionType === "capital_inflow";
+                    const isProfitWithdrawal = t.transactionType === "profit_withdrawal";
+                    const isCapitalWithdrawal = t.transactionType === "capital_withdrawal";
+
+                    return (
+                      <tr key={t.id} className="hover:bg-[#141414] transition-colors">
+                        <td className="py-3 px-3.5 font-mono text-[#A1A1AA] font-semibold">
+                          {t.transCode || "-"}
+                        </td>
+                        <td className="py-3 px-3.5 text-[#D4D4D8]">
+                          {formatDateIN(t.date)}
+                        </td>
+                        <td className="py-3 px-3.5">
+                          {isCapitalInflow && (
+                            <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-emerald-950/30 text-emerald-400 border border-emerald-800/30">
+                              Capital Inflow
+                            </span>
+                          )}
+                          {isCapitalWithdrawal && (
+                            <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-amber-950/30 text-amber-400 border border-amber-800/30">
+                              Capital Refund
+                            </span>
+                          )}
+                          {isProfitWithdrawal && (
+                            <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-rose-950/30 text-rose-400 border border-rose-800/30">
+                              Profit Drawing
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-3 px-3.5 font-semibold text-white">
+                          {t.recipientOrSource || t.category}
+                        </td>
+                        <td className="py-3 px-3.5">
+                          <span
+                            className={`inline-flex items-center gap-1 font-mono text-xs font-semibold px-2 py-0.5 rounded border ${
+                              t.mode === "Cash"
+                                ? "bg-amber-950/20 text-amber-400 border-amber-800/30"
+                                : "bg-blue-950/20 text-blue-400 border-blue-800/30"
+                            }`}
+                          >
+                            {t.mode}
+                          </span>
+                        </td>
+                        <td
+                          className={`py-3 px-3.5 text-right font-mono font-bold ${
+                            isCapitalInflow
+                              ? "text-[#22C55E]"
+                              : isCapitalWithdrawal
+                              ? "text-amber-400"
+                              : "text-rose-400"
+                          }`}
+                        >
+                          {isCapitalInflow ? "+" : "-"}
+                          {formatINR(t.amount)}
+                        </td>
+                        <td className="py-3 px-3.5 text-[#A1A1AA]">
+                          {t.remarks || "-"}
+                        </td>
+                        <td className="py-3 px-3.5 text-right">
+                          {onEditTransaction && (
+                            <button
+                              onClick={() => onEditTransaction(t)}
+                              className="btn-action-primary p-1.5 rounded-md inline-flex items-center justify-center"
+                              title="Edit Transaction"
+                            >
+                              <Pencil className="w-3.5 h-3.5 text-[#22C55E]" />
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+              <tfoot>
+                <tr className="bg-[#0e0e0e] border-t-2 border-[#262626] font-bold text-white text-sm">
+                  <td colSpan={5} className="py-3.5 px-3.5">
+                    Net Retained Capital (Injected - Refunds - Profit Drawings)
+                  </td>
+                  <td className="py-3.5 px-3.5 text-right font-mono text-[#22C55E]">
+                    {formatINR(metrics.netCapitalInjected - metrics.profitWithdrawalsTotal)}
+                  </td>
+                  <td colSpan={2}></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
       )}
 

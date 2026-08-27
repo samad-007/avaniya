@@ -3,6 +3,8 @@ export type FinancialRole =
   | "property_expense"
   | "sale_receipt"
   | "capital_infusion"
+  | "profit_withdrawal"
+  | "capital_withdrawal"
   | "internal_transfer"
   | "personal_milestone"
   | "personal_overhead";
@@ -32,7 +34,13 @@ export interface SeedProperty {
 export interface SeedTransaction {
   id: string;
   scope: "commercial" | "personal";
-  transactionType: "outflow" | "deal_inflow" | "capital_inflow" | "transfer";
+  transactionType:
+    | "outflow"
+    | "deal_inflow"
+    | "capital_inflow"
+    | "transfer"
+    | "profit_withdrawal"
+    | "capital_withdrawal";
   transCode?: string;
   propertyCode?: string;
   date: string;
@@ -1001,6 +1009,64 @@ export const INITIAL_CATEGORIES: SeedCategory[] = [
     scope: "personal",
     type: "outflow",
     financialRole: "personal_overhead",
+  },
+
+  // 13. Commercial & Personal Profit Withdrawals (Drawings / Retained Profit Allocations)
+  {
+    name: "Partner Profit Drawing",
+    scope: "commercial",
+    type: "outflow",
+    financialRole: "profit_withdrawal",
+  },
+  {
+    name: "Inter-Business Fund Reallocation",
+    scope: "commercial",
+    type: "outflow",
+    financialRole: "profit_withdrawal",
+  },
+  {
+    name: "Director Profit Dividend",
+    scope: "commercial",
+    type: "outflow",
+    financialRole: "profit_withdrawal",
+  },
+  {
+    name: "Personal Savings Withdrawal",
+    scope: "personal",
+    type: "outflow",
+    financialRole: "profit_withdrawal",
+  },
+  {
+    name: "Emergency Fund Drawdown",
+    scope: "personal",
+    type: "outflow",
+    financialRole: "profit_withdrawal",
+  },
+
+  // 14. Commercial & Personal Capital Refunds (Equity Reduction / Investment Withdrawals)
+  {
+    name: "Partner Capital Refund",
+    scope: "commercial",
+    type: "outflow",
+    financialRole: "capital_withdrawal",
+  },
+  {
+    name: "Equity Reduction / Capital Return",
+    scope: "commercial",
+    type: "outflow",
+    financialRole: "capital_withdrawal",
+  },
+  {
+    name: "Investor Principal Refund",
+    scope: "commercial",
+    type: "outflow",
+    financialRole: "capital_withdrawal",
+  },
+  {
+    name: "Builder Refund / Cancellation Return",
+    scope: "personal",
+    type: "inflow",
+    financialRole: "capital_withdrawal",
   },
 ];
 

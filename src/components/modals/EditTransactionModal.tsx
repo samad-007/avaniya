@@ -49,9 +49,8 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
     }
   }, [transaction]);
 
-  if (!isOpen || !transaction) return null;
-
   const filteredCategories = useMemo(() => {
+    if (!categories) return [];
     return categories.filter((c) => {
       const scopeMatches =
         c.scope === "both" ||
@@ -60,6 +59,10 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
       const typeMatches =
         formData.transactionType === "transfer"
           ? c.type === "transfer"
+          : formData.transactionType === "profit_withdrawal"
+          ? c.financialRole === "profit_withdrawal"
+          : formData.transactionType === "capital_withdrawal"
+          ? c.financialRole === "capital_withdrawal"
           : formData.transactionType === "deal_inflow" ||
             formData.transactionType === "capital_inflow"
           ? c.type === "inflow"
@@ -67,6 +70,8 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
       return scopeMatches && typeMatches;
     });
   }, [categories, formData.scope, formData.transactionType]);
+
+  if (!isOpen || !transaction) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -197,7 +202,9 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                       | "outflow"
                       | "deal_inflow"
                       | "capital_inflow"
-                      | "transfer",
+                      | "transfer"
+                      | "profit_withdrawal"
+                      | "capital_withdrawal",
                   })
                 }
                 className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
@@ -205,6 +212,8 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                 <option value="outflow">Property Outflow / Expense</option>
                 <option value="deal_inflow">Property Sale Receipt</option>
                 <option value="capital_inflow">External Capital Inflow</option>
+                <option value="profit_withdrawal">Profit Drawing / Business Draw</option>
+                <option value="capital_withdrawal">Investment Capital Refund</option>
                 <option value="transfer">Internal Bank / Cash Transfer</option>
               </select>
             </div>

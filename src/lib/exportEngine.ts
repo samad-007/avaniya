@@ -32,6 +32,19 @@ export async function generateExcelWorkbook(
   const capInflows = transactions.filter(
     (t) => t.scope === "commercial" && t.transactionType === "capital_inflow"
   );
+  const capWithdrawals = transactions.filter(
+    (t) => t.scope === "commercial" && t.transactionType === "capital_withdrawal"
+  );
+  const profitWithdrawals = transactions.filter(
+    (t) => t.scope === "commercial" && t.transactionType === "profit_withdrawal"
+  );
+  const capAndWithdrawals = transactions.filter(
+    (t) =>
+      t.scope === "commercial" &&
+      (t.transactionType === "capital_inflow" ||
+        t.transactionType === "capital_withdrawal" ||
+        t.transactionType === "profit_withdrawal")
+  );
   const transfers = transactions.filter(
     (t) => t.scope === "commercial" && t.transactionType === "transfer"
   );
@@ -53,7 +66,7 @@ export async function generateExcelWorkbook(
   const dealInTotalRow = dealInEnd + 1;
 
   const capInStart = 4;
-  const capInEnd = Math.max(capInStart, capInStart + capInflows.length - 1);
+  const capInEnd = Math.max(capInStart, capInStart + capAndWithdrawals.length - 1);
   const capInTotalRow = capInEnd + 1;
 
   const trfStart = 4;
@@ -110,11 +123,11 @@ export async function generateExcelWorkbook(
 
   // KPI Value Cells with Bounded Formulas + Precomputed Results
   wsDash.getCell("B6").value = {
-    formula: "C12-C13+C14-C15+C16",
+    formula: "C12-C13+C14-C15-C16-C17+C18",
     result: commMetrics.netBankLiquidity,
   };
   wsDash.getCell("C6").value = {
-    formula: "D12-D13+D14+D15-D16",
+    formula: "D12-D13+D14-D15-D16+D17-D18",
     result: commMetrics.netCashLiquidity,
   };
   wsDash.getCell("D6").value = {
@@ -185,15 +198,31 @@ export async function generateExcelWorkbook(
     },
     {
       row: 15,
-      label: "4. Less/Add: Bank Withdrawals to Cash",
+      label: "4. Less: Capital Principal Returned",
+      bankFormula: `${commMetrics.capitalWithdrawalsBank}`,
+      cashFormula: `${commMetrics.capitalWithdrawalsCash}`,
+      bankVal: commMetrics.capitalWithdrawalsBank,
+      cashVal: commMetrics.capitalWithdrawalsCash,
+    },
+    {
+      row: 16,
+      label: "5. Less: Profit & Drawings Withdrawn",
+      bankFormula: `${commMetrics.profitWithdrawalsBank}`,
+      cashFormula: `${commMetrics.profitWithdrawalsCash}`,
+      bankVal: commMetrics.profitWithdrawalsBank,
+      cashVal: commMetrics.profitWithdrawalsCash,
+    },
+    {
+      row: 17,
+      label: "6. Less/Add: Bank Withdrawals to Cash",
       bankFormula: `SUMIF(Transfers!C$${trfStart}:C$${trfEnd}, "Bank Withdrawal to Cash", Transfers!D$${trfStart}:D$${trfEnd})`,
       cashFormula: `SUMIF(Transfers!C$${trfStart}:C$${trfEnd}, "Bank Withdrawal to Cash", Transfers!D$${trfStart}:D$${trfEnd})`,
       bankVal: commMetrics.transfersBankToCash,
       cashVal: commMetrics.transfersBankToCash,
     },
     {
-      row: 16,
-      label: "5. Add/Less: Cash Deposits to Bank",
+      row: 18,
+      label: "7. Add/Less: Cash Deposits to Bank",
       bankFormula: `SUMIF(Transfers!C$${trfStart}:C$${trfEnd}, "Cash Deposit to Bank", Transfers!D$${trfStart}:D$${trfEnd})`,
       cashFormula: `SUMIF(Transfers!C$${trfStart}:C$${trfEnd}, "Cash Deposit to Bank", Transfers!D$${trfStart}:D$${trfEnd})`,
       bankVal: commMetrics.transfersCashToBank,
@@ -216,13 +245,13 @@ export async function generateExcelWorkbook(
   });
 
   // Current Net Liquidity Summary Row
-  wsDash.getCell("B17").value = "CURRENT NET LIQUIDITY AVAILABLE";
-  wsDash.getCell("B17").font = { bold: true, color: { argb: "FF166534" } };
-  wsDash.getCell("C17").value = { formula: "C12-C13+C14-C15+C16", result: commMetrics.netBankLiquidity };
-  wsDash.getCell("D17").value = { formula: "D12-D13+D14+D15-D16", result: commMetrics.netCashLiquidity };
-  wsDash.getCell("E17").value = { formula: "C17+D17", result: commMetrics.currentNetLiquidity };
+  wsDash.getCell("B19").value = "CURRENT NET LIQUIDITY AVAILABLE";
+  wsDash.getCell("B19").font = { bold: true, color: { argb: "FF166534" } };
+  wsDash.getCell("C19").value = { formula: "C12-C13+C14-C15-C16-C17+C18", result: commMetrics.netBankLiquidity };
+  wsDash.getCell("D19").value = { formula: "D12-D13+D14-D15-D16+D17-D18", result: commMetrics.netCashLiquidity };
+  wsDash.getCell("E19").value = { formula: "C19+D19", result: commMetrics.currentNetLiquidity };
 
-  ["B17", "C17", "D17", "E17"].forEach((coord) => {
+  ["B19", "C19", "D19", "E19"].forEach((coord) => {
     const c = wsDash.getCell(coord);
     c.font = { bold: true };
     c.fill = {
@@ -475,20 +504,21 @@ export async function generateExcelWorkbook(
   wsIn.getRow(dealInTotalRow).getCell(6).numFmt = "₹ #,##,##0";
 
   // -------------------------------------------------------------
-  // Sheet 5: Capital_Inflows
+  // Sheet 5: Capital_Inflows (Capital Funding & Withdrawals)
   // -------------------------------------------------------------
   const wsCap = workbook.addWorksheet("Capital_Inflows", {
     views: [{ state: "frozen", xSplit: 0, ySplit: 3, showGridLines: true }],
   });
   wsCap.columns = [
-    { header: "Inflow ID", width: 14 },
+    { header: "Trans ID", width: 14 },
     { header: "Date", width: 14 },
-    { header: "Source / Description", width: 30 },
+    { header: "Type", width: 18 },
+    { header: "Source / Beneficiary", width: 30 },
     { header: "Payment Mode", width: 16 },
-    { header: "Amount", width: 22 },
+    { header: "Amount (₹)", width: 22 },
     { header: "Notes", width: 38 },
   ];
-  wsCap.spliceRows(1, 0, ["External Capital Funding Log"]);
+  wsCap.spliceRows(1, 0, ["External Capital Funding & Equity Withdrawals Log"]);
   wsCap.getCell("A1").font = { name: "Arial", size: 14, bold: true };
   wsCap.spliceRows(2, 0, []);
   wsCap.getRow(3).font = { bold: true, color: { argb: "FFFFFFFF" } };
@@ -498,32 +528,41 @@ export async function generateExcelWorkbook(
     fgColor: { argb: "FF111111" },
   };
 
-  capInflows.forEach((t) => {
+  capAndWithdrawals.forEach((t) => {
+    const isInflow = t.transactionType === "capital_inflow";
+    const typeLabel =
+      t.transactionType === "capital_inflow"
+        ? "Capital Inflow"
+        : t.transactionType === "capital_withdrawal"
+        ? "Capital Refund"
+        : "Profit Drawing";
     wsCap.addRow([
       t.transCode,
       t.date,
-      t.recipientOrSource,
+      typeLabel,
+      t.recipientOrSource || t.category,
       t.mode,
-      t.amount,
+      isInflow ? t.amount : -t.amount,
       t.remarks || "",
     ]);
   });
   wsCap.eachRow((row, rowNum) => {
     if (rowNum >= 4) {
-      row.getCell(5).numFmt = "₹ #,##,##0";
+      row.getCell(6).numFmt = "₹ #,##,##0";
     }
   });
 
   wsCap.addRow([
-    "Total Capital Injected",
+    "Net Retained Capital In Business",
     "",
     "",
     "",
-    { formula: `SUM(E$4:E$${capInEnd})`, result: commMetrics.capitalInjectedTotal },
+    "",
+    { formula: `SUM(F$4:F$${capInEnd})`, result: commMetrics.netCapitalInjected - commMetrics.profitWithdrawalsTotal },
     "",
   ]);
   wsCap.getRow(capInTotalRow).font = { bold: true };
-  wsCap.getRow(capInTotalRow).getCell(5).numFmt = "₹ #,##,##0";
+  wsCap.getRow(capInTotalRow).getCell(6).numFmt = "₹ #,##,##0";
 
   // -------------------------------------------------------------
   // Sheet 6: Transfers
@@ -732,6 +771,12 @@ export function generateExecutivePDF(
   const capInflows = transactions.filter(
     (t) => t.scope === "commercial" && t.transactionType === "capital_inflow"
   );
+  const capWithdrawals = transactions.filter(
+    (t) => t.scope === "commercial" && t.transactionType === "capital_withdrawal"
+  );
+  const profitWithdrawals = transactions.filter(
+    (t) => t.scope === "commercial" && t.transactionType === "profit_withdrawal"
+  );
   const transfers = transactions.filter(
     (t) => t.scope === "commercial" && t.transactionType === "transfer"
   );
@@ -820,13 +865,25 @@ export function generateExecutivePDF(
       formatINR(commMetrics.dealInflowsTotal),
     ],
     [
-      "4. Bank Withdrawals to Cash",
+      "4. Less: Capital Principal Returned",
+      `- ${formatINR(commMetrics.capitalWithdrawalsBank)}`,
+      `- ${formatINR(commMetrics.capitalWithdrawalsCash)}`,
+      `- ${formatINR(commMetrics.capitalWithdrawalsTotal)}`,
+    ],
+    [
+      "5. Less: Profit & Drawings Withdrawn",
+      `- ${formatINR(commMetrics.profitWithdrawalsBank)}`,
+      `- ${formatINR(commMetrics.profitWithdrawalsCash)}`,
+      `- ${formatINR(commMetrics.profitWithdrawalsTotal)}`,
+    ],
+    [
+      "6. Bank Withdrawals to Cash",
       `- ${formatINR(commMetrics.transfersBankToCash)}`,
       `+ ${formatINR(commMetrics.transfersBankToCash)}`,
       "₹ 0 (Internal)",
     ],
     [
-      "5. Cash Deposits to Bank",
+      "7. Cash Deposits to Bank",
       `+ ${formatINR(commMetrics.transfersCashToBank)}`,
       `- ${formatINR(commMetrics.transfersCashToBank)}`,
       "₹ 0 (Internal)",
@@ -1076,54 +1133,46 @@ export function generateExecutivePDF(
   });
 
   // =========================================================================
-  // PAGE 5: RECEIPTS & CAPITAL FUNDING LEDGER
+  // PAGE 5: RECEIPTS, CAPITAL & WITHDRAWALS LEDGER
   // =========================================================================
   doc.addPage();
-  drawHeader("RECEIPTS & CAPITAL FUNDING LEDGER", "Chronological record of buyer collections, booking tokens, and capital funding");
+  drawHeader("RECEIPTS, CAPITAL & WITHDRAWALS LEDGER", "Chronological record of buyer collections, capital funding, and withdrawals");
 
   const receiptsAndFunding = [
     ...dealInflows.map((t) => ({ ...t, kind: "Deal Receipt" })),
     ...capInflows.map((t) => ({ ...t, kind: "Capital Inflow" })),
+    ...capWithdrawals.map((t) => ({ ...t, kind: "Capital Refund" })),
+    ...profitWithdrawals.map((t) => ({ ...t, kind: "Profit Drawing" })),
   ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-  const receiptsData = receiptsAndFunding.map((t) => [
-    t.date,
-    t.transCode || "-",
-    t.kind,
-    t.propertyCode || "-",
-    t.category,
-    t.mode,
-    formatINR(t.amount),
-    t.remarks || t.recipientOrSource || "-",
-  ]);
+  const receiptsData = receiptsAndFunding.map((t) => {
+    const isPositive = t.kind === "Deal Receipt" || t.kind === "Capital Inflow";
+    return [
+      t.date,
+      t.transCode || "-",
+      t.kind,
+      t.propertyCode || "-",
+      t.category,
+      t.mode,
+      `${isPositive ? "+" : "-"}${formatINR(t.amount)}`,
+      t.remarks || t.recipientOrSource || "-",
+    ];
+  });
 
   autoTable(doc, {
     startY: 32,
     margin: { left: 14, right: 14 },
-    head: [["Date", "Code", "Type", "Land ID", "Category", "Mode", "Amount (₹)", "Source / Payer / Remarks"]],
+    head: [["Date", "Code", "Type", "Land ID", "Category", "Mode", "Amount (₹)", "Source / Beneficiary / Remarks"]],
     body: receiptsData,
-    foot: [
-      [
-        "Total Inward Collections",
-        "",
-        "",
-        "",
-        "",
-        "",
-        formatINR(commMetrics.dealInflowsTotal + commMetrics.capitalInjectedTotal),
-        "",
-      ],
-    ],
     theme: "grid",
     headStyles: { fillColor: [24, 24, 27], textColor: [255, 255, 255], fontStyle: "bold", fontSize: 7.5 },
     bodyStyles: { fontSize: 7, textColor: [30, 30, 30], cellPadding: 1.8 },
-    footStyles: { fillColor: [244, 244, 245], textColor: [0, 0, 0], fontStyle: "bold", fontSize: 7.5 },
     columnStyles: {
       0: { cellWidth: 16 },
       1: { cellWidth: 16 },
-      2: { cellWidth: 20 },
+      2: { cellWidth: 22 },
       3: { cellWidth: 16 },
-      4: { cellWidth: 28 },
+      4: { cellWidth: 26 },
       5: { cellWidth: 14 },
       6: { cellWidth: 24, halign: "right", fontStyle: "bold" },
       7: { cellWidth: 48 },

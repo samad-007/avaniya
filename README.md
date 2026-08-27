@@ -226,24 +226,28 @@ npm run build
 ### A. Mathematical Formula Engine Rules
 All business logic MUST mirror the formulas verified in [`tests/formulaEngine.test.ts`](file:///Users/abdulsamad/Documents/development/projects/VibeCoded/Real-estate-tracker/tests/formulaEngine.test.ts):
 1. **Commercial Net Bank Liquidity**:
-   $$\text{Net Bank} = \text{Capital Inflows (Bank)} + \text{Deal Inflows (Bank)} - \text{Outflows (Bank)} - \text{Transfers (Bank to Cash)}$$
+   $$\text{Net Bank} = \text{Gross Cap (Bank)} - \text{Cap Returned (Bank)} - \text{Profit Drawn (Bank)} + \text{Deal Inflows (Bank)} - \text{Outflows (Bank)} \pm \text{Transfers}$$
 2. **Commercial Net Cash Balance**:
-   $$\text{Net Cash} = \text{Capital Inflows (Cash)} + \text{Deal Inflows (Cash)} + \text{Transfers (Bank to Cash)} - \text{Outflows (Cash)}$$
-3. **Current Combined Liquidity**:
+   $$\text{Net Cash} = \text{Gross Cap (Cash)} - \text{Cap Returned (Cash)} - \text{Profit Drawn (Cash)} + \text{Deal Inflows (Cash)} - \text{Outflows (Cash)} \mp \text{Transfers}$$
+3. **Current Combined Net Liquidity**:
    $$\text{Net Liquidity} = \text{Net Bank Liquidity} + \text{Net Cash Balance}$$
-4. **Total Project Outlay**:
+4. **Net Retained Capital in Business**:
+   $$\text{Net Retained Capital} = \text{Gross Capital Injected} - \text{Capital Principal Returned} - \text{Profit Drawings}$$
+5. **Total Project Outlay**:
    $$\text{Total Outlay} = \text{Agreed Purchase Price} + \text{Property Expenses}$$
-5. **Pending Payable to Seller**:
+6. **Pending Payable to Seller**:
    $$\text{Pending Outflow} = \max(0, \text{Agreed Purchase Price} - \text{Principal Paid So Far})$$
-6. **Pending Buyer Receivable**:
+7. **Pending Buyer Receivable**:
    $$\text{Pending Inflow} = \max(0, \text{Agreed Selling Price} - \text{Sale Inflows Received})$$
 
 ### B. Zero-Break Financial Role Mapping
-Whenever adding categories, assign one of the 7 predefined `financialRole` types:
+Whenever adding categories, assign one of the 9 predefined `financialRole` types:
 - `purchase_principal`: Outflow that directly reduces the pending consideration owed to the land seller.
 - `property_expense`: Outflow for legal, stamp duty, fencing, or leveling. Increases Total Project Outlay without reducing the base seller payable.
 - `sale_receipt`: Deal inflow from incoming buyer that reduces Pending Buyer Receivables.
 - `capital_infusion`: External equity funding that injects business liquidity.
+- `profit_withdrawal`: Profit / earnings drawn to fund external ventures or personal dividends (reduces available liquidity, retains base capital).
+- `capital_withdrawal`: Invested capital refund / equity pool reduction (reduces both available liquidity and net retained capital).
 - `personal_milestone`: Outflow that completes a stage in personal asset construction.
 - `personal_overhead`: Personal maintenance, GST, or registration charges.
 - `internal_transfer`: Neutral net effect, shifting balances between Bank and Cash accounts.

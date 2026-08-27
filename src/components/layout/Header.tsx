@@ -18,7 +18,7 @@ import {
 interface HeaderProps {
   currentMode: "commercial" | "personal";
   onModeChange: (mode: "commercial" | "personal") => void;
-  onOpenEntryModal: (type: "outflow" | "inflow" | "transfer") => void;
+  onOpenEntryModal: (type: "outflow" | "inflow" | "transfer" | "withdrawal") => void;
   onOpenNewPropertyModal: () => void;
   onOpenExportModal: () => void;
   onOpenCategoryModal: () => void;
@@ -163,6 +163,14 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
 
               <button
+                onClick={() => onOpenEntryModal("withdrawal")}
+                className="btn-action-primary flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs border border-amber-800/40 text-amber-300"
+                title="Log Profit Withdrawal or Capital Refund"
+              >
+                <span>Withdraw</span>
+              </button>
+
+              <button
                 onClick={onOpenNewPropertyModal}
                 className="btn-action-primary flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs"
                 title="Create New Real Estate Asset"
@@ -252,7 +260,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex md:hidden items-center justify-between gap-1.5 w-full overflow-x-auto pb-0.5 pt-0.5 scrollbar-none">
           <button
             onClick={() => onOpenEntryModal("outflow")}
-            className="btn-action-primary flex-1 min-w-[85px] flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold"
+            className="btn-action-primary flex-1 min-w-[75px] flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold"
           >
             <Plus className="w-3 h-3 stroke-[2.5]" />
             <span>Outflow</span>
@@ -260,15 +268,22 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => onOpenEntryModal("inflow")}
-            className="btn-action-primary flex-1 min-w-[80px] flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold"
+            className="btn-action-primary flex-1 min-w-[70px] flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold"
           >
             <ArrowUpRight className="w-3 h-3 text-[#22C55E]" />
             <span>Inflow</span>
           </button>
 
           <button
+            onClick={() => onOpenEntryModal("withdrawal")}
+            className="btn-action-primary flex-1 min-w-[75px] flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold text-amber-300 border border-amber-800/40"
+          >
+            <span>Withdraw</span>
+          </button>
+
+          <button
             onClick={onOpenNewPropertyModal}
-            className="btn-action-primary flex-1 min-w-[80px] flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold"
+            className="btn-action-primary flex-1 min-w-[70px] flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold"
           >
             <span>+ Deal</span>
           </button>

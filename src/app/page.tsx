@@ -61,7 +61,7 @@ export default function DashboardPage() {
   // Modals state
   const [isEntryModalOpen, setIsEntryModalOpen] = useState(false);
   const [entryModalType, setEntryModalType] = useState<
-    "outflow" | "inflow" | "transfer"
+    "outflow" | "inflow" | "transfer" | "withdrawal"
   >("outflow");
   const [entryDefaultPropertyCode, setEntryDefaultPropertyCode] =
     useState<string>("");
@@ -265,7 +265,7 @@ export default function DashboardPage() {
   };
 
   const handleOpenEntryModal = (
-    type: "outflow" | "inflow" | "transfer",
+    type: "outflow" | "inflow" | "transfer" | "withdrawal",
     propertyCode?: string
   ) => {
     setEntryModalType(type);
@@ -335,22 +335,28 @@ export default function DashboardPage() {
         const json = await res.json();
         setTransactions((prev) => [json.data, ...prev]);
       } else {
+        const prefix =
+          txData.transactionType === "profit_withdrawal" ||
+          txData.transactionType === "capital_withdrawal"
+            ? "WTH"
+            : txData.transactionType.slice(0, 3).toUpperCase();
         const localTx: SeedTransaction = {
           ...txData,
           id: `tx-${Date.now()}`,
-          transCode: `${txData.transactionType.slice(0, 3).toUpperCase()}-${String(
-            transactions.length + 1
-          ).padStart(3, "0")}`,
+          transCode: `${prefix}-${String(transactions.length + 1).padStart(3, "0")}`,
         };
         setTransactions((prev) => [localTx, ...prev]);
       }
     } catch {
+      const prefix =
+        txData.transactionType === "profit_withdrawal" ||
+        txData.transactionType === "capital_withdrawal"
+          ? "WTH"
+          : txData.transactionType.slice(0, 3).toUpperCase();
       const localTx: SeedTransaction = {
         ...txData,
         id: `tx-${Date.now()}`,
-        transCode: `${txData.transactionType.slice(0, 3).toUpperCase()}-${String(
-          transactions.length + 1
-        ).padStart(3, "0")}`,
+        transCode: `${prefix}-${String(transactions.length + 1).padStart(3, "0")}`,
       };
       setTransactions((prev) => [localTx, ...prev]);
     }

@@ -22,7 +22,7 @@ interface PersonalViewProps {
   }) => void;
   onOpenNewPropertyModal: () => void;
   onOpenEntryModal: (
-    type: "outflow" | "inflow" | "transfer",
+    type: "outflow" | "inflow" | "transfer" | "withdrawal",
     propertyCode?: string
   ) => void;
   onEditProperty?: (property: SeedProperty) => void;
@@ -50,10 +50,14 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
     [transactions]
   );
 
-  const personalInflows = useMemo(
+  const personalInflowsAndWithdrawals = useMemo(
     () =>
       transactions.filter(
-        (t) => t.scope === "personal" && t.transactionType === "capital_inflow"
+        (t) =>
+          t.scope === "personal" &&
+          (t.transactionType === "capital_inflow" ||
+            t.transactionType === "profit_withdrawal" ||
+            t.transactionType === "capital_withdrawal")
       ),
     [transactions]
   );
@@ -333,14 +337,15 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
         </div>
       )}
 
-      {/* SubTab 3: Inflows */}
+      {/* SubTab 3: Inflows & Withdrawals */}
       {activeSubTab === "inflows" && (
         <div className="border border-[#262626] rounded-xl overflow-x-auto bg-[#0a0a0a]">
           <table className="w-full text-left text-sm border-collapse">
             <thead>
               <tr className="bg-[#111111] border-b border-[#262626] text-[#D4D4D8] uppercase text-xs font-bold tracking-wider">
                 <th className="py-3 px-3.5">Date</th>
-                <th className="py-3 px-3.5">Source Description</th>
+                <th className="py-3 px-3.5">Type</th>
+                <th className="py-3 px-3.5">Source / Purpose</th>
                 <th className="py-3 px-3.5">Payment Mode</th>
                 <th className="py-3 px-3.5 text-right">Amount (INR)</th>
                 <th className="py-3 px-3.5">Remarks</th>
@@ -348,38 +353,68 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-[#181818]">
-              {personalInflows.map((t) => (
-                <tr key={t.id} className="hover:bg-[#141414] transition-colors">
-                  <td className="py-3 px-3.5 text-[#D4D4D8]">
-                    {formatDateIN(t.date)}
-                  </td>
-                  <td className="py-3 px-3.5 font-bold text-white">
-                    {t.recipientOrSource || t.category}
-                  </td>
-                  <td className="py-3 px-3.5">
-                    <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded border bg-blue-950/20 text-blue-400 border-blue-800/30">
-                      {t.mode}
-                    </span>
-                  </td>
-                  <td className="py-3 px-3.5 text-right font-mono font-bold text-[#22C55E]">
-                    {formatINR(t.amount)}
-                  </td>
-                  <td className="py-3 px-3.5 text-[#A1A1AA]">
-                    {t.remarks || "-"}
-                  </td>
-                  <td className="py-3 px-3.5 text-right">
-                    {onEditTransaction && (
-                      <button
-                        onClick={() => onEditTransaction(t)}
-                        className="btn-action-primary p-1.5 rounded-md inline-flex items-center justify-center"
-                        title="Edit Transaction"
-                      >
-                        <Pencil className="w-3.5 h-3.5 text-[#22C55E]" />
-                      </button>
-                    )}
+              {personalInflowsAndWithdrawals.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={7}
+                    className="py-8 text-center text-[#71717A] text-sm font-medium"
+                  >
+                    No personal inflows or withdrawals logged yet.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                personalInflowsAndWithdrawals.map((t) => {
+                  const isInflow = t.transactionType === "capital_inflow";
+                  return (
+                    <tr key={t.id} className="hover:bg-[#141414] transition-colors">
+                      <td className="py-3 px-3.5 text-[#D4D4D8]">
+                        {formatDateIN(t.date)}
+                      </td>
+                      <td className="py-3 px-3.5">
+                        <span
+                          className={`font-mono text-xs font-semibold px-2 py-0.5 rounded border ${
+                            isInflow
+                              ? "bg-emerald-950/30 text-emerald-400 border-emerald-800/30"
+                              : "bg-rose-950/30 text-rose-400 border-rose-800/30"
+                          }`}
+                        >
+                          {isInflow ? "Inflow" : "Withdrawal"}
+                        </span>
+                      </td>
+                      <td className="py-3 px-3.5 font-bold text-white">
+                        {t.recipientOrSource || t.category}
+                      </td>
+                      <td className="py-3 px-3.5">
+                        <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded border bg-blue-950/20 text-blue-400 border-blue-800/30">
+                          {t.mode}
+                        </span>
+                      </td>
+                      <td
+                        className={`py-3 px-3.5 text-right font-mono font-bold ${
+                          isInflow ? "text-[#22C55E]" : "text-rose-400"
+                        }`}
+                      >
+                        {isInflow ? "+" : "-"}
+                        {formatINR(t.amount)}
+                      </td>
+                      <td className="py-3 px-3.5 text-[#A1A1AA]">
+                        {t.remarks || "-"}
+                      </td>
+                      <td className="py-3 px-3.5 text-right">
+                        {onEditTransaction && (
+                          <button
+                            onClick={() => onEditTransaction(t)}
+                            className="btn-action-primary p-1.5 rounded-md inline-flex items-center justify-center"
+                            title="Edit Transaction"
+                          >
+                            <Pencil className="w-3.5 h-3.5 text-[#22C55E]" />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
