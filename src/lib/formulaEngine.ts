@@ -2,6 +2,7 @@ import {
   SeedProperty,
   SeedTransaction,
   SeedCategory,
+  SeedLoan,
 } from "./seedData";
 
 export interface PropertyFinancialMetrics {
@@ -22,6 +23,26 @@ export interface PropertyFinancialMetrics {
   transactions: SeedTransaction[];
 }
 
+export interface LoanFinancialMetrics {
+  loan: SeedLoan;
+  totalBorrowedCash: number;
+  totalBorrowedBank: number;
+  totalBorrowed: number;
+  principalRepaidCash: number;
+  principalRepaidBank: number;
+  principalRepaidTotal: number;
+  interestPaidCash: number;
+  interestPaidBank: number;
+  interestPaidTotal: number;
+  profitSharePaidCash: number;
+  profitSharePaidBank: number;
+  profitSharePaidTotal: number;
+  totalFinanceCost: number;
+  outstandingPrincipal: number;
+  repaymentProgressPct: number;
+  transactions: SeedTransaction[];
+}
+
 export interface CommercialDashboardMetrics {
   capitalInjectedBank: number;
   capitalInjectedCash: number;
@@ -39,6 +60,21 @@ export interface CommercialDashboardMetrics {
   dealInflowsBank: number;
   dealInflowsCash: number;
   dealInflowsTotal: number;
+  loansBorrowedBank: number;
+  loansBorrowedCash: number;
+  loansBorrowedTotal: number;
+  loansRepaidBank: number;
+  loansRepaidCash: number;
+  loansRepaidTotal: number;
+  loansInterestPaidBank: number;
+  loansInterestPaidCash: number;
+  loansInterestPaidTotal: number;
+  loansProfitSharePaidBank: number;
+  loansProfitSharePaidCash: number;
+  loansProfitSharePaidTotal: number;
+  totalFinanceCosts: number;
+  outstandingLoansPrincipal: number;
+  totalLiabilitiesAndObligations: number;
   transfersBankToCash: number;
   transfersCashToBank: number;
   netBankLiquidity: number;
@@ -53,6 +89,7 @@ export interface CommercialDashboardMetrics {
   totalPendingReceivable: number;
   totalRealizedProfit: number;
   propertyMetrics: PropertyFinancialMetrics[];
+  loanMetrics: LoanFinancialMetrics[];
 }
 
 export interface PersonalDashboardMetrics {
@@ -86,7 +123,8 @@ export interface PersonalDashboardMetrics {
 export function calculateCommercialMetrics(
   properties: SeedProperty[],
   transactions: SeedTransaction[],
-  categories: SeedCategory[] = []
+  categories: SeedCategory[] = [],
+  loans: SeedLoan[] = []
 ): CommercialDashboardMetrics {
   const commProps = properties.filter((p) => p.type === "commercial");
   const commTx = transactions.filter((t) => t.scope === "commercial");
@@ -153,6 +191,49 @@ export function calculateCommercialMetrics(
     .reduce((sum, t) => sum + (t.amount || 0), 0);
   const dealInflowsTotal = dealInflowsBank + dealInflowsCash;
 
+  // Loan Borrowings / Inflows
+  const loanInTx = commTx.filter((t) => t.transactionType === "loan_inflow");
+  const loansBorrowedBank = loanInTx
+    .filter((t) => t.mode === "Bank")
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
+  const loansBorrowedCash = loanInTx
+    .filter((t) => t.mode === "Cash")
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
+  const loansBorrowedTotal = loansBorrowedBank + loansBorrowedCash;
+
+  // Loan Principal Repayments
+  const loanRepayTx = commTx.filter((t) => t.transactionType === "loan_repayment");
+  const loansRepaidBank = loanRepayTx
+    .filter((t) => t.mode === "Bank")
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
+  const loansRepaidCash = loanRepayTx
+    .filter((t) => t.mode === "Cash")
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
+  const loansRepaidTotal = loansRepaidBank + loansRepaidCash;
+
+  // Loan Interest Paid
+  const loanIntTx = commTx.filter((t) => t.transactionType === "loan_interest");
+  const loansInterestPaidBank = loanIntTx
+    .filter((t) => t.mode === "Bank")
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
+  const loansInterestPaidCash = loanIntTx
+    .filter((t) => t.mode === "Cash")
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
+  const loansInterestPaidTotal = loansInterestPaidBank + loansInterestPaidCash;
+
+  // Loan Profit Share Paid
+  const loanProfTx = commTx.filter((t) => t.transactionType === "loan_profit_share");
+  const loansProfitSharePaidBank = loanProfTx
+    .filter((t) => t.mode === "Bank")
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
+  const loansProfitSharePaidCash = loanProfTx
+    .filter((t) => t.mode === "Cash")
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
+  const loansProfitSharePaidTotal = loansProfitSharePaidBank + loansProfitSharePaidCash;
+
+  const totalFinanceCosts = loansInterestPaidTotal + loansProfitSharePaidTotal;
+  const outstandingLoansPrincipal = Math.max(0, loansBorrowedTotal - loansRepaidTotal);
+
   // Internal Transfers
   const trfTx = commTx.filter((t) => t.transactionType === "transfer");
   const transfersBankToCash = trfTx
@@ -170,24 +251,32 @@ export function calculateCommercialMetrics(
     )
     .reduce((sum, t) => sum + (t.amount || 0), 0);
 
-  // Exact formulas with withdrawal reconciliation:
-  // Net Bank = Gross Capital (Bank) - Capital Withdrawn (Bank) - Profit Withdrawn (Bank) - Outflows (Bank) + Deal Inflows (Bank) - Trf (Bank->Cash) + Trf (Cash->Bank)
+  // Exact formulas with withdrawal and loan reconciliation:
+  // Net Bank = Gross Capital (Bank) - Capital Withdrawn (Bank) - Profit Withdrawn (Bank) - Outflows (Bank) + Deal Inflows (Bank) + Loans Borrowed (Bank) - Loans Repaid (Bank) - Loan Interest (Bank) - Loan Profit Share (Bank) - Trf (Bank->Cash) + Trf (Cash->Bank)
   const netBankLiquidity =
     capitalInjectedBank -
     capitalWithdrawalsBank -
     profitWithdrawalsBank -
     outflowsBank +
-    dealInflowsBank -
+    dealInflowsBank +
+    loansBorrowedBank -
+    loansRepaidBank -
+    loansInterestPaidBank -
+    loansProfitSharePaidBank -
     transfersBankToCash +
     transfersCashToBank;
 
-  // Net Cash = Gross Capital (Cash) - Capital Withdrawn (Cash) - Profit Withdrawn (Cash) - Outflows (Cash) + Deal Inflows (Cash) + Trf (Bank->Cash) - Trf (Cash->Bank)
+  // Net Cash = Gross Capital (Cash) - Capital Withdrawn (Cash) - Profit Withdrawn (Cash) - Outflows (Cash) + Deal Inflows (Cash) + Loans Borrowed (Cash) - Loans Repaid (Cash) - Loan Interest (Cash) - Loan Profit Share (Cash) + Trf (Bank->Cash) - Trf (Cash->Bank)
   const netCashLiquidity =
     capitalInjectedCash -
     capitalWithdrawalsCash -
     profitWithdrawalsCash -
     outflowsCash +
     dealInflowsCash +
+    loansBorrowedCash -
+    loansRepaidCash -
+    loansInterestPaidCash -
+    loansProfitSharePaidCash +
     transfersBankToCash -
     transfersCashToBank;
 
@@ -307,6 +396,100 @@ export function calculateCommercialMetrics(
     0
   );
 
+  // Per-Loan Financial Metrics
+  const commLoans = loans.filter((l) => l.scope === "commercial");
+  const loanMetrics: LoanFinancialMetrics[] = commLoans.map((l) => {
+    const lTx = commTx.filter(
+      (t) =>
+        t.loanId === l.id ||
+        t.loanCode === l.loanCode ||
+        (t.recipientOrSource &&
+          t.recipientOrSource.toLowerCase().includes(l.lenderName.toLowerCase())) ||
+        (t.remarks &&
+          l.loanCode &&
+          t.remarks.toLowerCase().includes(l.loanCode.toLowerCase()))
+    );
+
+    const lInflows = lTx.filter((t) => t.transactionType === "loan_inflow");
+    const totalBorrowedBank = lInflows
+      .filter((t) => t.mode === "Bank")
+      .reduce((sum, t) => sum + t.amount, 0);
+    const totalBorrowedCash = lInflows
+      .filter((t) => t.mode === "Cash")
+      .reduce((sum, t) => sum + t.amount, 0);
+    const totalBorrowed =
+      totalBorrowedBank + totalBorrowedCash || l.principalAmount || 0;
+
+    const lRepayments = lTx.filter(
+      (t) => t.transactionType === "loan_repayment"
+    );
+    const principalRepaidBank = lRepayments
+      .filter((t) => t.mode === "Bank")
+      .reduce((sum, t) => sum + t.amount, 0);
+    const principalRepaidCash = lRepayments
+      .filter((t) => t.mode === "Cash")
+      .reduce((sum, t) => sum + t.amount, 0);
+    const principalRepaidTotal = principalRepaidBank + principalRepaidCash;
+
+    const lInterest = lTx.filter((t) => t.transactionType === "loan_interest");
+    const interestPaidBank = lInterest
+      .filter((t) => t.mode === "Bank")
+      .reduce((sum, t) => sum + t.amount, 0);
+    const interestPaidCash = lInterest
+      .filter((t) => t.mode === "Cash")
+      .reduce((sum, t) => sum + t.amount, 0);
+    const interestPaidTotal = interestPaidBank + interestPaidCash;
+
+    const lProfitShare = lTx.filter(
+      (t) => t.transactionType === "loan_profit_share"
+    );
+    const profitSharePaidBank = lProfitShare
+      .filter((t) => t.mode === "Bank")
+      .reduce((sum, t) => sum + t.amount, 0);
+    const profitSharePaidCash = lProfitShare
+      .filter((t) => t.mode === "Cash")
+      .reduce((sum, t) => sum + t.amount, 0);
+    const profitSharePaidTotal = profitSharePaidBank + profitSharePaidCash;
+
+    const totalFinanceCost = interestPaidTotal + profitSharePaidTotal;
+    const outstandingPrincipal = Math.max(
+      0,
+      totalBorrowed - principalRepaidTotal
+    );
+    const repaymentProgressPct =
+      totalBorrowed > 0
+        ? Math.min(
+            100,
+            Math.round((principalRepaidTotal / totalBorrowed) * 100)
+          )
+        : 0;
+
+    return {
+      loan: l,
+      totalBorrowedCash,
+      totalBorrowedBank,
+      totalBorrowed,
+      principalRepaidCash,
+      principalRepaidBank,
+      principalRepaidTotal,
+      interestPaidCash,
+      interestPaidBank,
+      interestPaidTotal,
+      profitSharePaidCash,
+      profitSharePaidBank,
+      profitSharePaidTotal,
+      totalFinanceCost,
+      outstandingPrincipal,
+      repaymentProgressPct,
+      transactions: lTx.sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      ),
+    };
+  });
+
+  const totalLiabilitiesAndObligations =
+    totalPendingPayable + outstandingLoansPrincipal;
+
   return {
     capitalInjectedBank: Math.round(capitalInjectedBank),
     capitalInjectedCash: Math.round(capitalInjectedCash),
@@ -324,6 +507,21 @@ export function calculateCommercialMetrics(
     dealInflowsBank: Math.round(dealInflowsBank),
     dealInflowsCash: Math.round(dealInflowsCash),
     dealInflowsTotal: Math.round(dealInflowsTotal),
+    loansBorrowedBank: Math.round(loansBorrowedBank),
+    loansBorrowedCash: Math.round(loansBorrowedCash),
+    loansBorrowedTotal: Math.round(loansBorrowedTotal),
+    loansRepaidBank: Math.round(loansRepaidBank),
+    loansRepaidCash: Math.round(loansRepaidCash),
+    loansRepaidTotal: Math.round(loansRepaidTotal),
+    loansInterestPaidBank: Math.round(loansInterestPaidBank),
+    loansInterestPaidCash: Math.round(loansInterestPaidCash),
+    loansInterestPaidTotal: Math.round(loansInterestPaidTotal),
+    loansProfitSharePaidBank: Math.round(loansProfitSharePaidBank),
+    loansProfitSharePaidCash: Math.round(loansProfitSharePaidCash),
+    loansProfitSharePaidTotal: Math.round(loansProfitSharePaidTotal),
+    totalFinanceCosts: Math.round(totalFinanceCosts),
+    outstandingLoansPrincipal: Math.round(outstandingLoansPrincipal),
+    totalLiabilitiesAndObligations: Math.round(totalLiabilitiesAndObligations),
     transfersBankToCash: Math.round(transfersBankToCash),
     transfersCashToBank: Math.round(transfersCashToBank),
     netBankLiquidity: Math.round(netBankLiquidity),
@@ -338,6 +536,7 @@ export function calculateCommercialMetrics(
     totalPendingReceivable: Math.round(totalPendingReceivable),
     totalRealizedProfit: Math.round(totalRealizedProfit),
     propertyMetrics,
+    loanMetrics,
   };
 }
 

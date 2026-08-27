@@ -11,6 +11,7 @@ import { QuickEntryModal } from "@/components/modals/QuickEntryModal";
 import { NewPropertyModal } from "@/components/modals/NewPropertyModal";
 import { EditPropertyModal } from "@/components/modals/EditPropertyModal";
 import { EditTransactionModal } from "@/components/modals/EditTransactionModal";
+import { LoanModal } from "@/components/modals/LoanModal";
 import { CategoryModal } from "@/components/modals/CategoryModal";
 import { ExportModal } from "@/components/modals/ExportModal";
 import { AuthModal, AuthUserData } from "@/components/auth/AuthModal";
@@ -25,6 +26,7 @@ import {
   SeedProperty,
   SeedTransaction,
   SeedCategory,
+  SeedLoan,
   INITIAL_CATEGORIES,
 } from "@/lib/seedData";
 import {
@@ -38,6 +40,7 @@ export default function DashboardPage() {
   );
   const [properties, setProperties] = useState<SeedProperty[]>([]);
   const [transactions, setTransactions] = useState<SeedTransaction[]>([]);
+  const [loans, setLoans] = useState<SeedLoan[]>([]);
   const [categories, setCategories] =
     useState<SeedCategory[]>(INITIAL_CATEGORIES);
 
@@ -61,9 +64,11 @@ export default function DashboardPage() {
   // Modals state
   const [isEntryModalOpen, setIsEntryModalOpen] = useState(false);
   const [entryModalType, setEntryModalType] = useState<
-    "outflow" | "inflow" | "transfer" | "withdrawal"
+    "outflow" | "inflow" | "transfer" | "withdrawal" | "loan"
   >("outflow");
   const [entryDefaultPropertyCode, setEntryDefaultPropertyCode] =
+    useState<string>("");
+  const [entryDefaultLoanCode, setEntryDefaultLoanCode] =
     useState<string>("");
 
   const [isNewPropModalOpen, setIsNewPropModalOpen] = useState(false);
@@ -71,6 +76,9 @@ export default function DashboardPage() {
   const [editingProperty, setEditingProperty] = useState<SeedProperty | null>(
     null
   );
+  const [isLoanModalOpen, setIsLoanModalOpen] = useState(false);
+  const [editingLoan, setEditingLoan] = useState<SeedLoan | null>(null);
+
   const [isEditTxModalOpen, setIsEditTxModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<SeedTransaction | null>(
     null
@@ -95,12 +103,13 @@ export default function DashboardPage() {
     const comm = calculateCommercialMetrics(
       properties,
       transactions,
-      categories
+      categories,
+      loans
     );
     const pers = calculatePersonalMetrics(properties, transactions);
     setCommercialMetrics(comm);
     setPersonalMetrics(pers);
-  }, [properties, transactions, categories]);
+  }, [properties, transactions, categories, loans]);
 
   // Load dataset-specific data in a single consolidated HTTP call (cuts initial load latency by ~65%)
   const loadDatasetData = useCallback(async (targetDataset: string) => {
@@ -113,6 +122,7 @@ export default function DashboardPage() {
         if (json.success && json.data) {
           setProperties(json.data.properties || []);
           setTransactions(json.data.transactions || []);
+          setLoans(json.data.loans || []);
           setCategories(
             json.data.categories && json.data.categories.length > 0
               ? json.data.categories
@@ -265,12 +275,148 @@ export default function DashboardPage() {
   };
 
   const handleOpenEntryModal = (
-    type: "outflow" | "inflow" | "transfer" | "withdrawal",
-    propertyCode?: string
+    type: "outflow" | "inflow" | "transfer" | "withdrawal" | "loan",
+    propertyCode?: string,
+    loanCode?: string
   ) => {
     setEntryModalType(type);
     setEntryDefaultPropertyCode(propertyCode || "");
+    setEntryDefaultLoanCode(loanCode || "");
     setIsEntryModalOpen(true);
+  };
+
+  const handleOpenNewLoanModal = () => {
+    setEditingLoan(null);
+    setIsLoanModalOpen(true);
+  };
+
+  const handleOpenEditLoan = (loan: SeedLoan) => {
+    setEditingLoan(loan);
+    setIsLoanModalOpen(true);
+  };
+
+  const handleSaveLoan = async (
+    loanData: Omit<SeedLoan, "id" | "loanCode"> & {
+      id?: string;
+      loanCode?: string;
+    }
+  ) => {
+    try {
+      if (loanData.id || loanData.loanCode) {
+        const idOrCode = loanData.loanCode || loanData.id || "";
+        const res = await fetch(
+          `/api/loans/${encodeURIComponent(idOrCode)}?datasetId=${encodeURIComponent(
+            currentDatasetId
+          )}`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(loanData),
+          }
+        );
+        if (res.ok) {
+          const json = await res.json();
+          setLoans((prev) =>
+            prev.map((l) =>
+              (l.loanCode && l.loanCode.toLowerCase() === idOrCode.toLowerCase()) ||
+              l.id === idOrCode
+                ? { ...l, ...json.data }
+                : l
+            )
+          );
+        } else {
+          setLoans((prev) =>
+            prev.map((l) =>
+              (l.loanCode && l.loanCode.toLowerCase() === idOrCode.toLowerCase()) ||
+              l.id === idOrCode
+                ? { ...l, ...loanData }
+                : l
+            )
+          );
+        }
+      } else {
+        const res = await fetch("/api/loans", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...loanData, datasetId: currentDatasetId }),
+        });
+        if (res.ok) {
+          const json = await res.json();
+          setLoans((prev) => [...prev, json.data]);
+        } else {
+          const localLoan: SeedLoan = {
+            ...loanData,
+            id: `loan-${Date.now()}`,
+            datasetId: currentDatasetId,
+            loanCode:
+              loanData.loanCode ||
+              `LOAN-${String(loans.length + 1).padStart(3, "0")}`,
+            scope: loanData.scope || "commercial",
+            lenderName: loanData.lenderName,
+            lenderType: loanData.lenderType || "bank",
+            principalAmount: loanData.principalAmount,
+            interestRatePct: loanData.interestRatePct || 0,
+            profitSharePct: loanData.profitSharePct || 0,
+            startDate:
+              loanData.startDate || new Date().toISOString().split("T")[0],
+            status: loanData.status || "active",
+          };
+          setLoans((prev) => [...prev, localLoan]);
+        }
+      }
+    } catch {
+      const localLoan: SeedLoan = {
+        ...loanData,
+        id: `loan-${Date.now()}`,
+        datasetId: currentDatasetId,
+        loanCode:
+          loanData.loanCode ||
+          `LOAN-${String(loans.length + 1).padStart(3, "0")}`,
+        scope: loanData.scope || "commercial",
+        lenderName: loanData.lenderName,
+        lenderType: loanData.lenderType || "bank",
+        principalAmount: loanData.principalAmount,
+        interestRatePct: loanData.interestRatePct || 0,
+        profitSharePct: loanData.profitSharePct || 0,
+        startDate: loanData.startDate || new Date().toISOString().split("T")[0],
+        status: loanData.status || "active",
+      };
+      setLoans((prev) => [...prev, localLoan]);
+    }
+  };
+
+  const handleDeleteLoan = async (loanIdOrCode: string) => {
+    try {
+      await fetch(
+        `/api/loans/${encodeURIComponent(loanIdOrCode)}?datasetId=${encodeURIComponent(
+          currentDatasetId
+        )}`,
+        {
+          method: "DELETE",
+        }
+      );
+      setLoans((prev) =>
+        prev.filter(
+          (l) =>
+            !(
+              (l.loanCode &&
+                l.loanCode.toLowerCase() === loanIdOrCode.toLowerCase()) ||
+              l.id === loanIdOrCode
+            )
+        )
+      );
+    } catch {
+      setLoans((prev) =>
+        prev.filter(
+          (l) =>
+            !(
+              (l.loanCode &&
+                l.loanCode.toLowerCase() === loanIdOrCode.toLowerCase()) ||
+              l.id === loanIdOrCode
+            )
+        )
+      );
+    }
   };
 
   const handleOpenEditProperty = (prop: SeedProperty) => {
@@ -339,6 +485,8 @@ export default function DashboardPage() {
           txData.transactionType === "profit_withdrawal" ||
           txData.transactionType === "capital_withdrawal"
             ? "WTH"
+            : txData.transactionType.startsWith("loan_")
+            ? "LON"
             : txData.transactionType.slice(0, 3).toUpperCase();
         const localTx: SeedTransaction = {
           ...txData,
@@ -352,6 +500,8 @@ export default function DashboardPage() {
         txData.transactionType === "profit_withdrawal" ||
         txData.transactionType === "capital_withdrawal"
           ? "WTH"
+          : txData.transactionType.startsWith("loan_")
+          ? "LON"
           : txData.transactionType.slice(0, 3).toUpperCase();
       const localTx: SeedTransaction = {
         ...txData,
@@ -587,6 +737,7 @@ export default function DashboardPage() {
         onModeChange={(m) => setAppMode(m)}
         onOpenEntryModal={handleOpenEntryModal}
         onOpenNewPropertyModal={() => setIsNewPropModalOpen(true)}
+        onOpenNewLoanModal={handleOpenNewLoanModal}
         onOpenExportModal={() => setIsExportModalOpen(true)}
         onOpenCategoryModal={() => setIsCategoryModalOpen(true)}
         user={user}
@@ -611,10 +762,13 @@ export default function DashboardPage() {
           <CommercialView
             metrics={commercialMetrics}
             transactions={transactions}
+            loans={loans}
             onSelectProperty={handleSelectCommercialProperty}
             onOpenNewDealModal={() => setIsNewPropModalOpen(true)}
+            onOpenNewLoanModal={handleOpenNewLoanModal}
             onOpenEntryModal={handleOpenEntryModal}
             onEditProperty={handleOpenEditProperty}
+            onEditLoan={handleOpenEditLoan}
             onEditTransaction={handleOpenEditTransaction}
           />
         )}
@@ -694,7 +848,9 @@ export default function DashboardPage() {
         entryType={entryModalType}
         currentScope={appMode}
         defaultPropertyCode={entryDefaultPropertyCode}
+        defaultLoanCode={entryDefaultLoanCode}
         properties={properties}
+        loans={loans}
         categories={categories}
         onSave={handleSaveTransaction}
         onOpenCategoryModal={() => {
@@ -722,6 +878,20 @@ export default function DashboardPage() {
         onSave={handleUpdateProperty}
       />
 
+      {/* Loan Facility Modal (Create / Edit Loan Facility) */}
+      <LoanModal
+        isOpen={isLoanModalOpen}
+        onClose={() => {
+          setIsLoanModalOpen(false);
+          setEditingLoan(null);
+        }}
+        loan={editingLoan}
+        properties={properties}
+        defaultScope={appMode}
+        onSave={handleSaveLoan}
+        onDelete={handleDeleteLoan}
+      />
+
       {/* Edit Transaction Modal (Edit / Delete Historical Transactions) */}
       <EditTransactionModal
         isOpen={isEditTxModalOpen}
@@ -731,6 +901,7 @@ export default function DashboardPage() {
         }}
         transaction={editingTransaction}
         properties={properties}
+        loans={loans}
         categories={categories}
         onSave={handleUpdateTransaction}
         onDelete={handleDeleteTransaction}

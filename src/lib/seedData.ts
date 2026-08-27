@@ -5,6 +5,10 @@ export type FinancialRole =
   | "capital_infusion"
   | "profit_withdrawal"
   | "capital_withdrawal"
+  | "loan_principal_borrowed"
+  | "loan_principal_repaid"
+  | "loan_interest_expense"
+  | "loan_profit_distribution"
   | "internal_transfer"
   | "personal_milestone"
   | "personal_overhead";
@@ -31,6 +35,25 @@ export interface SeedProperty {
   }[];
 }
 
+export interface SeedLoan {
+  id: string;
+  datasetId?: string;
+  scope: "commercial" | "personal";
+  loanCode: string;
+  lenderName: string;
+  lenderType: "bank" | "family_friend" | "private_financier" | "other";
+  principalAmount: number;
+  interestRatePct?: number;
+  profitSharePct?: number;
+  profitShareTerms?: string;
+  startDate: string;
+  endDate?: string;
+  tenureMonths?: number;
+  linkedPropertyCode?: string;
+  status: "active" | "closed" | "defaulted";
+  notes?: string;
+}
+
 export interface SeedTransaction {
   id: string;
   scope: "commercial" | "personal";
@@ -40,8 +63,14 @@ export interface SeedTransaction {
     | "capital_inflow"
     | "transfer"
     | "profit_withdrawal"
-    | "capital_withdrawal";
+    | "capital_withdrawal"
+    | "loan_inflow"
+    | "loan_repayment"
+    | "loan_interest"
+    | "loan_profit_share";
   transCode?: string;
+  loanId?: string;
+  loanCode?: string;
   propertyCode?: string;
   date: string;
   category: string;
@@ -182,6 +211,40 @@ export const INITIAL_PROPERTIES: SeedProperty[] = [
         status: "pending",
       },
     ],
+  },
+];
+
+export const INITIAL_LOANS: SeedLoan[] = [
+  {
+    id: "loan-1",
+    datasetId: "ds_yousuf_portfolio",
+    scope: "commercial",
+    loanCode: "LOAN-001",
+    lenderName: "FIL Business Loan (HDFC Bank)",
+    lenderType: "bank",
+    principalAmount: 3500000,
+    interestRatePct: 10.5,
+    profitSharePct: 0,
+    startDate: "2026-02-15",
+    tenureMonths: 36,
+    status: "active",
+    notes: "Commercial working capital term loan via cheque",
+  },
+  {
+    id: "loan-2",
+    datasetId: "ds_yousuf_portfolio",
+    scope: "commercial",
+    loanCode: "LOAN-002",
+    lenderName: "Farooq Bhai (Friend & Venture Partner)",
+    lenderType: "family_friend",
+    principalAmount: 2000000,
+    interestRatePct: 0,
+    profitSharePct: 12.5,
+    profitShareTerms: "12.5% of net realized profit upon sale of Kalaimal Nagar (LND-002)",
+    startDate: "2026-03-01",
+    linkedPropertyCode: "LND-002",
+    status: "active",
+    notes: "Friendly funding for layout infrastructure and registration",
   },
 ];
 
@@ -1062,11 +1125,78 @@ export const INITIAL_CATEGORIES: SeedCategory[] = [
     type: "outflow",
     financialRole: "capital_withdrawal",
   },
+  // 15. Commercial & Personal Loan Categories (Borrowings, Principal Repayments, Interest & Profit Share)
   {
-    name: "Builder Refund / Cancellation Return",
+    name: "Bank Loan Borrowing",
+    scope: "commercial",
+    type: "inflow",
+    financialRole: "loan_principal_borrowed",
+  },
+  {
+    name: "Family / Friend Loan Borrowing",
+    scope: "commercial",
+    type: "inflow",
+    financialRole: "loan_principal_borrowed",
+  },
+  {
+    name: "Private Financier Loan Borrowing",
+    scope: "commercial",
+    type: "inflow",
+    financialRole: "loan_principal_borrowed",
+  },
+  {
+    name: "Loan Principal Repayment",
+    scope: "commercial",
+    type: "outflow",
+    financialRole: "loan_principal_repaid",
+  },
+  {
+    name: "Bank Loan EMI / Principal Repaid",
+    scope: "commercial",
+    type: "outflow",
+    financialRole: "loan_principal_repaid",
+  },
+  {
+    name: "Friend / Family Loan Principal Repaid",
+    scope: "commercial",
+    type: "outflow",
+    financialRole: "loan_principal_repaid",
+  },
+  {
+    name: "Loan Interest Payment",
+    scope: "commercial",
+    type: "outflow",
+    financialRole: "loan_interest_expense",
+  },
+  {
+    name: "Bank Interest / Processing Charges",
+    scope: "commercial",
+    type: "outflow",
+    financialRole: "loan_interest_expense",
+  },
+  {
+    name: "Lender / Partner Profit Share Paid",
+    scope: "commercial",
+    type: "outflow",
+    financialRole: "loan_profit_distribution",
+  },
+  {
+    name: "Family / Friend Venture Profit Distribution",
+    scope: "commercial",
+    type: "outflow",
+    financialRole: "loan_profit_distribution",
+  },
+  {
+    name: "Personal Loan Borrowing",
     scope: "personal",
     type: "inflow",
-    financialRole: "capital_withdrawal",
+    financialRole: "loan_principal_borrowed",
+  },
+  {
+    name: "Personal Loan Repayment",
+    scope: "personal",
+    type: "outflow",
+    financialRole: "loan_principal_repaid",
   },
 ];
 
@@ -1134,6 +1264,40 @@ export const DEMO_FILLER_PROPERTIES: SeedProperty[] = [
       { name: "4. Brickwork & Finishing", targetAmount: 2500000, paidAmount: 0, status: "pending" },
       { name: "5. Handover & Registration", targetAmount: 2000000, paidAmount: 0, status: "pending" },
     ],
+  },
+];
+
+export const DEMO_FILLER_LOANS: SeedLoan[] = [
+  {
+    id: "demo-loan-1",
+    datasetId: "ds_demo_sandbox",
+    scope: "commercial",
+    loanCode: "DEMO-LOAN-01",
+    lenderName: "Demo Commercial Bank Term Loan",
+    lenderType: "bank",
+    principalAmount: 10000000,
+    interestRatePct: 9.5,
+    profitSharePct: 0,
+    startDate: "2026-03-01",
+    tenureMonths: 24,
+    status: "active",
+    notes: "Sample bank facility for sandbox demonstration",
+  },
+  {
+    id: "demo-loan-2",
+    datasetId: "ds_demo_sandbox",
+    scope: "commercial",
+    loanCode: "DEMO-LOAN-02",
+    lenderName: "Demo Family Venture Partner",
+    lenderType: "family_friend",
+    principalAmount: 5000000,
+    interestRatePct: 0,
+    profitSharePct: 10,
+    profitShareTerms: "10% net profit share upon greenfield exit",
+    startDate: "2026-03-15",
+    linkedPropertyCode: "DEMO-LND-01",
+    status: "active",
+    notes: "Sample friend loan with profit share",
   },
 ];
 

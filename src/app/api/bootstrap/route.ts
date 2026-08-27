@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getProperties, getTransactions, getCategories } from "@/lib/dataStore";
+import {
+  getProperties,
+  getTransactions,
+  getCategories,
+  getLoans,
+} from "@/lib/dataStore";
 import { getSessionFromRequest } from "@/lib/auth";
 import {
   calculateCommercialMetrics,
@@ -9,7 +14,7 @@ import { INITIAL_CATEGORIES } from "@/lib/seedData";
 
 /**
  * Consolidated Bootstrap API Endpoint:
- * Returns properties, transactions, dynamic categories, and pre-calculated metrics in 1 single HTTP call.
+ * Returns properties, transactions, dynamic categories, loans, and pre-calculated metrics in 1 single HTTP call.
  * Eliminates client-side request waterfalls and cuts initial load latency by ~65%.
  */
 export async function GET(req: NextRequest) {
@@ -25,10 +30,11 @@ export async function GET(req: NextRequest) {
   const isAll = isSuperAdmin && requestedDataset === "all";
 
   try {
-    const [properties, transactions, categories] = await Promise.all([
+    const [properties, transactions, categories, loans] = await Promise.all([
       getProperties(datasetId, undefined, isAll),
       getTransactions(datasetId, undefined, isAll),
       getCategories(datasetId, undefined, isAll),
+      getLoans(datasetId, undefined, isAll),
     ]);
 
     const activeCategories =
@@ -37,7 +43,8 @@ export async function GET(req: NextRequest) {
     const commercialMetrics = calculateCommercialMetrics(
       properties,
       transactions,
-      activeCategories
+      activeCategories,
+      loans
     );
     const personalMetrics = calculatePersonalMetrics(properties, transactions);
 
@@ -48,6 +55,7 @@ export async function GET(req: NextRequest) {
         properties,
         transactions,
         categories: activeCategories,
+        loans,
         commercialMetrics,
         personalMetrics,
       },

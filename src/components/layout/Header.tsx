@@ -18,8 +18,9 @@ import {
 interface HeaderProps {
   currentMode: "commercial" | "personal";
   onModeChange: (mode: "commercial" | "personal") => void;
-  onOpenEntryModal: (type: "outflow" | "inflow" | "transfer" | "withdrawal") => void;
+  onOpenEntryModal: (type: "outflow" | "inflow" | "transfer" | "withdrawal" | "loan") => void;
   onOpenNewPropertyModal: () => void;
+  onOpenNewLoanModal?: () => void;
   onOpenExportModal: () => void;
   onOpenCategoryModal: () => void;
   user?: { name: string; email: string; role: string; datasetId?: string } | null;
@@ -35,6 +36,7 @@ export const Header: React.FC<HeaderProps> = ({
   onModeChange,
   onOpenEntryModal,
   onOpenNewPropertyModal,
+  onOpenNewLoanModal,
   onOpenExportModal,
   onOpenCategoryModal,
   user,
@@ -170,6 +172,16 @@ export const Header: React.FC<HeaderProps> = ({
                 <span>Withdraw</span>
               </button>
 
+              {onOpenNewLoanModal && (
+                <button
+                  onClick={onOpenNewLoanModal}
+                  className="btn-action-primary flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs border border-emerald-800/40 text-emerald-400"
+                  title="Create or Track Loan Facility"
+                >
+                  <span>+ Loan</span>
+                </button>
+              )}
+
               <button
                 onClick={onOpenNewPropertyModal}
                 className="btn-action-primary flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs"
@@ -260,7 +272,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex md:hidden items-center justify-between gap-1.5 w-full overflow-x-auto pb-0.5 pt-0.5 scrollbar-none">
           <button
             onClick={() => onOpenEntryModal("outflow")}
-            className="btn-action-primary flex-1 min-w-[75px] flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold"
+            className="btn-action-primary flex-1 min-w-[70px] flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold"
           >
             <Plus className="w-3 h-3 stroke-[2.5]" />
             <span>Outflow</span>
@@ -268,7 +280,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => onOpenEntryModal("inflow")}
-            className="btn-action-primary flex-1 min-w-[70px] flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold"
+            className="btn-action-primary flex-1 min-w-[65px] flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold"
           >
             <ArrowUpRight className="w-3 h-3 text-[#22C55E]" />
             <span>Inflow</span>
@@ -276,14 +288,23 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => onOpenEntryModal("withdrawal")}
-            className="btn-action-primary flex-1 min-w-[75px] flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold text-amber-300 border border-amber-800/40"
+            className="btn-action-primary flex-1 min-w-[70px] flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold text-amber-300 border border-amber-800/40"
           >
             <span>Withdraw</span>
           </button>
 
+          {onOpenNewLoanModal && (
+            <button
+              onClick={onOpenNewLoanModal}
+              className="btn-action-primary flex-1 min-w-[65px] flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold text-emerald-400 border border-emerald-800/40"
+            >
+              <span>+ Loan</span>
+            </button>
+          )}
+
           <button
             onClick={onOpenNewPropertyModal}
-            className="btn-action-primary flex-1 min-w-[70px] flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold"
+            className="btn-action-primary flex-1 min-w-[65px] flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold"
           >
             <span>+ Deal</span>
           </button>

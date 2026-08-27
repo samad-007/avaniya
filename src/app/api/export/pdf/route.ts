@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getProperties, getTransactions } from "@/lib/dataStore";
+import { getProperties, getTransactions, getLoans } from "@/lib/dataStore";
 import { generateExecutivePDF } from "@/lib/exportEngine";
 import { getSessionFromRequest } from "@/lib/auth";
 
@@ -23,12 +23,13 @@ export async function GET(req: NextRequest) {
   const isAll = isSuperAdmin && requestedDataset === "all";
 
   try {
-    const [properties, transactions] = await Promise.all([
+    const [properties, transactions, loans] = await Promise.all([
       getProperties(datasetId, undefined, isAll),
       getTransactions(datasetId, undefined, isAll),
+      getLoans(datasetId, undefined, isAll),
     ]);
 
-    const buffer = generateExecutivePDF(properties, transactions);
+    const buffer = generateExecutivePDF(properties, transactions, loans);
 
     return new NextResponse(new Uint8Array(buffer), {
       status: 200,

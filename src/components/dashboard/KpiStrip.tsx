@@ -30,6 +30,7 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
       capitalInjectedTotal,
       netCapitalInjected,
       profitWithdrawalsTotal,
+      outstandingLoansPrincipal,
       propertyMetrics,
     } = commercialMetrics;
 
@@ -77,7 +78,7 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
           </div>
         </div>
 
-        {/* Pending Payables to Sellers */}
+        {/* Pending Payables to Sellers or Outstanding Debt */}
         <div className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-3.5 flex flex-col justify-between hover:border-[#383838] transition-standard shadow-sm">
           <div className="flex items-center justify-between text-[#F59E0B] text-xs font-semibold uppercase tracking-wider mb-1.5">
             <span>Pending to Sellers</span>
@@ -86,23 +87,42 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
           <div className="text-xl md:text-2xl font-bold font-mono text-[#F59E0B] tracking-tight">
             {formatINR(totalPendingPayable)}
           </div>
-          <div className="text-xs text-[#A1A1AA] font-medium mt-1.5">
-            {propertyMetrics.length} Land Deals
+          <div className="text-xs text-[#A1A1AA] font-medium mt-1.5 truncate">
+            {outstandingLoansPrincipal > 0
+              ? `+ Debt: ${formatINR(outstandingLoansPrincipal)}`
+              : `${propertyMetrics.length} Land Deals`}
           </div>
         </div>
 
-        {/* Pending Receivables from Buyers */}
+        {/* Outstanding Loan Debt / Buyer Receivables */}
         <div className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-3.5 flex flex-col justify-between hover:border-[#383838] transition-standard shadow-sm">
-          <div className="flex items-center justify-between text-[#22C55E] text-xs font-semibold uppercase tracking-wider mb-1.5">
-            <span>Buyer Receivables</span>
-            <ArrowDownLeft className="w-4 h-4 text-[#22C55E]" />
-          </div>
-          <div className="text-xl md:text-2xl font-bold font-mono text-[#22C55E] tracking-tight">
-            {formatINR(totalPendingReceivable)}
-          </div>
-          <div className="text-xs text-[#A1A1AA] font-medium mt-1.5">
-            Agreed Selling Pipeline
-          </div>
+          {outstandingLoansPrincipal > 0 ? (
+            <>
+              <div className="flex items-center justify-between text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-1.5">
+                <span>Active Loan Debt</span>
+                <Landmark className="w-4 h-4 text-emerald-400" />
+              </div>
+              <div className="text-xl md:text-2xl font-bold font-mono text-emerald-400 tracking-tight">
+                {formatINR(outstandingLoansPrincipal)}
+              </div>
+              <div className="text-xs text-[#A1A1AA] font-medium mt-1.5 truncate">
+                Receivables: {formatINR(totalPendingReceivable)}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center justify-between text-[#22C55E] text-xs font-semibold uppercase tracking-wider mb-1.5">
+                <span>Buyer Receivables</span>
+                <ArrowDownLeft className="w-4 h-4 text-[#22C55E]" />
+              </div>
+              <div className="text-xl md:text-2xl font-bold font-mono text-[#22C55E] tracking-tight">
+                {formatINR(totalPendingReceivable)}
+              </div>
+              <div className="text-xs text-[#A1A1AA] font-medium mt-1.5">
+                Agreed Selling Pipeline
+              </div>
+            </>
+          )}
         </div>
 
         {/* Realized Profit */}

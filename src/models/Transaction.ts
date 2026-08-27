@@ -4,8 +4,20 @@ export interface ITransaction extends Document {
   userId: string;
   datasetId?: string;
   scope: "commercial" | "personal";
-  transactionType: "outflow" | "deal_inflow" | "capital_inflow" | "transfer";
+  transactionType:
+    | "outflow"
+    | "deal_inflow"
+    | "capital_inflow"
+    | "transfer"
+    | "profit_withdrawal"
+    | "capital_withdrawal"
+    | "loan_inflow"
+    | "loan_repayment"
+    | "loan_interest"
+    | "loan_profit_share";
   transCode?: string;
+  loanId?: string;
+  loanCode?: string;
   propertyId?: string;
   propertyCode?: string;
   date: Date;
@@ -35,11 +47,24 @@ const TransactionSchema = new Schema<ITransaction>(
     },
     transactionType: {
       type: String,
-      enum: ["outflow", "deal_inflow", "capital_inflow", "transfer"],
+      enum: [
+        "outflow",
+        "deal_inflow",
+        "capital_inflow",
+        "transfer",
+        "profit_withdrawal",
+        "capital_withdrawal",
+        "loan_inflow",
+        "loan_repayment",
+        "loan_interest",
+        "loan_profit_share",
+      ],
       required: true,
       index: true,
     },
     transCode: { type: String },
+    loanId: { type: String, index: true },
+    loanCode: { type: String, index: true },
     propertyId: { type: String, index: true },
     propertyCode: { type: String, index: true },
     date: { type: Date, required: true, default: Date.now, index: true },

@@ -3,17 +3,21 @@ import { connectDB, getSanitizedMongoUri } from "./db";
 import { Property, IProperty } from "../models/Property";
 import { Transaction, ITransaction } from "../models/Transaction";
 import { Category, ICategory } from "../models/Category";
+import { Loan, ILoan } from "../models/Loan";
 import { AccountBalance, IAccountBalance } from "../models/AccountBalance";
 import {
   INITIAL_PROPERTIES,
   INITIAL_TRANSACTIONS,
   INITIAL_CATEGORIES,
+  INITIAL_LOANS,
   INITIAL_ACCOUNT_BALANCES,
   DEMO_FILLER_PROPERTIES,
   DEMO_FILLER_TRANSACTIONS,
+  DEMO_FILLER_LOANS,
   SeedProperty,
   SeedTransaction,
   SeedCategory,
+  SeedLoan,
 } from "./seedData";
 import {
   calculateCommercialMetrics,
@@ -31,6 +35,9 @@ let memTransactions: (SeedTransaction & { datasetId?: string })[] = [
 ];
 let memCategories: (SeedCategory & { datasetId?: string })[] = [
   ...INITIAL_CATEGORIES.map((c) => ({ ...c, datasetId: "ds_yousuf_portfolio" })),
+];
+let memLoans: (SeedLoan & { datasetId?: string })[] = [
+  ...INITIAL_LOANS.map((l) => ({ ...l, datasetId: "ds_yousuf_portfolio" })),
 ];
 let memAccountBalances = [...INITIAL_ACCOUNT_BALANCES];
 
@@ -472,6 +479,216 @@ export async function addCategory(
 }
 
 /**
+ * Get all loans filtered by dataset ID and optional scope
+ */
+export async function getLoans(
+  datasetId: string = "ds_yousuf_portfolio",
+  scope?: "commercial" | "personal",
+  isSuperAdminAll: boolean = false
+): Promise<SeedLoan[]> {
+  // Demo Sandbox Guest Mode
+  if (datasetId === "ds_demo_sandbox") {
+    return scope
+      ? DEMO_FILLER_LOANS.filter((l) => l.scope === scope)
+      : DEMO_FILLER_LOANS;
+  }
+
+  const dbOk = await isDBConnected();
+  if (dbOk) {
+    const query: Record<string, unknown> = {};
+    if (!isSuperAdminAll) {
+      query.$or = [{ datasetId }, { userId: datasetId }];
+    }
+    if (scope) query.scope = scope;
+
+    const docs = await Loan.find(query).sort({ startDate: -1 }).lean<{ _id: unknown } & ILoan[]>();
+    if (docs && docs.length > 0) {
+      return (docs as unknown as ({ _id: { toString: () => string } } & ILoan)[]).map((d) => ({
+        id: d._id.toString(),
+        scope: d.scope,
+        loanCode: d.loanCode,
+        lenderName: d.lenderName,
+        lenderType: d.lenderType,
+        principalAmount: d.principalAmount,
+        interestRatePct: d.interestRatePct,
+        profitSharePct: d.profitSharePct,
+        profitShareTerms: d.profitShareTerms,
+        startDate: d.startDate
+          ? new Date(d.startDate).toISOString().split("T")[0]
+          : "",
+        endDate: d.endDate
+          ? new Date(d.endDate).toISOString().split("T")[0]
+          : undefined,
+        tenureMonths: d.tenureMonths,
+        linkedPropertyCode: d.linkedPropertyCode,
+        status: d.status,
+        notes: d.notes,
+      }));
+    }
+    return [];
+  }
+
+  let list = isSuperAdminAll
+    ? memLoans
+    : memLoans.filter((l) => l.datasetId === datasetId || !datasetId);
+  return scope ? list.filter((l) => l.scope === scope) : list;
+}
+
+/**
+ * Get loan by code or ID
+ */
+export async function getLoanByCode(
+  loanCode: string,
+  datasetId: string = "ds_yousuf_portfolio"
+): Promise<SeedLoan | null> {
+  const loans = await getLoans(datasetId);
+  return (
+    loans.find(
+      (l) =>
+        l.loanCode.toLowerCase() === loanCode.toLowerCase() ||
+        l.id === loanCode
+    ) || null
+  );
+}
+
+/**
+ * Add a new loan facility
+ */
+export async function addLoan(
+  data: Omit<SeedLoan, "id" | "loanCode"> & { loanCode?: string },
+  datasetId: string = "ds_yousuf_portfolio",
+  userId: string = "user_default"
+): Promise<SeedLoan> {
+  const newLoan: SeedLoan & { datasetId: string } = {
+    ...data,
+    id: `loan-${Date.now()}`,
+    datasetId,
+    loanCode:
+      data.loanCode ||
+      `LOAN-${String(memLoans.length + 1).padStart(3, "0")}`,
+  };
+
+  const dbOk = await isDBConnected();
+  if (dbOk) {
+    try {
+      const doc = await Loan.create({ ...newLoan, userId, datasetId });
+      newLoan.id = doc._id.toString();
+    } catch (e) {
+      console.warn("Loan DB write failed, updating in-memory store", e);
+    }
+  }
+
+  memLoans.push(newLoan);
+  return newLoan;
+}
+
+/**
+ * Update loan terms and metadata
+ */
+export async function updateLoan(
+  loanIdOrCode: string,
+  updates: Partial<SeedLoan>,
+  datasetId: string = "ds_yousuf_portfolio"
+): Promise<SeedLoan | null> {
+  const dbOk = await isDBConnected();
+  if (dbOk) {
+    try {
+      const query: Record<string, unknown> = {
+        $or: [
+          { loanCode: loanIdOrCode },
+          { _id: mongoose.isValidObjectId(loanIdOrCode) ? loanIdOrCode : null },
+        ],
+      };
+      if (datasetId && datasetId !== "all") {
+        query.$and = [{ $or: [{ datasetId }, { userId: datasetId }] }];
+      }
+
+      const updated = await Loan.findOneAndUpdate(
+        query,
+        { $set: updates },
+        { new: true }
+      ).lean<ILoan & { _id: unknown }>();
+
+      if (updated) {
+        return {
+          id: updated._id.toString(),
+          scope: updated.scope,
+          loanCode: updated.loanCode,
+          lenderName: updated.lenderName,
+          lenderType: updated.lenderType,
+          principalAmount: updated.principalAmount,
+          interestRatePct: updated.interestRatePct,
+          profitSharePct: updated.profitSharePct,
+          profitShareTerms: updated.profitShareTerms,
+          startDate: updated.startDate
+            ? new Date(updated.startDate).toISOString().split("T")[0]
+            : "",
+          endDate: updated.endDate
+            ? new Date(updated.endDate).toISOString().split("T")[0]
+            : undefined,
+          tenureMonths: updated.tenureMonths,
+          linkedPropertyCode: updated.linkedPropertyCode,
+          status: updated.status,
+          notes: updated.notes,
+        };
+      }
+    } catch (e) {
+      console.warn("DB loan update failed, falling back to memory store", e);
+    }
+  }
+
+  const idx = memLoans.findIndex(
+    (l) =>
+      l.loanCode.toLowerCase() === loanIdOrCode.toLowerCase() ||
+      l.id === loanIdOrCode
+  );
+  if (idx !== -1) {
+    memLoans[idx] = { ...memLoans[idx], ...updates };
+    return memLoans[idx];
+  }
+  return null;
+}
+
+/**
+ * Delete a loan facility
+ */
+export async function deleteLoan(
+  loanIdOrCode: string,
+  datasetId: string = "ds_yousuf_portfolio"
+): Promise<boolean> {
+  const dbOk = await isDBConnected();
+  if (dbOk) {
+    try {
+      const query: Record<string, unknown> = {
+        $or: [
+          { loanCode: loanIdOrCode },
+          { _id: mongoose.isValidObjectId(loanIdOrCode) ? loanIdOrCode : null },
+        ],
+      };
+      if (datasetId && datasetId !== "all") {
+        query.$and = [{ $or: [{ datasetId }, { userId: datasetId }] }];
+      }
+
+      const res = await Loan.findOneAndDelete(query);
+      if (res) return true;
+    } catch (e) {
+      console.warn("DB loan delete failed, falling back to memory store", e);
+    }
+  }
+
+  const idx = memLoans.findIndex(
+    (l) =>
+      l.loanCode.toLowerCase() === loanIdOrCode.toLowerCase() ||
+      l.id === loanIdOrCode
+  );
+  if (idx !== -1) {
+    memLoans.splice(idx, 1);
+    return true;
+  }
+  return false;
+}
+
+/**
  * Calculate commercial metrics for dataset
  */
 export async function getCommercialMetrics(
@@ -481,7 +698,8 @@ export async function getCommercialMetrics(
   const props = await getProperties(datasetId, "commercial", isSuperAdminAll);
   const txs = await getTransactions(datasetId, { scope: "commercial" }, isSuperAdminAll);
   const cats = await getCategories(datasetId, "commercial", isSuperAdminAll);
-  return calculateCommercialMetrics(props, txs, cats);
+  const loans = await getLoans(datasetId, "commercial", isSuperAdminAll);
+  return calculateCommercialMetrics(props, txs, cats, loans);
 }
 
 /**

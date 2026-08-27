@@ -1,7 +1,7 @@
 import ExcelJS from "exceljs";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { SeedProperty, SeedTransaction, SeedCategory } from "./seedData";
+import { SeedProperty, SeedTransaction, SeedCategory, SeedLoan } from "./seedData";
 import {
   calculateCommercialMetrics,
   calculatePersonalMetrics,
@@ -10,33 +10,31 @@ import { formatINR } from "./formatters";
 
 /**
  * Generate multi-tab Excel (.xlsx) workbook with zero circular references,
- * exact bounded formula ranges, cached evaluation results, and complete portfolio coverage.
+ * exact bounded formula ranges, cached evaluation results, and complete portfolio coverage including loans & debt.
  */
 export async function generateExcelWorkbook(
   properties: SeedProperty[],
   transactions: SeedTransaction[],
-  categories?: SeedCategory[]
+  categories?: SeedCategory[],
+  loans?: SeedLoan[]
 ): Promise<Buffer> {
-  const commMetrics = calculateCommercialMetrics(properties, transactions, categories || []);
+  const commMetrics = calculateCommercialMetrics(
+    properties,
+    transactions,
+    categories || [],
+    loans || []
+  );
   const persMetrics = calculatePersonalMetrics(properties, transactions);
 
   const commProps = properties.filter((p) => p.type === "commercial");
   const persProps = properties.filter((p) => p.type === "personal");
+  const activeLoans = loans || [];
 
   const commOutflows = transactions.filter(
     (t) => t.scope === "commercial" && t.transactionType === "outflow"
   );
   const dealInflows = transactions.filter(
     (t) => t.scope === "commercial" && t.transactionType === "deal_inflow"
-  );
-  const capInflows = transactions.filter(
-    (t) => t.scope === "commercial" && t.transactionType === "capital_inflow"
-  );
-  const capWithdrawals = transactions.filter(
-    (t) => t.scope === "commercial" && t.transactionType === "capital_withdrawal"
-  );
-  const profitWithdrawals = transactions.filter(
-    (t) => t.scope === "commercial" && t.transactionType === "profit_withdrawal"
   );
   const capAndWithdrawals = transactions.filter(
     (t) =>
@@ -93,17 +91,17 @@ export async function generateExcelWorkbook(
   ];
 
   // Header Title
-  wsDash.getCell("B2").value = "AVANIYA — REAL ESTATE & LAND ASSET PORTFOLIO";
+  wsDash.getCell("B2").value = "AVANIYA — REAL ESTATE & DEBT FINANCING ENGINE";
   wsDash.getCell("B2").font = { name: "Arial", size: 16, bold: true, color: { argb: "FF0A0A0A" } };
 
-  wsDash.getCell("B3").value = `Executive Liquidity & Deal Statement • Generated on ${new Date().toLocaleDateString("en-IN")}`;
+  wsDash.getCell("B3").value = `Executive Liquidity, Land Deals & Debt Audit • Generated on ${new Date().toLocaleDateString("en-IN")}`;
   wsDash.getCell("B3").font = { name: "Arial", size: 9, italic: true, color: { argb: "FF71717A" } };
 
   // KPI Header Cards
   wsDash.getCell("B5").value = "NET BANK LIQUIDITY";
   wsDash.getCell("C5").value = "NET CASH BALANCE";
   wsDash.getCell("D5").value = "TOTAL LIQUIDITY";
-  wsDash.getCell("E5").value = "REALIZED NET PROFIT";
+  wsDash.getCell("E5").value = "OUTSTANDING DEBT";
 
   ["B5", "C5", "D5", "E5"].forEach((coord) => {
     const c = wsDash.getCell(coord);
@@ -123,11 +121,11 @@ export async function generateExcelWorkbook(
 
   // KPI Value Cells with Bounded Formulas + Precomputed Results
   wsDash.getCell("B6").value = {
-    formula: "C12-C13+C14-C15-C16-C17+C18",
+    formula: "C12-C13+C14-C15-C16-C17+C18+C19-C20-C21-C22",
     result: commMetrics.netBankLiquidity,
   };
   wsDash.getCell("C6").value = {
-    formula: "D12-D13+D14-D15-D16+D17-D18",
+    formula: "D12-D13+D14-D15-D16+D17-D18+D19-D20-D21-D22",
     result: commMetrics.netCashLiquidity,
   };
   wsDash.getCell("D6").value = {
@@ -135,8 +133,8 @@ export async function generateExcelWorkbook(
     result: commMetrics.currentNetLiquidity,
   };
   wsDash.getCell("E6").value = {
-    formula: `Land_Master!Q${landTotalRow}`,
-    result: commMetrics.totalRealizedProfit,
+    formula: "E19-E20",
+    result: commMetrics.outstandingLoansPrincipal,
   };
 
   ["B6", "C6", "D6", "E6"].forEach((coord) => {
@@ -152,7 +150,7 @@ export async function generateExcelWorkbook(
   });
 
   // Breakdown Table Header
-  wsDash.getCell("B10").value = "Commercial Liquidity Breakdown Matrix";
+  wsDash.getCell("B10").value = "Commercial Liquidity & Debt Breakdown Matrix";
   wsDash.getCell("B10").font = { name: "Arial", size: 12, bold: true, color: { argb: "FF0A0A0A" } };
 
   wsDash.getCell("B11").value = "Portfolio Financial Component";
@@ -174,7 +172,7 @@ export async function generateExcelWorkbook(
   const breakdownRows = [
     {
       row: 12,
-      label: "1. Capital Injected (External Funding)",
+      label: "1. Capital Injected (External Equity)",
       bankFormula: `SUMIF(Capital_Inflows!D$${capInStart}:D$${capInEnd}, "Bank", Capital_Inflows!E$${capInStart}:E$${capInEnd})`,
       cashFormula: `SUMIF(Capital_Inflows!D$${capInStart}:D$${capInEnd}, "Cash", Capital_Inflows!E$${capInStart}:E$${capInEnd})`,
       bankVal: commMetrics.capitalInjectedBank,
@@ -228,6 +226,38 @@ export async function generateExcelWorkbook(
       bankVal: commMetrics.transfersCashToBank,
       cashVal: commMetrics.transfersCashToBank,
     },
+    {
+      row: 19,
+      label: "8. Add: Loan Borrowings (Debt Inflow)",
+      bankFormula: `${commMetrics.loansBorrowedBank}`,
+      cashFormula: `${commMetrics.loansBorrowedCash}`,
+      bankVal: commMetrics.loansBorrowedBank,
+      cashVal: commMetrics.loansBorrowedCash,
+    },
+    {
+      row: 20,
+      label: "9. Less: Loan Principal Repaid",
+      bankFormula: `${commMetrics.loansRepaidBank}`,
+      cashFormula: `${commMetrics.loansRepaidCash}`,
+      bankVal: commMetrics.loansRepaidBank,
+      cashVal: commMetrics.loansRepaidCash,
+    },
+    {
+      row: 21,
+      label: "10. Less: Loan Interest Expense Paid",
+      bankFormula: `${commMetrics.loansInterestPaidBank}`,
+      cashFormula: `${commMetrics.loansInterestPaidCash}`,
+      bankVal: commMetrics.loansInterestPaidBank,
+      cashVal: commMetrics.loansInterestPaidCash,
+    },
+    {
+      row: 22,
+      label: "11. Less: Loan Profit Share Paid",
+      bankFormula: `${commMetrics.loansProfitSharePaidBank}`,
+      cashFormula: `${commMetrics.loansProfitSharePaidCash}`,
+      bankVal: commMetrics.loansProfitSharePaidBank,
+      cashVal: commMetrics.loansProfitSharePaidCash,
+    },
   ];
 
   breakdownRows.forEach(({ row, label, bankFormula, cashFormula, bankVal, cashVal }) => {
@@ -245,13 +275,19 @@ export async function generateExcelWorkbook(
   });
 
   // Current Net Liquidity Summary Row
-  wsDash.getCell("B19").value = "CURRENT NET LIQUIDITY AVAILABLE";
-  wsDash.getCell("B19").font = { bold: true, color: { argb: "FF166534" } };
-  wsDash.getCell("C19").value = { formula: "C12-C13+C14-C15-C16-C17+C18", result: commMetrics.netBankLiquidity };
-  wsDash.getCell("D19").value = { formula: "D12-D13+D14-D15-D16+D17-D18", result: commMetrics.netCashLiquidity };
-  wsDash.getCell("E19").value = { formula: "C19+D19", result: commMetrics.currentNetLiquidity };
+  wsDash.getCell("B23").value = "CURRENT NET LIQUIDITY AVAILABLE";
+  wsDash.getCell("B23").font = { bold: true, color: { argb: "FF166534" } };
+  wsDash.getCell("C23").value = {
+    formula: "C12-C13+C14-C15-C16-C17+C18+C19-C20-C21-C22",
+    result: commMetrics.netBankLiquidity,
+  };
+  wsDash.getCell("D23").value = {
+    formula: "D12-D13+D14-D15-D16+D17-D18+D19-D20-D21-D22",
+    result: commMetrics.netCashLiquidity,
+  };
+  wsDash.getCell("E23").value = { formula: "C23+D23", result: commMetrics.currentNetLiquidity };
 
-  ["B19", "C19", "D19", "E19"].forEach((coord) => {
+  ["B23", "C23", "D23", "E23"].forEach((coord) => {
     const c = wsDash.getCell(coord);
     c.font = { bold: true };
     c.fill = {
@@ -565,7 +601,82 @@ export async function generateExcelWorkbook(
   wsCap.getRow(capInTotalRow).getCell(6).numFmt = "₹ #,##,##0";
 
   // -------------------------------------------------------------
-  // Sheet 6: Transfers
+  // Sheet 6: Loans_and_Debt (Loan Facilities & Repayments)
+  // -------------------------------------------------------------
+  const wsLoans = workbook.addWorksheet("Loans_and_Debt", {
+    views: [{ state: "frozen", xSplit: 0, ySplit: 3, showGridLines: true }],
+  });
+  wsLoans.columns = [
+    { header: "Loan Code", width: 14 },
+    { header: "Lender Name", width: 26 },
+    { header: "Lender Type", width: 16 },
+    { header: "Principal (₹)", width: 22 },
+    { header: "Interest % p.a.", width: 16 },
+    { header: "Profit Share %", width: 16 },
+    { header: "Outstanding Debt (₹)", width: 24 },
+    { header: "Finance Cost Paid (₹)", width: 24 },
+    { header: "Linked Land Deal", width: 18 },
+    { header: "Status", width: 14 },
+    { header: "Notes / Terms", width: 38 },
+  ];
+  wsLoans.spliceRows(1, 0, ["Loans, Borrowings & Debt Financing Ledger"]);
+  wsLoans.getCell("A1").font = { name: "Arial", size: 14, bold: true };
+  wsLoans.spliceRows(2, 0, []);
+  wsLoans.getRow(3).font = { bold: true, color: { argb: "FFFFFFFF" } };
+  wsLoans.getRow(3).fill = {
+    type: "pattern",
+    pattern: "solid",
+    fgColor: { argb: "FF111111" },
+  };
+
+  activeLoans.forEach((l) => {
+    const lm = commMetrics.loanMetrics.find(
+      (m) => m.loan.loanCode === l.loanCode || m.loan.id === l.id
+    );
+    wsLoans.addRow([
+      l.loanCode,
+      l.lenderName,
+      l.lenderType.toUpperCase(),
+      l.principalAmount,
+      l.interestRatePct ? `${l.interestRatePct}%` : "0%",
+      l.profitSharePct ? `${l.profitSharePct}%` : "0%",
+      lm?.outstandingPrincipal || 0,
+      (lm?.interestPaidTotal || 0) + (lm?.profitSharePaidTotal || 0),
+      l.linkedPropertyCode || "-",
+      l.status.toUpperCase(),
+      l.profitShareTerms || l.notes || "",
+    ]);
+  });
+  wsLoans.eachRow((row, rowNum) => {
+    if (rowNum >= 4) {
+      row.getCell(4).numFmt = "₹ #,##,##0";
+      row.getCell(7).numFmt = "₹ #,##,##0";
+      row.getCell(8).numFmt = "₹ #,##,##0";
+    }
+  });
+
+  const loansEnd = Math.max(4, 4 + activeLoans.length - 1);
+  const loansTotalRow = loansEnd + 1;
+  wsLoans.addRow([
+    "Total Debt Facilities",
+    "",
+    "",
+    { formula: `SUM(D$4:D$${loansEnd})`, result: activeLoans.reduce((s, l) => s + l.principalAmount, 0) },
+    "",
+    "",
+    { formula: `SUM(G$4:G$${loansEnd})`, result: commMetrics.outstandingLoansPrincipal },
+    { formula: `SUM(H$4:H$${loansEnd})`, result: commMetrics.loansInterestPaidTotal + commMetrics.loansProfitSharePaidTotal },
+    "",
+    "",
+    "",
+  ]);
+  wsLoans.getRow(loansTotalRow).font = { bold: true };
+  wsLoans.getRow(loansTotalRow).getCell(4).numFmt = "₹ #,##,##0";
+  wsLoans.getRow(loansTotalRow).getCell(7).numFmt = "₹ #,##,##0";
+  wsLoans.getRow(loansTotalRow).getCell(8).numFmt = "₹ #,##,##0";
+
+  // -------------------------------------------------------------
+  // Sheet 7: Transfers
   // -------------------------------------------------------------
   const wsTrf = workbook.addWorksheet("Transfers", {
     views: [{ state: "frozen", xSplit: 0, ySplit: 3, showGridLines: true }],
@@ -616,7 +727,7 @@ export async function generateExcelWorkbook(
   wsTrf.getRow(trfTotalRow).getCell(4).numFmt = "₹ #,##,##0";
 
   // -------------------------------------------------------------
-  // Sheet 7: Personal_Master (Personal Assets & Milestone Schedule)
+  // Sheet 8: Personal_Master (Personal Assets & Milestone Schedule)
   // -------------------------------------------------------------
   const wsPers = workbook.addWorksheet("Personal_Master", {
     views: [{ state: "frozen", xSplit: 0, ySplit: 3, showGridLines: true }],
@@ -688,7 +799,7 @@ export async function generateExcelWorkbook(
   wsPers.getRow(persTotalRow).getCell(6).numFmt = "₹ #,##,##0";
 
   // -------------------------------------------------------------
-  // Sheet 8: Personal_Transactions
+  // Sheet 9: Personal_Transactions
   // -------------------------------------------------------------
   const wsPersTx = workbook.addWorksheet("Personal_Transactions", {
     views: [{ state: "frozen", xSplit: 0, ySplit: 3, showGridLines: true }],
@@ -750,17 +861,24 @@ export async function generateExcelWorkbook(
 
 /**
  * Generate Comprehensive Multi-Page Executive Statement PDF
- * Contains complete financial breakdown, land deals, personal assets, and itemized transaction ledgers.
+ * Contains complete financial breakdown, land deals, loans/debt financing, personal assets, and itemized transaction ledgers.
  */
 export function generateExecutivePDF(
   properties: SeedProperty[],
-  transactions: SeedTransaction[]
+  transactions: SeedTransaction[],
+  loans?: SeedLoan[]
 ): Buffer {
-  const commMetrics = calculateCommercialMetrics(properties, transactions);
+  const commMetrics = calculateCommercialMetrics(
+    properties,
+    transactions,
+    undefined,
+    loans || []
+  );
   const persMetrics = calculatePersonalMetrics(properties, transactions);
 
   const commProps = properties.filter((p) => p.type === "commercial");
   const persProps = properties.filter((p) => p.type === "personal");
+  const activeLoans = loans || [];
 
   const commOutflows = transactions.filter(
     (t) => t.scope === "commercial" && t.transactionType === "outflow"
@@ -776,6 +894,18 @@ export function generateExecutivePDF(
   );
   const profitWithdrawals = transactions.filter(
     (t) => t.scope === "commercial" && t.transactionType === "profit_withdrawal"
+  );
+  const loanInflows = transactions.filter(
+    (t) => t.scope === "commercial" && t.transactionType === "loan_inflow"
+  );
+  const loanRepayments = transactions.filter(
+    (t) => t.scope === "commercial" && t.transactionType === "loan_repayment"
+  );
+  const loanInterests = transactions.filter(
+    (t) => t.scope === "commercial" && t.transactionType === "loan_interest"
+  );
+  const loanProfitShares = transactions.filter(
+    (t) => t.scope === "commercial" && t.transactionType === "loan_profit_share"
   );
   const transfers = transactions.filter(
     (t) => t.scope === "commercial" && t.transactionType === "transfer"
@@ -808,7 +938,7 @@ export function generateExecutivePDF(
   // PAGE 1: EXECUTIVE PORTFOLIO SUMMARY & LIQUIDITY MATRIX
   // =========================================================================
   drawHeader(
-    "AVANIYA — REAL ESTATE ASSET & LAND PORTFOLIO",
+    "AVANIYA — REAL ESTATE ASSET & DEBT AUDIT",
     `Comprehensive Portfolio Audit & Financial Statement • Generated: ${new Date().toLocaleDateString("en-IN")}`
   );
 
@@ -822,7 +952,14 @@ export function generateExecutivePDF(
     { label: "Net Bank Liquidity", val: formatINR(commMetrics.netBankLiquidity) },
     { label: "Net Cash Balance", val: formatINR(commMetrics.netCashLiquidity) },
     { label: "Total Net Liquidity", val: formatINR(commMetrics.currentNetLiquidity) },
-    { label: "Pending to Sellers", val: formatINR(commMetrics.totalPendingPayable) },
+    {
+      label: commMetrics.outstandingLoansPrincipal > 0 ? "Active Loan Debt" : "Pending to Sellers",
+      val: formatINR(
+        commMetrics.outstandingLoansPrincipal > 0
+          ? commMetrics.outstandingLoansPrincipal
+          : commMetrics.totalPendingPayable
+      ),
+    },
   ];
 
   const cardWidth = (pageWidth - 28 - 9) / 4;
@@ -877,13 +1014,31 @@ export function generateExecutivePDF(
       `- ${formatINR(commMetrics.profitWithdrawalsTotal)}`,
     ],
     [
-      "6. Bank Withdrawals to Cash",
+      "6. Add: Loan Borrowings Inward",
+      `+ ${formatINR(commMetrics.loansBorrowedBank)}`,
+      `+ ${formatINR(commMetrics.loansBorrowedCash)}`,
+      `+ ${formatINR(commMetrics.loansBorrowedTotal)}`,
+    ],
+    [
+      "7. Less: Loan Principal Repaid",
+      `- ${formatINR(commMetrics.loansRepaidBank)}`,
+      `- ${formatINR(commMetrics.loansRepaidCash)}`,
+      `- ${formatINR(commMetrics.loansRepaidTotal)}`,
+    ],
+    [
+      "8. Less: Loan Interest & Profit Share Paid",
+      `- ${formatINR(commMetrics.loansInterestPaidBank + commMetrics.loansProfitSharePaidBank)}`,
+      `- ${formatINR(commMetrics.loansInterestPaidCash + commMetrics.loansProfitSharePaidCash)}`,
+      `- ${formatINR(commMetrics.loansInterestPaidTotal + commMetrics.loansProfitSharePaidTotal)}`,
+    ],
+    [
+      "9. Bank Withdrawals to Cash",
       `- ${formatINR(commMetrics.transfersBankToCash)}`,
       `+ ${formatINR(commMetrics.transfersBankToCash)}`,
       "₹ 0 (Internal)",
     ],
     [
-      "7. Cash Deposits to Bank",
+      "10. Cash Deposits to Bank",
       `+ ${formatINR(commMetrics.transfersCashToBank)}`,
       `- ${formatINR(commMetrics.transfersCashToBank)}`,
       "₹ 0 (Internal)",
@@ -891,7 +1046,7 @@ export function generateExecutivePDF(
   ];
 
   autoTable(doc, {
-    startY: 61,
+    startY: 60,
     margin: { left: 14, right: 14 },
     head: [["Financial Flow Component", "Bank Account (₹)", "Cash in Hand (₹)", "Combined Net (₹)"]],
     body: breakdownData,
@@ -904,9 +1059,9 @@ export function generateExecutivePDF(
       ],
     ],
     theme: "grid",
-    headStyles: { fillColor: [24, 24, 27], textColor: [255, 255, 255], fontStyle: "bold", fontSize: 8 },
-    bodyStyles: { fontSize: 8, textColor: [30, 30, 30], cellPadding: 2.5 },
-    footStyles: { fillColor: [220, 252, 231], textColor: [22, 101, 52], fontStyle: "bold", fontSize: 8.5 },
+    headStyles: { fillColor: [24, 24, 27], textColor: [255, 255, 255], fontStyle: "bold", fontSize: 7.5 },
+    bodyStyles: { fontSize: 7.5, textColor: [30, 30, 30], cellPadding: 2 },
+    footStyles: { fillColor: [220, 252, 231], textColor: [22, 101, 52], fontStyle: "bold", fontSize: 8 },
     columnStyles: {
       0: { cellWidth: 74 },
       1: { cellWidth: 36, halign: "right" },
@@ -916,11 +1071,11 @@ export function generateExecutivePDF(
   });
 
   // Portfolio Overview Summary Table
-  const portfolioSummaryY = (doc as any).lastAutoTable.finalY + 8;
+  const portfolioSummaryY = (doc as any).lastAutoTable.finalY + 6;
   doc.setTextColor(20, 20, 20);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(11);
-  doc.text("Portfolio Asset Allocation Summary", 14, portfolioSummaryY);
+  doc.text("Portfolio Asset & Debt Allocation Summary", 14, portfolioSummaryY);
 
   const allocationData = [
     [
@@ -939,27 +1094,24 @@ export function generateExecutivePDF(
       formatINR(totalPersPending),
       "N/A (Personal)",
     ],
+    [
+      "Debt & Loan Facilities",
+      `${activeLoans.length} Active Loans`,
+      formatINR(activeLoans.reduce((s, l) => s + l.principalAmount, 0)),
+      formatINR(commMetrics.loansRepaidTotal),
+      formatINR(commMetrics.outstandingLoansPrincipal),
+      `Cost: ${formatINR(commMetrics.loansInterestPaidTotal + commMetrics.loansProfitSharePaidTotal)}`,
+    ],
   ];
 
   autoTable(doc, {
     startY: portfolioSummaryY + 4,
     margin: { left: 14, right: 14 },
-    head: [["Asset Portfolio Scope", "Asset Count", "Total Value / Buy (₹)", "Paid to Date (₹)", "Pending Payable (₹)", "Receivables (₹)"]],
+    head: [["Asset / Liability Scope", "Facility Count", "Total Sanction / Buy (₹)", "Paid / Repaid to Date (₹)", "Pending Liability (₹)", "Receivables / Costs (₹)"]],
     body: allocationData,
-    foot: [
-      [
-        "Total Portfolio Aggregation",
-        `${commProps.length + persProps.length} Total Assets`,
-        formatINR(commMetrics.totalAgreedBuyPrice + totalPersAgreed),
-        formatINR(commMetrics.outflowsTotal + persMetrics.totalInvestmentDone),
-        formatINR(commMetrics.totalPendingPayable + totalPersPending),
-        formatINR(commMetrics.totalPendingReceivable),
-      ],
-    ],
     theme: "grid",
-    headStyles: { fillColor: [39, 39, 42], textColor: [255, 255, 255], fontStyle: "bold", fontSize: 8 },
-    bodyStyles: { fontSize: 8, textColor: [30, 30, 30], cellPadding: 2.5 },
-    footStyles: { fillColor: [244, 244, 245], textColor: [0, 0, 0], fontStyle: "bold", fontSize: 8 },
+    headStyles: { fillColor: [39, 39, 42], textColor: [255, 255, 255], fontStyle: "bold", fontSize: 7.5 },
+    bodyStyles: { fontSize: 7.5, textColor: [30, 30, 30], cellPadding: 2 },
     columnStyles: {
       0: { cellWidth: 42 },
       1: { cellWidth: 28 },
@@ -1040,14 +1192,76 @@ export function generateExecutivePDF(
   });
 
   // =========================================================================
-  // PAGE 3: PERSONAL REAL ESTATE & MILESTONE SCHEDULE
+  // PAGE 3: LOANS & DEBT FINANCING LEDGER
+  // =========================================================================
+  doc.addPage();
+  drawHeader("LOANS, BORROWINGS & DEBT FINANCING LEDGER", "Bank loans, private family/friend debt facilities, interest, and profit sharing");
+
+  const loanRows = activeLoans.map((l) => {
+    const lm = commMetrics.loanMetrics.find(
+      (m) => m.loan.loanCode === l.loanCode || m.loan.id === l.id
+    );
+    return [
+      l.loanCode,
+      l.lenderName,
+      l.lenderType.toUpperCase(),
+      formatINR(l.principalAmount),
+      l.interestRatePct ? `${l.interestRatePct}% p.a.` : "-",
+      l.profitSharePct ? `${l.profitSharePct}%` : "-",
+      formatINR(lm?.principalRepaidTotal || 0),
+      formatINR(lm?.outstandingPrincipal || 0),
+      formatINR((lm?.interestPaidTotal || 0) + (lm?.profitSharePaidTotal || 0)),
+      l.status.toUpperCase(),
+    ];
+  });
+
+  autoTable(doc, {
+    startY: 32,
+    margin: { left: 14, right: 14 },
+    head: [["Loan ID", "Lender Name", "Type", "Principal", "Interest", "Profit %", "Repaid", "Outstanding", "Finance Cost", "Status"]],
+    body: loanRows,
+    foot: [
+      [
+        "Total",
+        "All Facilities",
+        "-",
+        formatINR(activeLoans.reduce((s, l) => s + l.principalAmount, 0)),
+        "-",
+        "-",
+        formatINR(commMetrics.loansRepaidTotal),
+        formatINR(commMetrics.outstandingLoansPrincipal),
+        formatINR(commMetrics.loansInterestPaidTotal + commMetrics.loansProfitSharePaidTotal),
+        "-",
+      ],
+    ],
+    theme: "grid",
+    headStyles: { fillColor: [24, 24, 27], textColor: [255, 255, 255], fontStyle: "bold", fontSize: 7.5 },
+    bodyStyles: { fontSize: 7, textColor: [30, 30, 30], cellPadding: 2 },
+    footStyles: { fillColor: [244, 244, 245], textColor: [0, 0, 0], fontStyle: "bold", fontSize: 7.5 },
+    columnStyles: {
+      0: { cellWidth: 16, fontStyle: "bold" },
+      1: { cellWidth: 28 },
+      2: { cellWidth: 15 },
+      3: { cellWidth: 18, halign: "right" },
+      4: { cellWidth: 15, halign: "right" },
+      5: { cellWidth: 14, halign: "right" },
+      6: { cellWidth: 18, halign: "right" },
+      7: { cellWidth: 20, halign: "right", fontStyle: "bold" },
+      8: { cellWidth: 20, halign: "right" },
+      9: { cellWidth: 14 },
+    },
+  });
+
+  // =========================================================================
+  // PAGE 4: PERSONAL REAL ESTATE & MILESTONE SCHEDULE
   // =========================================================================
   doc.addPage();
   drawHeader("PERSONAL REAL ESTATE & MILESTONE SCHEDULE", "Residential assets, construction installments, and payment stages");
 
   const persData = persProps.map((p) => {
     const pm = persMetrics.properties.find((m) => m.property.propertyCode === p.propertyCode || m.property.id === p.id);
-    const msCount = (p.milestones || []).length;
+    const msCount = (p.milestones || [])
+      .length;
     const msDone = (p.milestones || []).filter((m) => m.status === "completed").length;
 
     return [
@@ -1096,7 +1310,7 @@ export function generateExecutivePDF(
   });
 
   // =========================================================================
-  // PAGE 4: COMMERCIAL OUTFLOWS & EXPENSES LEDGER
+  // PAGE 5: COMMERCIAL OUTFLOWS & EXPENSES LEDGER
   // =========================================================================
   doc.addPage();
   drawHeader("COMMERCIAL PROPERTY OUTFLOWS LEDGER", "Chronological record of land purchases, advances, and legal expenses");
@@ -1133,25 +1347,32 @@ export function generateExecutivePDF(
   });
 
   // =========================================================================
-  // PAGE 5: RECEIPTS, CAPITAL & WITHDRAWALS LEDGER
+  // PAGE 6: RECEIPTS, CAPITAL, LOANS & WITHDRAWALS LEDGER
   // =========================================================================
   doc.addPage();
-  drawHeader("RECEIPTS, CAPITAL & WITHDRAWALS LEDGER", "Chronological record of buyer collections, capital funding, and withdrawals");
+  drawHeader("RECEIPTS, CAPITAL, LOANS & WITHDRAWALS LEDGER", "Chronological record of buyer collections, capital equity, debt flows, and withdrawals");
 
   const receiptsAndFunding = [
     ...dealInflows.map((t) => ({ ...t, kind: "Deal Receipt" })),
     ...capInflows.map((t) => ({ ...t, kind: "Capital Inflow" })),
     ...capWithdrawals.map((t) => ({ ...t, kind: "Capital Refund" })),
     ...profitWithdrawals.map((t) => ({ ...t, kind: "Profit Drawing" })),
+    ...loanInflows.map((t) => ({ ...t, kind: "Loan Borrowing" })),
+    ...loanRepayments.map((t) => ({ ...t, kind: "Loan Repayment" })),
+    ...loanInterests.map((t) => ({ ...t, kind: "Loan Interest" })),
+    ...loanProfitShares.map((t) => ({ ...t, kind: "Loan Profit Share" })),
   ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   const receiptsData = receiptsAndFunding.map((t) => {
-    const isPositive = t.kind === "Deal Receipt" || t.kind === "Capital Inflow";
+    const isPositive =
+      t.kind === "Deal Receipt" ||
+      t.kind === "Capital Inflow" ||
+      t.kind === "Loan Borrowing";
     return [
       t.date,
       t.transCode || "-",
       t.kind,
-      t.propertyCode || "-",
+      t.propertyCode || t.loanCode || "-",
       t.category,
       t.mode,
       `${isPositive ? "+" : "-"}${formatINR(t.amount)}`,
@@ -1162,7 +1383,7 @@ export function generateExecutivePDF(
   autoTable(doc, {
     startY: 32,
     margin: { left: 14, right: 14 },
-    head: [["Date", "Code", "Type", "Land ID", "Category", "Mode", "Amount (₹)", "Source / Beneficiary / Remarks"]],
+    head: [["Date", "Code", "Type", "Ref ID", "Category", "Mode", "Amount (₹)", "Source / Beneficiary / Remarks"]],
     body: receiptsData,
     theme: "grid",
     headStyles: { fillColor: [24, 24, 27], textColor: [255, 255, 255], fontStyle: "bold", fontSize: 7.5 },
@@ -1170,17 +1391,17 @@ export function generateExecutivePDF(
     columnStyles: {
       0: { cellWidth: 16 },
       1: { cellWidth: 16 },
-      2: { cellWidth: 22 },
+      2: { cellWidth: 24 },
       3: { cellWidth: 16 },
       4: { cellWidth: 26 },
       5: { cellWidth: 14 },
       6: { cellWidth: 24, halign: "right", fontStyle: "bold" },
-      7: { cellWidth: 48 },
+      7: { cellWidth: 46 },
     },
   });
 
   // =========================================================================
-  // PAGE 6: PERSONAL TRANSACTIONS & INTERNAL TRANSFERS
+  // PAGE 7: PERSONAL TRANSACTIONS & INTERNAL TRANSFERS
   // =========================================================================
   doc.addPage();
   drawHeader("PERSONAL TRANSACTIONS & INTERNAL TRANSFERS", "Personal asset outflows, savings allocations, and bank-cash transfers");
@@ -1259,7 +1480,7 @@ export function generateExecutivePDF(
 }
 
 /**
- * Generate Universal Tabular CSV with UTF-8 BOM encoding
+ * Generate Universal Tabular CSV with UTF-8 BOM encoding and loan support
  */
 export function generateCSV(transactions: SeedTransaction[]): string {
   const headers = [
@@ -1268,6 +1489,7 @@ export function generateCSV(transactions: SeedTransaction[]): string {
     "Type",
     "Date",
     "Property Code",
+    "Loan Code",
     "Category",
     "Payment Mode",
     "Transfer Type",
@@ -1282,6 +1504,7 @@ export function generateCSV(transactions: SeedTransaction[]): string {
     `"${t.transactionType}"`,
     `"${t.date}"`,
     `"${t.propertyCode || ""}"`,
+    `"${t.loanCode || ""}"`,
     `"${t.category}"`,
     `"${t.mode}"`,
     `"${t.transferType || ""}"`,
@@ -1294,3 +1517,4 @@ export function generateCSV(transactions: SeedTransaction[]): string {
     "\uFEFF" + [headers.join(","), ...rows.map((r) => r.join(","))].join("\n")
   );
 }
+

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { X, Save, Trash2, Calendar, AlertTriangle, ArrowRightLeft, DollarSign } from "lucide-react";
-import { SeedTransaction, SeedProperty, SeedCategory } from "@/lib/seedData";
+import { SeedTransaction, SeedProperty, SeedCategory, SeedLoan } from "@/lib/seedData";
 import { formatINRCompact } from "@/lib/formatters";
 
 interface EditTransactionModalProps {
@@ -10,6 +10,7 @@ interface EditTransactionModalProps {
   onClose: () => void;
   transaction: SeedTransaction | null;
   properties: SeedProperty[];
+  loans?: SeedLoan[];
   categories: SeedCategory[];
   onSave: (transIdOrCode: string, updates: Partial<SeedTransaction>) => Promise<void>;
   onDelete?: (transIdOrCode: string) => Promise<void>;
@@ -20,6 +21,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
   onClose,
   transaction,
   properties,
+  loans = [],
   categories,
   onSave,
   onDelete,
@@ -37,6 +39,8 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
         scope: transaction.scope || "commercial",
         transactionType: transaction.transactionType || "outflow",
         propertyCode: transaction.propertyCode || "",
+        loanId: transaction.loanId,
+        loanCode: transaction.loanCode || "",
         category: transaction.category || "",
         mode: transaction.mode || "Bank",
         transferType: transaction.transferType,
@@ -63,6 +67,14 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
           ? c.financialRole === "profit_withdrawal"
           : formData.transactionType === "capital_withdrawal"
           ? c.financialRole === "capital_withdrawal"
+          : formData.transactionType === "loan_inflow"
+          ? c.financialRole === "loan_principal_borrowed"
+          : formData.transactionType === "loan_repayment"
+          ? c.financialRole === "loan_principal_repaid"
+          : formData.transactionType === "loan_interest"
+          ? c.financialRole === "loan_interest_expense"
+          : formData.transactionType === "loan_profit_share"
+          ? c.financialRole === "loan_profit_distribution"
           : formData.transactionType === "deal_inflow" ||
             formData.transactionType === "capital_inflow"
           ? c.type === "inflow"
@@ -204,7 +216,11 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                       | "capital_inflow"
                       | "transfer"
                       | "profit_withdrawal"
-                      | "capital_withdrawal",
+                      | "capital_withdrawal"
+                      | "loan_inflow"
+                      | "loan_repayment"
+                      | "loan_interest"
+                      | "loan_profit_share",
                   })
                 }
                 className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
@@ -212,6 +228,10 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                 <option value="outflow">Property Outflow / Expense</option>
                 <option value="deal_inflow">Property Sale Receipt</option>
                 <option value="capital_inflow">External Capital Inflow</option>
+                <option value="loan_inflow">Loan Borrowing Inflow (+ Liquidity)</option>
+                <option value="loan_repayment">Loan Principal Repaid (- Liquidity)</option>
+                <option value="loan_interest">Loan Interest Paid (- Finance Expense)</option>
+                <option value="loan_profit_share">Loan Profit Share Paid (- Profit Bonus)</option>
                 <option value="profit_withdrawal">Profit Drawing / Business Draw</option>
                 <option value="capital_withdrawal">Investment Capital Refund</option>
                 <option value="transfer">Internal Bank / Cash Transfer</option>
@@ -264,29 +284,57 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
             </div>
           </div>
 
-          {/* Row 3: Linked Property & Category */}
+          {/* Row 3: Linked Property / Loan & Category */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
-                Linked Property
-              </label>
-              <select
-                value={formData.propertyCode || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, propertyCode: e.target.value })
-                }
-                className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
-              >
-                <option value="">(None / General Liquidity)</option>
-                {properties
-                  .filter((p) => p.type === formData.scope)
-                  .map((p) => (
-                    <option key={p.id} value={p.propertyCode}>
-                      {p.propertyCode} - {p.name}
+            {formData.transactionType?.startsWith("loan_") ? (
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
+                  Linked Loan Agreement
+                </label>
+                <select
+                  value={formData.loanCode || ""}
+                  onChange={(e) => {
+                    const selectedCode = e.target.value;
+                    const matched = loans.find((l) => l.loanCode === selectedCode);
+                    setFormData({
+                      ...formData,
+                      loanCode: selectedCode,
+                      loanId: matched?.id,
+                    });
+                  }}
+                  className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-emerald-500"
+                >
+                  <option value="">(None / Unlinked Debt)</option>
+                  {loans.map((l) => (
+                    <option key={l.id} value={l.loanCode}>
+                      {l.loanCode} : {l.lenderName}
                     </option>
                   ))}
-              </select>
-            </div>
+                </select>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
+                  Linked Property
+                </label>
+                <select
+                  value={formData.propertyCode || ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, propertyCode: e.target.value })
+                  }
+                  className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
+                >
+                  <option value="">(None / General Liquidity)</option>
+                  {properties
+                    .filter((p) => p.type === formData.scope)
+                    .map((p) => (
+                      <option key={p.id} value={p.propertyCode}>
+                        {p.propertyCode} - {p.name}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            )}
 
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">

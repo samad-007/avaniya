@@ -2,16 +2,18 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { amountToVerbalSummary } from "@/lib/formatters";
-import { SeedProperty, SeedCategory, SeedTransaction } from "@/lib/seedData";
-import { X, Banknote, Landmark, Plus, Edit3 } from "lucide-react";
+import { SeedProperty, SeedCategory, SeedTransaction, SeedLoan } from "@/lib/seedData";
+import { X, Banknote, Landmark, Plus, Edit3, HandCoins } from "lucide-react";
 
 interface QuickEntryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  entryType: "outflow" | "inflow" | "transfer" | "withdrawal";
+  entryType: "outflow" | "inflow" | "transfer" | "withdrawal" | "loan";
   currentScope: "commercial" | "personal";
   defaultPropertyCode?: string;
+  defaultLoanCode?: string;
   properties: SeedProperty[];
+  loans?: SeedLoan[];
   categories: SeedCategory[];
   onSave: (transactionData: Omit<SeedTransaction, "id">) => Promise<void>;
   onOpenCategoryModal: () => void;
@@ -23,21 +25,29 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
   entryType: initialEntryType,
   currentScope,
   defaultPropertyCode,
+  defaultLoanCode,
   properties,
+  loans = [],
   categories,
   onSave,
   onOpenCategoryModal,
 }) => {
   const [activeType, setActiveType] = useState<
-    "outflow" | "inflow" | "transfer" | "withdrawal"
+    "outflow" | "inflow" | "transfer" | "withdrawal" | "loan"
   >(initialEntryType);
   const [withdrawalSubtype, setWithdrawalSubtype] = useState<
     "profit_withdrawal" | "capital_withdrawal"
   >("profit_withdrawal");
+  const [loanSubtype, setLoanSubtype] = useState<
+    "loan_inflow" | "loan_repayment" | "loan_interest" | "loan_profit_share"
+  >("loan_inflow");
   const [amount, setAmount] = useState<number>(500000);
   const [mode, setMode] = useState<"Bank" | "Cash">("Bank");
   const [propertyCode, setPropertyCode] = useState<string>(
     defaultPropertyCode || ""
+  );
+  const [loanCode, setLoanCode] = useState<string>(
+    defaultLoanCode || ""
   );
   const [category, setCategory] = useState<string>("");
   const [isCustomCategory, setIsCustomCategory] = useState(false);
@@ -58,8 +68,13 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setActiveType(initialEntryType);
+      if (defaultLoanCode) {
+        setLoanCode(defaultLoanCode);
+      } else if (loans.length > 0) {
+        setLoanCode(loans[0].loanCode);
+      }
     }
-  }, [isOpen, initialEntryType]);
+  }, [isOpen, initialEntryType, defaultLoanCode, loans]);
 
   useEffect(() => {
     if (defaultPropertyCode) {
@@ -93,6 +108,20 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
             : c.financialRole === "capital_withdrawal")
         );
       }
+      if (activeType === "loan") {
+        if (loanSubtype === "loan_inflow") {
+          return scopeMatches && c.financialRole === "loan_principal_borrowed";
+        }
+        if (loanSubtype === "loan_repayment") {
+          return scopeMatches && c.financialRole === "loan_principal_repaid";
+        }
+        if (loanSubtype === "loan_interest") {
+          return scopeMatches && c.financialRole === "loan_interest_expense";
+        }
+        if (loanSubtype === "loan_profit_share") {
+          return scopeMatches && c.financialRole === "loan_profit_distribution";
+        }
+      }
       if (activeType === "inflow") {
         return scopeMatches && c.type === "inflow";
       }
@@ -102,7 +131,58 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
     if (list.length > 0) return list;
 
     // Safety fallback defaults
-    if (activeType === "withdrawal") {
+    if (activeType === "loan") {
+      if (loanSubtype === "loan_inflow") {
+        return [
+          {
+            name: "Bank Loan Borrowing",
+            scope: currentScope,
+            type: "inflow" as const,
+            financialRole: "loan_principal_borrowed" as const,
+          },
+          {
+            name: "Family / Friend Loan Borrowing",
+            scope: currentScope,
+            type: "inflow" as const,
+            financialRole: "loan_principal_borrowed" as const,
+          },
+        ];
+      }
+      if (loanSubtype === "loan_repayment") {
+        return [
+          {
+            name: "Loan Principal Repayment",
+            scope: currentScope,
+            type: "outflow" as const,
+            financialRole: "loan_principal_repaid" as const,
+          },
+          {
+            name: "Bank Loan EMI / Principal Repaid",
+            scope: currentScope,
+            type: "outflow" as const,
+            financialRole: "loan_principal_repaid" as const,
+          },
+        ];
+      }
+      if (loanSubtype === "loan_interest") {
+        return [
+          {
+            name: "Loan Interest Payment",
+            scope: currentScope,
+            type: "outflow" as const,
+            financialRole: "loan_interest_expense" as const,
+          },
+        ];
+      }
+      return [
+        {
+          name: "Lender / Partner Profit Share Paid",
+          scope: currentScope,
+          type: "outflow" as const,
+          financialRole: "loan_profit_distribution" as const,
+        },
+      ];
+    } else if (activeType === "withdrawal") {
       return withdrawalSubtype === "profit_withdrawal"
         ? [
             {
@@ -265,7 +345,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
         },
       ];
     }
-  }, [categories, currentScope, activeType, withdrawalSubtype]);
+  }, [categories, currentScope, activeType, withdrawalSubtype, loanSubtype]);
 
   // Synchronize category on modal open or type switch
   useEffect(() => {
@@ -278,7 +358,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
         }
       }
     }
-  }, [isOpen, activeType, withdrawalSubtype, currentScope, availableCategories]);
+  }, [isOpen, activeType, withdrawalSubtype, loanSubtype, currentScope, availableCategories]);
 
   if (!isOpen) return null;
 
@@ -291,7 +371,12 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
     if (!amount || amount <= 0) return;
 
     const finalCategory = isCustomCategory
-      ? customCategoryInput.trim() || (activeType === "withdrawal" ? "Profit Drawing" : "General Inflow")
+      ? customCategoryInput.trim() ||
+        (activeType === "withdrawal"
+          ? "Profit Drawing"
+          : activeType === "loan"
+          ? "Loan Transaction"
+          : "General Inflow")
       : category || (availableCategories[0]?.name ?? "General");
 
     // Determine precise transaction type
@@ -301,12 +386,26 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
       | "capital_inflow"
       | "transfer"
       | "profit_withdrawal"
-      | "capital_withdrawal" = "outflow";
+      | "capital_withdrawal"
+      | "loan_inflow"
+      | "loan_repayment"
+      | "loan_interest"
+      | "loan_profit_share" = "outflow";
+
+    let targetLoanId: string | undefined;
+    let targetLoanCode: string | undefined;
 
     if (activeType === "transfer") {
       finalTxType = "transfer";
     } else if (activeType === "withdrawal") {
       finalTxType = withdrawalSubtype;
+    } else if (activeType === "loan") {
+      finalTxType = loanSubtype;
+      targetLoanCode = loanCode || undefined;
+      const matchedLoan = loans.find(
+        (l) => l.loanCode.toLowerCase() === (loanCode || "").toLowerCase()
+      );
+      targetLoanId = matchedLoan ? matchedLoan.id : undefined;
     } else if (activeType === "inflow") {
       if (currentScope === "commercial" && propertyCode) {
         finalTxType = "deal_inflow";
@@ -322,7 +421,14 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
       await onSave({
         scope: currentScope,
         transactionType: finalTxType,
-        propertyCode: activeType === "withdrawal" || activeType === "transfer" ? undefined : propertyCode || undefined,
+        loanId: targetLoanId,
+        loanCode: targetLoanCode,
+        propertyCode:
+          activeType === "withdrawal" ||
+          activeType === "transfer" ||
+          activeType === "loan"
+            ? undefined
+            : propertyCode || undefined,
         category: finalCategory,
         mode,
         transferType: activeType === "transfer" ? transferType : undefined,
@@ -362,6 +468,8 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                 ? "Record Inflow / Receipt"
                 : activeType === "withdrawal"
                 ? "Record Fund / Capital Withdrawal"
+                : activeType === "loan"
+                ? "Record Loan / Debt Transaction"
                 : "Internal Liquidity Transfer"}
             </span>
             <span className="text-[10px] sm:text-xs font-mono font-semibold px-2 py-0.5 rounded bg-[#161616] text-[#A1A1AA] border border-[#262626]">
@@ -377,7 +485,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
         </div>
 
         {/* Entry Type Selector Tabs */}
-        <div className="grid grid-cols-4 gap-1.5 bg-[#111111] p-1 rounded-lg border border-[#262626]">
+        <div className="grid grid-cols-5 gap-1 bg-[#111111] p-1 rounded-lg border border-[#262626]">
           <button
             type="button"
             onClick={() => setActiveType("outflow")}
@@ -413,6 +521,17 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           </button>
           <button
             type="button"
+            onClick={() => setActiveType("loan")}
+            className={`py-1.5 rounded-md text-xs font-semibold transition-all duration-150 ${
+              activeType === "loan"
+                ? "bg-[#262626] text-white shadow-sm font-bold text-emerald-400"
+                : "text-[#A1A1AA] hover:text-white"
+            }`}
+          >
+            Loan
+          </button>
+          <button
+            type="button"
             onClick={() => setActiveType("transfer")}
             className={`py-1.5 rounded-md text-xs font-semibold transition-all duration-150 ${
               activeType === "transfer"
@@ -423,6 +542,101 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
             Transfer
           </button>
         </div>
+
+        {/* Loan Flow Selector (Only if activeType === "loan") */}
+        {activeType === "loan" && (
+          <div className="flex flex-col gap-2 bg-[#111111] p-3 rounded-lg border border-emerald-900/30">
+            <label className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">
+              Loan Action / Cashflow Direction
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setLoanSubtype("loan_inflow")}
+                className={`p-2 rounded-md text-left text-xs transition-all duration-150 border ${
+                  loanSubtype === "loan_inflow"
+                    ? "bg-emerald-950/50 border-emerald-500 text-white font-bold"
+                    : "bg-[#161616] border-[#2a2a2a] text-[#A1A1AA] hover:text-white"
+                }`}
+              >
+                <div className="font-semibold text-emerald-300">+ Borrow Funds</div>
+                <div className="text-[10px] text-[#A1A1AA] mt-0.5">
+                  Receiving loan injection (+ Bank/Cash)
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setLoanSubtype("loan_repayment")}
+                className={`p-2 rounded-md text-left text-xs transition-all duration-150 border ${
+                  loanSubtype === "loan_repayment"
+                    ? "bg-emerald-950/50 border-emerald-500 text-white font-bold"
+                    : "bg-[#161616] border-[#2a2a2a] text-[#A1A1AA] hover:text-white"
+                }`}
+              >
+                <div className="font-semibold text-emerald-300">- Repay Principal</div>
+                <div className="text-[10px] text-[#A1A1AA] mt-0.5">
+                  Paying back borrowed loan principal
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setLoanSubtype("loan_interest")}
+                className={`p-2 rounded-md text-left text-xs transition-all duration-150 border ${
+                  loanSubtype === "loan_interest"
+                    ? "bg-emerald-950/50 border-emerald-500 text-white font-bold"
+                    : "bg-[#161616] border-[#2a2a2a] text-[#A1A1AA] hover:text-white"
+                }`}
+              >
+                <div className="font-semibold text-emerald-300">- Pay Interest</div>
+                <div className="text-[10px] text-[#A1A1AA] mt-0.5">
+                  Finance charge / interest expense
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setLoanSubtype("loan_profit_share")}
+                className={`p-2 rounded-md text-left text-xs transition-all duration-150 border ${
+                  loanSubtype === "loan_profit_share"
+                    ? "bg-emerald-950/50 border-emerald-500 text-white font-bold"
+                    : "bg-[#161616] border-[#2a2a2a] text-[#A1A1AA] hover:text-white"
+                }`}
+              >
+                <div className="font-semibold text-emerald-300">- Pay Profit Share</div>
+                <div className="text-[10px] text-[#A1A1AA] mt-0.5">
+                  Distribute partner/friend profit bonus
+                </div>
+              </button>
+            </div>
+
+            {/* Loan Facility Selector Dropdown */}
+            <div className="flex flex-col gap-1 mt-1 pt-2 border-t border-[#1e1e1e]">
+              <label className="text-[11px] font-semibold text-[#A1A1AA] uppercase tracking-wider">
+                Tag to Loan Facility Agreement
+              </label>
+              <select
+                value={loanCode}
+                onChange={(e) => {
+                  setLoanCode(e.target.value);
+                  const selLoan = loans.find((l) => l.loanCode === e.target.value);
+                  if (selLoan && !recipient) {
+                    setRecipient(selLoan.lenderName);
+                  }
+                }}
+                className="w-full bg-[#161616] border border-[#2a2a2a] rounded-lg p-2 text-white text-xs outline-none focus:border-emerald-500 cursor-pointer"
+              >
+                <option value="">-- General Unlinked Debt --</option>
+                {loans.map((l) => (
+                  <option key={l.id} value={l.loanCode}>
+                    {l.loanCode} : {l.lenderName} (₹{l.principalAmount.toLocaleString("en-IN")})
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
 
         {/* Withdrawal Purpose Selector (Only if activeType === "withdrawal") */}
         {activeType === "withdrawal" && (
