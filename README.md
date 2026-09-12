@@ -107,6 +107,11 @@ The top KPI strip features intelligent, touch-swipeable dual-state cards across 
   2. **Savings Inflows**: Personal Inflows Allocated (`[ SAVINGS ]`) vs Capital Withdrawn (`[ DRAWINGS ]`).
   3. **Bank Readiness**: Available Bank Reserve (`[ BANK BUFFER ]`) vs Total Liquid Buffer (`[ TOTAL CASH ]`).
   4. **Site Cash & Dues**: Physical Cash in Hand (`[ VAULT CASH ]`) vs Next Milestone Commitments (`[ NEXT MILESTONES ]`).
+- **4-Row Cohesive Executive Layout**:
+  - **Row 1**: Status badge (left) paired with the dual-pill switcher and icon indicator (right).
+  - **Row 2**: Full-width topic title (`text-xs font-semibold uppercase tracking-wider`) with zero horizontal truncation across desktop and mobile.
+  - **Row 3**: Primary bold monospace financial metric (`text-xl md:text-2xl font-bold font-mono`).
+  - **Row 4**: Contextual subtitle and reconciliation detail.
 - **Staggered 7-Second Auto Rotation**: Cards cycle smoothly on a 7-second interval with progressive 1.2-second start offsets so cards do not rotate simultaneously.
 - **Touch & Gesture Controls**: Swipe left or right on mobile devices (with vertical scroll guard) or click the dual-pill switcher buttons on desktop.
 - **Hover Pause Protection**: Touching or hovering over any card pauses rotation with a 4-second recovery timeout.
