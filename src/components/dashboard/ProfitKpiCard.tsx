@@ -33,6 +33,7 @@ export const ProfitKpiCard: React.FC<ProfitKpiCardProps> = ({
         badgeColor: "bg-emerald-950/60 text-emerald-400 border border-emerald-800/40",
         titleColor: "text-emerald-400",
         value: formatINR(totalRealizedProfit),
+        valueColor: "text-emerald-400",
         subtitle:
           totalPendingProfit > 0 ? (
             <span className="text-amber-400/90">
@@ -55,6 +56,7 @@ export const ProfitKpiCard: React.FC<ProfitKpiCardProps> = ({
         badgeColor: "bg-emerald-950/60 text-emerald-400 border border-emerald-800/40",
         titleColor: "text-emerald-400",
         value: formatINR(totalProjectedProfit),
+        valueColor: "text-emerald-400",
         subtitle: (
           <span>
             Across {activeDealsCount} Active{" "}

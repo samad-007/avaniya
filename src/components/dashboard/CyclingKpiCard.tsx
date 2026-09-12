@@ -335,7 +335,7 @@ export const CyclingKpiCard: React.FC<CyclingKpiCardProps> = ({
         {/* Row 3: Main KPI Value */}
         <div
           className={`text-xl md:text-2xl font-bold font-mono tracking-tight my-0.5 ${
-            currentPanel.valueColor || "text-white"
+            currentPanel.valueColor || cardAccentText || "text-white"
           }`}
         >
           {currentPanel.value}
