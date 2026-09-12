@@ -93,37 +93,28 @@ export const ProfitKpiCard: React.FC<ProfitKpiCardProps> = ({
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-3.5 flex flex-col justify-between hover:border-[#383838] transition-standard shadow-sm relative overflow-hidden select-none min-h-[108px] cursor-pointer"
+      className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-3.5 flex flex-col justify-between hover:border-[#383838] transition-standard shadow-sm relative overflow-hidden select-none min-h-[118px] cursor-pointer"
       onClick={() => {
         togglePanel();
         resumeAfterDelay();
       }}
       title="Click or swipe to switch between Actual Profit and Projected Profit (auto-cycles every 7s)"
     >
-      {/* Top Header Row */}
-      <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wider mb-1.5">
-        <div className="flex items-center gap-1.5">
-          <span
-            className={
-              activePanel === "actual" ? "text-white" : "text-purple-400"
-            }
-          >
-            {activePanel === "actual" ? "Actual Profit" : "Projected Profit"}
-          </span>
-          <span
-            className={`text-[10px] px-1.5 py-0.2 rounded font-mono font-bold tracking-normal ${
-              activePanel === "actual"
-                ? "bg-emerald-950/60 text-emerald-400 border border-emerald-800/40"
-                : "bg-purple-950/60 text-purple-400 border border-purple-800/40"
-            }`}
-          >
-            {activePanel === "actual" ? "REALIZED" : "PIPELINE"}
-          </span>
-        </div>
+      {/* Row 1: Status Badge + Dual-Pill Switcher */}
+      <div className="flex items-center justify-between gap-2 mb-1">
+        <span
+          className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold tracking-normal shrink-0 ${
+            activePanel === "actual"
+              ? "bg-emerald-950/60 text-emerald-400 border border-emerald-800/40"
+              : "bg-purple-950/60 text-purple-400 border border-purple-800/40"
+          }`}
+        >
+          {activePanel === "actual" ? "REALIZED" : "PIPELINE"}
+        </span>
 
         {/* Dual-Pill Visual Switcher Controls */}
         <div
-          className="flex items-center gap-1 bg-[#141414] px-1.5 py-1 rounded border border-[#2a2a2a]"
+          className="flex items-center gap-1 bg-[#141414] px-1.5 py-1 rounded border border-[#2a2a2a] shrink-0"
           onClick={(e) => e.stopPropagation()}
         >
           <button
@@ -164,8 +155,18 @@ export const ProfitKpiCard: React.FC<ProfitKpiCardProps> = ({
         </div>
       </div>
 
-      {/* Main KPI Value */}
-      <div className="text-xl md:text-2xl font-bold font-mono text-white tracking-tight">
+      {/* Row 2: Full Width Topic Title */}
+      <div
+        className={`text-xs font-semibold uppercase tracking-wider truncate transition-colors duration-200 ${
+          activePanel === "actual" ? "text-white" : "text-purple-400"
+        }`}
+        title={activePanel === "actual" ? "Actual Profit" : "Projected Profit"}
+      >
+        {activePanel === "actual" ? "Actual Profit" : "Projected Profit"}
+      </div>
+
+      {/* Row 3: Main KPI Value */}
+      <div className="text-xl md:text-2xl font-bold font-mono text-white tracking-tight my-0.5">
         {activePanel === "actual"
           ? formatINR(totalRealizedProfit)
           : formatINR(totalProjectedProfit)}
