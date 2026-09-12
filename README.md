@@ -122,13 +122,13 @@ Click **Export** in the top bar to generate offline files:
 ## 3. Developer & DevOps Engineering Guide
 
 ### A. Architecture & Tech Stack
-- **Framework**: Next.js 15 (App Router, Server Components & Route Handlers)
-- **Runtime Environment**: Bun 1.4 (via `vercel.json` `"bunVersion": "1.4.x"`) with local Node.js / Bun cross-compatibility
-- **Package Manager**: Bun 1.4 (`packageManager: bun@1.4.0`)
-- **Language**: TypeScript 5 (Strict types, zero `any`, discriminated unions)
-- **Styling**: Tailwind CSS (True Black `#000000` baseline, high-contrast zinc tokens)
+- **Framework**: Next.js 16 (App Router with Turbopack, Server Components & Route Handlers)
+- **Runtime Environment**: Node.js 24 LTS / Current and npm 11 (with Bun 1.4 cross-compatibility via `vercel.json`)
+- **Package Manager**: npm 11 / Bun 1.4
+- **Language**: TypeScript 7 (Strict types, zero `any`, discriminated unions)
+- **Styling**: Tailwind CSS 3.4 (True Black `#000000` baseline, high-contrast zinc tokens)
 - **Typography**: IBM Plex Sans (Body) + JetBrains Mono (Financial Tabular Digits) via `next/font/google`
-- **Database & Persistence**: MongoDB Atlas Cluster (`ap-south-1` Mumbai) via Mongoose pooled connection with compound indexes (`datasetId + date`, `datasetId + scope`, `datasetId + propertyCode`, `datasetId + loanCode`). All tenant writes are strictly committed to MongoDB. Silent in-memory RAM fallback has been removed to guarantee data durability across serverless lifecycle events (retained strictly for sandboxed demo tenants).
+- **Database & Persistence**: MongoDB Atlas Cluster (`ap-south-1` Mumbai) via Mongoose 9 pooled connection with compound indexes (`datasetId + date`, `datasetId + scope`, `datasetId + propertyCode`, `datasetId + loanCode`). All tenant writes are strictly committed to MongoDB. Silent in-memory RAM fallback has been removed to guarantee data durability across serverless lifecycle events (retained strictly for sandboxed demo tenants).
 - **Serverless Connection Lifecycle**: Self-healing cached connection pool (`cached.promise = null`) automatically recycles dead or dropped connections when `mongoose.connection.readyState !== 1`, preventing cold-start hangs and stale-connection data loss.
 - **Client State Reactivity**: Dynamic derivation of active property financial metrics (`useMemo` keyed on `selectedPropertyCode`), ensuring modal ledgers and summaries update instantaneously on transaction entry without navigation or page reload.
 - **Query Optimization**: $O(1)$ MongoDB Aggregation pipelines for tenant user & transaction matrix calculations
@@ -204,13 +204,16 @@ This script executes [`scripts/migrateToMongo.ts`](file:///Users/abdulsamad/Docu
 # 1. Install dependencies
 npm install
 
-# 2. Run mathematical unit tests
-npx vitest run
+# 2. Run unit and integration tests
+npm test
 
-# 3. Start local development server
+# 3. Strict TypeScript type check
+npm run lint
+
+# 4. Start local development server
 npm run dev
 
-# 4. Production build verification
+# 5. Production build verification
 npm run build
 ```
 

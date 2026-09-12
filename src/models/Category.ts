@@ -5,6 +5,12 @@ export type FinancialRole =
   | "property_expense"
   | "sale_receipt"
   | "capital_infusion"
+  | "profit_withdrawal"
+  | "capital_withdrawal"
+  | "loan_principal_borrowed"
+  | "loan_principal_repaid"
+  | "loan_interest_expense"
+  | "loan_profit_distribution"
   | "internal_transfer"
   | "personal_milestone"
   | "personal_overhead";
@@ -44,6 +50,12 @@ const CategorySchema = new Schema<ICategory>(
         "property_expense",
         "sale_receipt",
         "capital_infusion",
+        "profit_withdrawal",
+        "capital_withdrawal",
+        "loan_principal_borrowed",
+        "loan_principal_repaid",
+        "loan_interest_expense",
+        "loan_profit_distribution",
         "internal_transfer",
         "personal_milestone",
         "personal_overhead",
