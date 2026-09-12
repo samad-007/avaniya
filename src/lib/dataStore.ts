@@ -147,15 +147,29 @@ export async function addProperty(
   const dbOk = await isDBConnected();
   if (dbOk) {
     try {
-      const doc = await Property.create({ ...newProp, userId, datasetId });
+      const { id, ...dbPayload } = newProp;
+      const doc = await Property.create({ ...dbPayload, userId, datasetId });
       newProp.id = doc._id.toString();
+      memProperties.push(newProp);
+      return newProp;
     } catch (e) {
-      console.warn("DB write failed, updating in-memory store", e);
+      console.error("MongoDB Property write failed:", e);
+      throw new Error(
+        `Failed to save property to MongoDB: ${
+          e instanceof Error ? e.message : "Database write failed"
+        }`
+      );
     }
   }
 
-  memProperties.push(newProp);
-  return newProp;
+  if (datasetId === "ds_demo_sandbox") {
+    memProperties.push(newProp);
+    return newProp;
+  }
+
+  throw new Error(
+    "MongoDB database is not connected. Property was not saved."
+  );
 }
 
 /**
@@ -175,7 +189,7 @@ export async function updateProperty(
           { _id: mongoose.isValidObjectId(propertyCodeOrId) ? propertyCodeOrId : null },
         ],
       };
-      if (datasetId) {
+      if (datasetId && datasetId !== "all") {
         query.$and = [{ $or: [{ datasetId }, { userId: datasetId }] }];
       }
 
@@ -186,7 +200,7 @@ export async function updateProperty(
       ).lean<IProperty & { _id: unknown }>();
 
       if (updated) {
-        return {
+        const mapped: SeedProperty = {
           id: updated._id.toString(),
           type: updated.type,
           propertyCode: updated.propertyCode,
@@ -204,22 +218,44 @@ export async function updateProperty(
           milestones: updated.milestones,
           notes: updated.notes,
         };
+
+        const idx = memProperties.findIndex(
+          (p) =>
+            p.propertyCode.toLowerCase() === propertyCodeOrId.toLowerCase() ||
+            p.id === propertyCodeOrId
+        );
+        if (idx !== -1) {
+          memProperties[idx] = { ...memProperties[idx], ...updates, id: mapped.id };
+        }
+        return mapped;
       }
+      return null;
     } catch (e) {
-      console.warn("DB update failed, falling back to memory store", e);
+      console.error("MongoDB Property update failed:", e);
+      throw new Error(
+        `Failed to update property in MongoDB: ${
+          e instanceof Error ? e.message : "Database update failed"
+        }`
+      );
     }
   }
 
-  const idx = memProperties.findIndex(
-    (p) =>
-      p.propertyCode.toLowerCase() === propertyCodeOrId.toLowerCase() ||
-      p.id === propertyCodeOrId
-  );
-  if (idx !== -1) {
-    memProperties[idx] = { ...memProperties[idx], ...updates };
-    return memProperties[idx];
+  if (datasetId === "ds_demo_sandbox") {
+    const idx = memProperties.findIndex(
+      (p) =>
+        p.propertyCode.toLowerCase() === propertyCodeOrId.toLowerCase() ||
+        p.id === propertyCodeOrId
+    );
+    if (idx !== -1) {
+      memProperties[idx] = { ...memProperties[idx], ...updates };
+      return memProperties[idx];
+    }
+    return null;
   }
-  return null;
+
+  throw new Error(
+    "MongoDB database is not connected. Property was not updated."
+  );
 }
 
 /**
@@ -317,15 +353,29 @@ export async function addTransaction(
   const dbOk = await isDBConnected();
   if (dbOk) {
     try {
-      const doc = await Transaction.create({ ...newTx, userId, datasetId });
+      const { id, ...dbPayload } = newTx;
+      const doc = await Transaction.create({ ...dbPayload, userId, datasetId });
       newTx.id = doc._id.toString();
+      memTransactions.push(newTx);
+      return newTx;
     } catch (e) {
-      console.warn("DB write failed, updating in-memory store", e);
+      console.error("MongoDB Transaction write failed:", e);
+      throw new Error(
+        `Failed to save transaction to MongoDB: ${
+          e instanceof Error ? e.message : "Database write failed"
+        }`
+      );
     }
   }
 
-  memTransactions.push(newTx);
-  return newTx;
+  if (datasetId === "ds_demo_sandbox") {
+    memTransactions.push(newTx);
+    return newTx;
+  }
+
+  throw new Error(
+    "MongoDB database is not connected. Transaction was not saved."
+  );
 }
 
 /**
@@ -356,7 +406,7 @@ export async function updateTransaction(
       ).lean<ITransaction & { _id: unknown }>();
 
       if (updated) {
-        return {
+        const mapped: SeedTransaction = {
           id: updated._id.toString(),
           scope: updated.scope,
           transactionType: updated.transactionType,
@@ -370,22 +420,44 @@ export async function updateTransaction(
           recipientOrSource: updated.recipientOrSource,
           remarks: updated.remarks,
         };
+
+        const idx = memTransactions.findIndex(
+          (t) =>
+            (t.transCode && t.transCode.toLowerCase() === transIdOrCode.toLowerCase()) ||
+            t.id === transIdOrCode
+        );
+        if (idx !== -1) {
+          memTransactions[idx] = { ...memTransactions[idx], ...updates, id: mapped.id };
+        }
+        return mapped;
       }
+      return null;
     } catch (e) {
-      console.warn("DB transaction update failed, falling back to memory store", e);
+      console.error("MongoDB Transaction update failed:", e);
+      throw new Error(
+        `Failed to update transaction in MongoDB: ${
+          e instanceof Error ? e.message : "Database update failed"
+        }`
+      );
     }
   }
 
-  const idx = memTransactions.findIndex(
-    (t) =>
-      (t.transCode && t.transCode.toLowerCase() === transIdOrCode.toLowerCase()) ||
-      t.id === transIdOrCode
-  );
-  if (idx !== -1) {
-    memTransactions[idx] = { ...memTransactions[idx], ...updates };
-    return memTransactions[idx];
+  if (datasetId === "ds_demo_sandbox") {
+    const idx = memTransactions.findIndex(
+      (t) =>
+        (t.transCode && t.transCode.toLowerCase() === transIdOrCode.toLowerCase()) ||
+        t.id === transIdOrCode
+    );
+    if (idx !== -1) {
+      memTransactions[idx] = { ...memTransactions[idx], ...updates };
+      return memTransactions[idx];
+    }
+    return null;
   }
-  return null;
+
+  throw new Error(
+    "MongoDB database is not connected. Transaction was not updated."
+  );
 }
 
 /**
@@ -409,22 +481,44 @@ export async function deleteTransaction(
       }
 
       const res = await Transaction.findOneAndDelete(query);
-      if (res) return true;
+      if (res) {
+        const idx = memTransactions.findIndex(
+          (t) =>
+            (t.transCode && t.transCode.toLowerCase() === transIdOrCode.toLowerCase()) ||
+            t.id === transIdOrCode
+        );
+        if (idx !== -1) {
+          memTransactions.splice(idx, 1);
+        }
+        return true;
+      }
+      return false;
     } catch (e) {
-      console.warn("DB transaction delete failed, falling back to memory store", e);
+      console.error("MongoDB Transaction delete failed:", e);
+      throw new Error(
+        `Failed to delete transaction from MongoDB: ${
+          e instanceof Error ? e.message : "Database delete failed"
+        }`
+      );
     }
   }
 
-  const idx = memTransactions.findIndex(
-    (t) =>
-      (t.transCode && t.transCode.toLowerCase() === transIdOrCode.toLowerCase()) ||
-      t.id === transIdOrCode
-  );
-  if (idx !== -1) {
-    memTransactions.splice(idx, 1);
-    return true;
+  if (datasetId === "ds_demo_sandbox") {
+    const idx = memTransactions.findIndex(
+      (t) =>
+        (t.transCode && t.transCode.toLowerCase() === transIdOrCode.toLowerCase()) ||
+        t.id === transIdOrCode
+    );
+    if (idx !== -1) {
+      memTransactions.splice(idx, 1);
+      return true;
+    }
+    return false;
   }
-  return false;
+
+  throw new Error(
+    "MongoDB database is not connected. Transaction was not deleted."
+  );
 }
 
 /**
@@ -571,15 +665,27 @@ export async function addLoan(
   const dbOk = await isDBConnected();
   if (dbOk) {
     try {
-      const doc = await Loan.create({ ...newLoan, userId, datasetId });
+      const { id, ...dbPayload } = newLoan;
+      const doc = await Loan.create({ ...dbPayload, userId, datasetId });
       newLoan.id = doc._id.toString();
+      memLoans.push(newLoan);
+      return newLoan;
     } catch (e) {
-      console.warn("Loan DB write failed, updating in-memory store", e);
+      console.error("Loan DB write failed:", e);
+      throw new Error(
+        `Failed to save loan to MongoDB: ${
+          e instanceof Error ? e.message : "Database write failed"
+        }`
+      );
     }
   }
 
-  memLoans.push(newLoan);
-  return newLoan;
+  if (datasetId === "ds_demo_sandbox") {
+    memLoans.push(newLoan);
+    return newLoan;
+  }
+
+  throw new Error("MongoDB database is not connected. Loan was not saved.");
 }
 
 /**
@@ -610,7 +716,7 @@ export async function updateLoan(
       ).lean<ILoan & { _id: unknown }>();
 
       if (updated) {
-        return {
+        const mapped: SeedLoan = {
           id: updated._id.toString(),
           scope: updated.scope,
           loanCode: updated.loanCode,
@@ -631,22 +737,42 @@ export async function updateLoan(
           status: updated.status,
           notes: updated.notes,
         };
+
+        const idx = memLoans.findIndex(
+          (l) =>
+            l.loanCode.toLowerCase() === loanIdOrCode.toLowerCase() ||
+            l.id === loanIdOrCode
+        );
+        if (idx !== -1) {
+          memLoans[idx] = { ...memLoans[idx], ...updates, id: mapped.id };
+        }
+        return mapped;
       }
+      return null;
     } catch (e) {
-      console.warn("DB loan update failed, falling back to memory store", e);
+      console.error("MongoDB Loan update failed:", e);
+      throw new Error(
+        `Failed to update loan in MongoDB: ${
+          e instanceof Error ? e.message : "Database update failed"
+        }`
+      );
     }
   }
 
-  const idx = memLoans.findIndex(
-    (l) =>
-      l.loanCode.toLowerCase() === loanIdOrCode.toLowerCase() ||
-      l.id === loanIdOrCode
-  );
-  if (idx !== -1) {
-    memLoans[idx] = { ...memLoans[idx], ...updates };
-    return memLoans[idx];
+  if (datasetId === "ds_demo_sandbox") {
+    const idx = memLoans.findIndex(
+      (l) =>
+        l.loanCode.toLowerCase() === loanIdOrCode.toLowerCase() ||
+        l.id === loanIdOrCode
+    );
+    if (idx !== -1) {
+      memLoans[idx] = { ...memLoans[idx], ...updates };
+      return memLoans[idx];
+    }
+    return null;
   }
-  return null;
+
+  throw new Error("MongoDB database is not connected. Loan was not updated.");
 }
 
 /**
@@ -670,22 +796,42 @@ export async function deleteLoan(
       }
 
       const res = await Loan.findOneAndDelete(query);
-      if (res) return true;
+      if (res) {
+        const idx = memLoans.findIndex(
+          (l) =>
+            l.loanCode.toLowerCase() === loanIdOrCode.toLowerCase() ||
+            l.id === loanIdOrCode
+        );
+        if (idx !== -1) {
+          memLoans.splice(idx, 1);
+        }
+        return true;
+      }
+      return false;
     } catch (e) {
-      console.warn("DB loan delete failed, falling back to memory store", e);
+      console.error("MongoDB Loan delete failed:", e);
+      throw new Error(
+        `Failed to delete loan from MongoDB: ${
+          e instanceof Error ? e.message : "Database delete failed"
+        }`
+      );
     }
   }
 
-  const idx = memLoans.findIndex(
-    (l) =>
-      l.loanCode.toLowerCase() === loanIdOrCode.toLowerCase() ||
-      l.id === loanIdOrCode
-  );
-  if (idx !== -1) {
-    memLoans.splice(idx, 1);
-    return true;
+  if (datasetId === "ds_demo_sandbox") {
+    const idx = memLoans.findIndex(
+      (l) =>
+        l.loanCode.toLowerCase() === loanIdOrCode.toLowerCase() ||
+        l.id === loanIdOrCode
+    );
+    if (idx !== -1) {
+      memLoans.splice(idx, 1);
+      return true;
+    }
+    return false;
   }
-  return false;
+
+  throw new Error("MongoDB database is not connected. Loan was not deleted.");
 }
 
 /**

@@ -1,4 +1,4 @@
-# Avaniya — Indian Real Estate & Land Business Asset Tracker
+# Avaniya: Indian Real Estate & Land Business Asset Tracker
 
 > **The Comprehensive Master Guide & System Blueprint**
 > 
@@ -14,7 +14,7 @@
 1. [Executive Overview & Mental Model](#1-executive-overview--mental-model)
 2. [Layman & Business User Manual](#2-layman--business-user-manual)
    - [Commercial Land Mode vs Personal Asset Mode](#a-commercial-land-mode-vs-personal-asset-mode)
-   - [The 4-Price Valuation Matrix](#b-the-4-price-valuation-matrix)
+   - [The 4-Price Valuation Matrix & Cost Recovery Profit Recognition](#b-the-4-price-valuation-matrix--cost-recovery-profit-recognition)
    - [Recording Outflows, Inflows & Transfers](#c-recording-outflows-inflows--transfers)
    - [Editing Properties & Managing Milestones](#d-editing-properties--managing-milestones)
    - [Multi-Format Exports (Excel, PDF, CSV)](#e-multi-format-exports-excel-pdf-csv)
@@ -67,7 +67,7 @@ Switch between modes using the toggle located in the top navigation bar:
 - **Commercial Land Business Mode**: Use for joint ventures, layout developments, plotting schemes, and commercial acreage acquisitions.
 - **Personal Asset Investment Mode**: Use for residential apartments, independent villas, or family plots with stage-wise builder payment schedules.
 
-### B. The 4-Price Valuation Matrix
+### B. The 4-Price Valuation Matrix & Cost Recovery Profit Recognition
 Every commercial deal card displays four distinct financial metrics:
 1. **Agreed Buy Price**: The baseline consideration agreed with the original land seller.
 2. **Property Expenses**: Total spent on legal verification, stamp duty, registration, DTCP scrutiny, boundary fencing, and earth leveling (can exceed the buy price).
@@ -75,6 +75,21 @@ Every commercial deal card displays four distinct financial metrics:
 4. **Agreed Selling Price**: The finalized contract price with the incoming buyer.
 - **Total Project Outlay**: `Agreed Buy Price + Property Expenses`
 - **Projected Profit**: `Agreed Selling Price - Total Project Outlay`
+
+#### Cost Recovery Profit Recognition Model
+In real estate asset management, recognizing paper profit on unsold or in-progress inventory distorts financial health. Avaniya enforces the conservative Cost Recovery Model:
+- **In-Progress Pipeline Deals (`open`, `in_progress`, `registered`)**: Realized Profit is strictly ₹0. Token advances or installment receipts from incoming buyers offset cash outlays and reduce Pending Inflow, but do not record profit until the deal is formally completed.
+- **Sold Deals (`sold`, `closed`)**: Realized Profit is recognized only when cumulative sale receipts exceed the Total Project Outlay:
+  $$\text{Realized Profit} = \max(0, \text{Total Receipts Collected} - \text{Total Project Outlay})$$
+- **Pending Profit**: For sold assets where the buyer still owes an outstanding balance, Pending Profit tracks uncollected profit:
+  $$\text{Pending Profit} = \max(0, \text{Projected Profit} - \text{Realized Profit})$$
+
+#### Auto-Switching Profit KPI Card
+The top KPI strip features an intelligent dual-state Profit card:
+- **Realized vs Pipeline States**: Toggles between Actual (Realized) Profit on sold assets and Total Projected Profit across active unsold pipeline inventory.
+- **7-Second Auto Cycle**: Automatically rotates view every 7 seconds with subtle indicator pill lights.
+- **Interactive Swipe & Touch Gestures**: Mobile users can swipe left or right across the card; desktop users can drag or click the pill buttons.
+- **Hover Pause**: Hovering or touching the card pauses the auto-rotation timer to prevent jarring transitions while reviewing figures.
 
 ### C. Recording Outflows, Inflows & Transfers
 Click **Record Outflow** or **Add Inflow** from the header:
@@ -113,9 +128,10 @@ Click **Export** in the top bar to generate offline files:
 - **Language**: TypeScript 5 (Strict types, zero `any`, discriminated unions)
 - **Styling**: Tailwind CSS (True Black `#000000` baseline, high-contrast zinc tokens)
 - **Typography**: IBM Plex Sans (Body) + JetBrains Mono (Financial Tabular Digits) via `next/font/google`
-- **Database**: MongoDB Atlas Cluster (`ap-south-1` Mumbai) via Mongoose connection caching with compound indexes (`datasetId + date`, `datasetId + scope`, `datasetId + propertyCode`, `datasetId + loanCode`)
+- **Database & Persistence**: MongoDB Atlas Cluster (`ap-south-1` Mumbai) via Mongoose pooled connection with compound indexes (`datasetId + date`, `datasetId + scope`, `datasetId + propertyCode`, `datasetId + loanCode`). All tenant writes are strictly committed to MongoDB. Silent in-memory RAM fallback has been removed to guarantee data durability across serverless lifecycle events (retained strictly for sandboxed demo tenants).
+- **Serverless Connection Lifecycle**: Self-healing cached connection pool (`cached.promise = null`) automatically recycles dead or dropped connections when `mongoose.connection.readyState !== 1`, preventing cold-start hangs and stale-connection data loss.
+- **Client State Reactivity**: Dynamic derivation of active property financial metrics (`useMemo` keyed on `selectedPropertyCode`), ensuring modal ledgers and summaries update instantaneously on transaction entry without navigation or page reload.
 - **Query Optimization**: $O(1)$ MongoDB Aggregation pipelines for tenant user & transaction matrix calculations
-- **Fallback Engine**: In-memory database mirror (`memProperties`, `memTransactions`, `memCategories`, `memLoans`) ensures zero runtime downtime if the database connection drops.
 - **Authentication**: Stateless JSON Web Tokens (JWT) stored in HTTP-only Secure Cookies with 12-hour expiration, bcrypt password hashing, and authenticated route protection across all data endpoints.
 
 ### B. Project Directory Structure
@@ -260,6 +276,12 @@ All business logic MUST mirror the formulas verified in [`tests/formulaEngine.te
    $$\text{Pending Outflow} = \max(0, \text{Agreed Purchase Price} - \text{Principal Paid So Far})$$
 8. **Pending Buyer Receivable**:
    $$\text{Pending Inflow} = \max(0, \text{Agreed Selling Price} - \text{Sale Inflows Received})$$
+9. **Realized Profit (Cost Recovery Model)**:
+   $$\text{Realized Profit} = \begin{cases} \max(0, \text{Total Sale Receipts Collected} - \text{Total Project Outlay}) & \text{if status} \in \{\text{sold}, \text{closed}\} \\ 0 & \text{otherwise} \end{cases}$$
+10. **Pending Uncollected Profit on Sold Deals**:
+    $$\text{Pending Profit} = \begin{cases} \max(0, \text{Projected Profit} - \text{Realized Profit}) & \text{if status} \in \{\text{sold}, \text{closed}\} \\ 0 & \text{otherwise} \end{cases}$$
+11. **Total Projected Pipeline Profit**:
+    $$\text{Total Projected Profit} = \sum_{\text{status} \in \{\text{open}, \text{in\_progress}, \text{registered}\}} \text{Projected Profit}$$
 
 ### B. Zero-Break Financial Role Mapping
 Whenever adding categories, assign one of the predefined `financialRole` types:

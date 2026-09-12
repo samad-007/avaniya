@@ -86,17 +86,60 @@ export default function DashboardPage() {
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
-  // Selected Property for Ledger Modal
-  const [selectedPropertyMetric, setSelectedPropertyMetric] =
-    useState<PropertyFinancialMetrics | null>(null);
-  const [selectedPersonalPropertyData, setSelectedPersonalPropertyData] =
-    useState<{
-      property: SeedProperty;
-      totalInvested: number;
-      pendingCommitment: number;
-      transactions: SeedTransaction[];
-    } | null>(null);
+  // Selected Property for Ledger Modal (stored as key identifier, dynamically derived below)
+  const [selectedPropertyCode, setSelectedPropertyCode] = useState<string | null>(null);
+  const [selectedPropertyType, setSelectedPropertyType] = useState<"commercial" | "personal">("commercial");
   const [isLedgerModalOpen, setIsLedgerModalOpen] = useState(false);
+
+  // Dynamically derived active commercial property metric (auto-updates immediately on mutations without navigating away!)
+  const activeCommercialPropertyMetric = React.useMemo(() => {
+    if (!selectedPropertyCode || selectedPropertyType !== "commercial" || !commercialMetrics) {
+      return null;
+    }
+    return (
+      commercialMetrics.propertyMetrics.find(
+        (pm) =>
+          pm.property.propertyCode.toLowerCase() === selectedPropertyCode.toLowerCase() ||
+          pm.property.id === selectedPropertyCode
+      ) || null
+    );
+  }, [selectedPropertyCode, selectedPropertyType, commercialMetrics]);
+
+  // Dynamically derived active personal property data (auto-updates immediately on mutations!)
+  const activePersonalPropertyData = React.useMemo(() => {
+    if (!selectedPropertyCode || selectedPropertyType !== "personal" || !personalMetrics) {
+      return null;
+    }
+    const prop = properties.find(
+      (p) =>
+        p.type === "personal" &&
+        (p.propertyCode.toLowerCase() === selectedPropertyCode.toLowerCase() ||
+          p.id === selectedPropertyCode)
+    );
+    if (!prop) return null;
+    const pTx = transactions.filter(
+      (t) =>
+        t.scope === "personal" &&
+        (t.propertyCode === prop.propertyCode ||
+          t.propertyCode === prop.name ||
+          (t.remarks && t.remarks.includes(prop.name)))
+    );
+    const totalInvested = pTx
+      .filter((t) => t.transactionType === "outflow")
+      .reduce((sum, t) => sum + t.amount, 0);
+    const pendingCommitment = Math.max(
+      0,
+      prop.agreedPurchasePrice - totalInvested
+    );
+    return {
+      property: prop,
+      totalInvested,
+      pendingCommitment,
+      transactions: pTx.sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      ),
+    };
+  }, [selectedPropertyCode, selectedPropertyType, personalMetrics, properties, transactions]);
 
   // Recalculate metrics when data changes
   const recompute = useCallback(() => {
@@ -325,14 +368,9 @@ export default function DashboardPage() {
             )
           );
         } else {
-          setLoans((prev) =>
-            prev.map((l) =>
-              (l.loanCode && l.loanCode.toLowerCase() === idOrCode.toLowerCase()) ||
-              l.id === idOrCode
-                ? { ...l, ...loanData }
-                : l
-            )
-          );
+          const errJson = await res.json().catch(() => null);
+          alert(`Error updating loan: ${errJson?.error || "Database error"}`);
+          throw new Error(errJson?.error || "Failed to update loan");
         }
       } else {
         const res = await fetch("/api/loans", {
@@ -344,44 +382,14 @@ export default function DashboardPage() {
           const json = await res.json();
           setLoans((prev) => [...prev, json.data]);
         } else {
-          const localLoan: SeedLoan = {
-            ...loanData,
-            id: `loan-${Date.now()}`,
-            datasetId: currentDatasetId,
-            loanCode:
-              loanData.loanCode ||
-              `LOAN-${String(loans.length + 1).padStart(3, "0")}`,
-            scope: loanData.scope || "commercial",
-            lenderName: loanData.lenderName,
-            lenderType: loanData.lenderType || "bank",
-            principalAmount: loanData.principalAmount,
-            interestRatePct: loanData.interestRatePct || 0,
-            profitSharePct: loanData.profitSharePct || 0,
-            startDate:
-              loanData.startDate || new Date().toISOString().split("T")[0],
-            status: loanData.status || "active",
-          };
-          setLoans((prev) => [...prev, localLoan]);
+          const errJson = await res.json().catch(() => null);
+          alert(`Error saving loan: ${errJson?.error || "Database error"}`);
+          throw new Error(errJson?.error || "Failed to save loan");
         }
       }
-    } catch {
-      const localLoan: SeedLoan = {
-        ...loanData,
-        id: `loan-${Date.now()}`,
-        datasetId: currentDatasetId,
-        loanCode:
-          loanData.loanCode ||
-          `LOAN-${String(loans.length + 1).padStart(3, "0")}`,
-        scope: loanData.scope || "commercial",
-        lenderName: loanData.lenderName,
-        lenderType: loanData.lenderType || "bank",
-        principalAmount: loanData.principalAmount,
-        interestRatePct: loanData.interestRatePct || 0,
-        profitSharePct: loanData.profitSharePct || 0,
-        startDate: loanData.startDate || new Date().toISOString().split("T")[0],
-        status: loanData.status || "active",
-      };
-      setLoans((prev) => [...prev, localLoan]);
+    } catch (err) {
+      console.error("Save loan error:", err);
+      throw err;
     }
   };
 
@@ -449,22 +457,14 @@ export default function DashboardPage() {
           )
         );
       } else {
-        setProperties((prev) =>
-          prev.map((p) =>
-            p.propertyCode.toLowerCase() === propertyCode.toLowerCase()
-              ? { ...p, ...updates }
-              : p
-          )
-        );
+        const errJson = await res.json().catch(() => null);
+        const errMsg = errJson?.error || "Failed to update property in MongoDB";
+        alert(`Property update error: ${errMsg}`);
+        throw new Error(errMsg);
       }
-    } catch {
-      setProperties((prev) =>
-        prev.map((p) =>
-          p.propertyCode.toLowerCase() === propertyCode.toLowerCase()
-            ? { ...p, ...updates }
-            : p
-        )
-      );
+    } catch (err) {
+      console.error("Update property error:", err);
+      throw err;
     }
   };
 
@@ -481,34 +481,19 @@ export default function DashboardPage() {
         const json = await res.json();
         setTransactions((prev) => [json.data, ...prev]);
       } else {
-        const prefix =
-          txData.transactionType === "profit_withdrawal" ||
-          txData.transactionType === "capital_withdrawal"
-            ? "WTH"
-            : txData.transactionType.startsWith("loan_")
-            ? "LON"
-            : txData.transactionType.slice(0, 3).toUpperCase();
-        const localTx: SeedTransaction = {
-          ...txData,
-          id: `tx-${Date.now()}`,
-          transCode: `${prefix}-${String(transactions.length + 1).padStart(3, "0")}`,
-        };
-        setTransactions((prev) => [localTx, ...prev]);
+        const errJson = await res.json().catch(() => null);
+        const errMsg = errJson?.error || "Failed to record transaction to MongoDB";
+        if (res.status === 401) {
+          setIsAuthModalOpen(true);
+          alert("Your session has expired. Please log in again to persist your transaction to MongoDB.");
+        } else {
+          alert(`Transaction save error: ${errMsg}`);
+        }
+        throw new Error(errMsg);
       }
-    } catch {
-      const prefix =
-        txData.transactionType === "profit_withdrawal" ||
-        txData.transactionType === "capital_withdrawal"
-          ? "WTH"
-          : txData.transactionType.startsWith("loan_")
-          ? "LON"
-          : txData.transactionType.slice(0, 3).toUpperCase();
-      const localTx: SeedTransaction = {
-        ...txData,
-        id: `tx-${Date.now()}`,
-        transCode: `${prefix}-${String(transactions.length + 1).padStart(3, "0")}`,
-      };
-      setTransactions((prev) => [localTx, ...prev]);
+    } catch (err) {
+      console.error("Save transaction error:", err);
+      throw err;
     }
   };
 
@@ -543,24 +528,14 @@ export default function DashboardPage() {
           )
         );
       } else {
-        setTransactions((prev) =>
-          prev.map((t) =>
-            (t.transCode && t.transCode.toLowerCase() === transIdOrCode.toLowerCase()) ||
-            t.id === transIdOrCode
-              ? { ...t, ...updates }
-              : t
-          )
-        );
+        const errJson = await res.json().catch(() => null);
+        const errMsg = errJson?.error || "Failed to update transaction in MongoDB";
+        alert(`Transaction update error: ${errMsg}`);
+        throw new Error(errMsg);
       }
-    } catch {
-      setTransactions((prev) =>
-        prev.map((t) =>
-          (t.transCode && t.transCode.toLowerCase() === transIdOrCode.toLowerCase()) ||
-          t.id === transIdOrCode
-            ? { ...t, ...updates }
-            : t
-        )
-      );
+    } catch (err) {
+      console.error("Update transaction error:", err);
+      throw err;
     }
   };
 
@@ -586,28 +561,11 @@ export default function DashboardPage() {
           )
         );
       } else {
-        setTransactions((prev) =>
-          prev.filter(
-            (t) =>
-              !(
-                (t.transCode &&
-                  t.transCode.toLowerCase() === transIdOrCode.toLowerCase()) ||
-                t.id === transIdOrCode
-              )
-          )
-        );
+        const errJson = await res.json().catch(() => null);
+        alert(`Delete transaction error: ${errJson?.error || "Failed to delete"}`);
       }
-    } catch {
-      setTransactions((prev) =>
-        prev.filter(
-          (t) =>
-            !(
-              (t.transCode &&
-                t.transCode.toLowerCase() === transIdOrCode.toLowerCase()) ||
-              t.id === transIdOrCode
-            )
-        )
-      );
+    } catch (err) {
+      console.error("Delete transaction error:", err);
     }
   };
 
@@ -626,28 +584,19 @@ export default function DashboardPage() {
         const json = await res.json();
         setProperties((prev) => [...prev, json.data]);
       } else {
-        const localProp: SeedProperty = {
-          ...propData,
-          id: `prop-${Date.now()}`,
-          propertyCode:
-            propData.propertyCode ||
-            `${propData.type === "commercial" ? "LND" : "APT"}-${String(
-              properties.length + 1
-            ).padStart(3, "0")}`,
-        };
-        setProperties((prev) => [...prev, localProp]);
+        const errJson = await res.json().catch(() => null);
+        const errMsg = errJson?.error || "Failed to save property to MongoDB";
+        if (res.status === 401) {
+          setIsAuthModalOpen(true);
+          alert("Your session has expired. Please log in again to persist your property to MongoDB.");
+        } else {
+          alert(`Property save error: ${errMsg}`);
+        }
+        throw new Error(errMsg);
       }
-    } catch {
-      const localProp: SeedProperty = {
-        ...propData,
-        id: `prop-${Date.now()}`,
-        propertyCode:
-          propData.propertyCode ||
-          `${propData.type === "commercial" ? "LND" : "APT"}-${String(
-            properties.length + 1
-          ).padStart(3, "0")}`,
-      };
-      setProperties((prev) => [...prev, localProp]);
+    } catch (err) {
+      console.error("Save property error:", err);
+      throw err;
     }
   };
 
@@ -672,8 +621,8 @@ export default function DashboardPage() {
   const handleSelectCommercialProperty = (
     metric: PropertyFinancialMetrics
   ) => {
-    setSelectedPropertyMetric(metric);
-    setSelectedPersonalPropertyData(null);
+    setSelectedPropertyCode(metric.property.propertyCode);
+    setSelectedPropertyType("commercial");
     setIsLedgerModalOpen(true);
   };
 
@@ -683,8 +632,8 @@ export default function DashboardPage() {
     pendingCommitment: number;
     transactions: SeedTransaction[];
   }) => {
-    setSelectedPersonalPropertyData(data);
-    setSelectedPropertyMetric(null);
+    setSelectedPropertyCode(data.property.propertyCode);
+    setSelectedPropertyType("personal");
     setIsLedgerModalOpen(true);
   };
 
@@ -831,11 +780,10 @@ export default function DashboardPage() {
         isOpen={isLedgerModalOpen}
         onClose={() => {
           setIsLedgerModalOpen(false);
-          setSelectedPropertyMetric(null);
-          setSelectedPersonalPropertyData(null);
+          setSelectedPropertyCode(null);
         }}
-        propertyMetrics={selectedPropertyMetric}
-        personalPropertyData={selectedPersonalPropertyData}
+        propertyMetrics={activeCommercialPropertyMetric}
+        personalPropertyData={activePersonalPropertyData}
         onOpenEntryModal={handleOpenEntryModal}
         onEditProperty={handleOpenEditProperty}
         onEditTransaction={handleOpenEditTransaction}

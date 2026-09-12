@@ -467,11 +467,21 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                           {formatINR(pm.totalProjectOutlay)}
                         </strong>
                       </span>
-                      {pm.projectedProfit !== 0 && (
-                        <span className="font-mono text-[#22C55E] font-bold">
-                          +{formatINR(pm.projectedProfit)} Gain
+                      {pm.property.status === "sold" || pm.property.status === "closed" ? (
+                        pm.realizedProfit > 0 ? (
+                          <span className="font-mono text-[#22C55E] font-bold">
+                            +{formatINR(pm.realizedProfit)} Realized
+                          </span>
+                        ) : (
+                          <span className="font-mono text-amber-400 font-semibold">
+                            Cost Recovering
+                          </span>
+                        )
+                      ) : pm.projectedProfit !== 0 ? (
+                        <span className="font-mono text-purple-400 font-semibold">
+                          Est. Gain: +{formatINR(pm.projectedProfit)}
                         </span>
-                      )}
+                      ) : null}
                     </div>
 
                     {/* Funding Progress Bar */}

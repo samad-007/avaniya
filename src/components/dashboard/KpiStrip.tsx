@@ -7,6 +7,7 @@ import {
   PersonalDashboardMetrics,
 } from "@/lib/formulaEngine";
 import { Wallet, Banknote, Landmark, Clock, ArrowDownLeft, TrendingUp } from "lucide-react";
+import { ProfitKpiCard } from "./ProfitKpiCard";
 
 interface KpiStripProps {
   mode: "commercial" | "personal";
@@ -27,12 +28,23 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
       totalPendingPayable,
       totalPendingReceivable,
       totalRealizedProfit,
+      totalProjectedProfit,
+      totalPendingProfit,
       capitalInjectedTotal,
       netCapitalInjected,
       profitWithdrawalsTotal,
       outstandingLoansPrincipal,
       propertyMetrics,
     } = commercialMetrics;
+
+    const activeDealsCount = propertyMetrics.filter(
+      (pm) =>
+        pm.property.status !== "sold" && pm.property.status !== "closed"
+    ).length;
+    const soldDealsCount = propertyMetrics.filter(
+      (pm) =>
+        pm.property.status === "sold" || pm.property.status === "closed"
+    ).length;
 
     return (
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -125,21 +137,15 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
           )}
         </div>
 
-        {/* Realized Profit */}
-        <div className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-3.5 flex flex-col justify-between hover:border-[#383838] transition-standard shadow-sm">
-          <div className="flex items-center justify-between text-[#A1A1AA] text-xs font-semibold uppercase tracking-wider mb-1.5">
-            <span>Realized Profit</span>
-            <TrendingUp className="w-4 h-4 text-white" />
-          </div>
-          <div className="text-xl md:text-2xl font-bold font-mono text-white tracking-tight">
-            {formatINR(totalRealizedProfit)}
-          </div>
-          <div className="text-xs text-[#A1A1AA] font-medium mt-1.5">
-            {profitWithdrawalsTotal > 0
-              ? `Drawings: -${formatINR(profitWithdrawalsTotal)}`
-              : "Settled Deal Gains"}
-          </div>
-        </div>
+        {/* Auto-Switching Actual vs Projected Profit KPI Card (7s Interval + Touch Swipe) */}
+        <ProfitKpiCard
+          totalRealizedProfit={totalRealizedProfit}
+          totalProjectedProfit={totalProjectedProfit}
+          totalPendingProfit={totalPendingProfit}
+          profitWithdrawalsTotal={profitWithdrawalsTotal}
+          activeDealsCount={activeDealsCount}
+          soldDealsCount={soldDealsCount}
+        />
       </div>
     );
   }

@@ -68,15 +68,21 @@ export async function connectDB(overrideDbName?: string): Promise<typeof mongoos
     return cached!.conn;
   }
 
+  // Reset stale cached connection and promise when disconnected (e.g. idle socket drop)
+  if (mongoose.connection.readyState !== 1) {
+    cached!.conn = null;
+    cached!.promise = null;
+  }
+
   if (!cached!.promise && MONGODB_URI) {
     const opts = {
       bufferCommands: false,
       maxPoolSize: 10,
       minPoolSize: 0,
       serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 30000,
+      socketTimeoutMS: 45000,
       connectTimeoutMS: 5000,
-      dbName: dbName, // Explicitly route to "production" database on Atlas
+      dbName: dbName, // Explicitly route to target database on Atlas
     };
 
     cached!.promise = mongoose.connect(MONGODB_URI, opts).then((m) => {
@@ -89,6 +95,7 @@ export async function connectDB(overrideDbName?: string): Promise<typeof mongoos
       cached!.conn = await cached!.promise;
     }
   } catch (e) {
+    cached!.conn = null;
     cached!.promise = null;
     throw e;
   }

@@ -210,9 +210,20 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                       : "Not Listed"}
                   </div>
                   <div className="text-xs text-[#71717A] mt-0.5">
-                    {propertyMetrics.projectedProfit !== 0 ? (
-                      <span className="text-[#22C55E] font-medium">
-                        Gain: +{formatINR(propertyMetrics.projectedProfit)}
+                    {prop.status === "sold" || prop.status === "closed" ? (
+                      propertyMetrics.realizedProfit > 0 ? (
+                        <span className="text-[#22C55E] font-medium">
+                          Realized Gain: +{formatINR(propertyMetrics.realizedProfit)}
+                          {propertyMetrics.pendingProfit > 0 && ` (${formatINR(propertyMetrics.pendingProfit)} pending)`}
+                        </span>
+                      ) : (
+                        <span className="text-amber-400 font-medium">
+                          Cost Recovering ({formatINR(propertyMetrics.pendingProfit)} pending)
+                        </span>
+                      )
+                    ) : propertyMetrics.projectedProfit !== 0 ? (
+                      <span className="text-purple-400 font-medium">
+                        Est. Pipeline Gain: +{formatINR(propertyMetrics.projectedProfit)}
                       </span>
                     ) : (
                       "Exit Valuation"

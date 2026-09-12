@@ -20,6 +20,7 @@ export interface PropertyFinancialMetrics {
   pendingInflow: number; // Remaining receivable from buyer
   projectedProfit: number; // Selling/Target Price - Total Project Outlay
   realizedProfit: number; // Total Receipts Collected - Total Outflows Paid
+  pendingProfit: number; // Remaining profit to be received from buyer
   transactions: SeedTransaction[];
 }
 
@@ -88,6 +89,8 @@ export interface CommercialDashboardMetrics {
   totalPendingPayable: number;
   totalPendingReceivable: number;
   totalRealizedProfit: number;
+  totalProjectedProfit: number;
+  totalPendingProfit: number;
   propertyMetrics: PropertyFinancialMetrics[];
   loanMetrics: LoanFinancialMetrics[];
 }
@@ -137,7 +140,8 @@ export function calculateCommercialMetrics(
   const isPurchasePrincipal = (catName: string) => {
     const role = roleMap.get(catName.toLowerCase());
     if (role === "purchase_principal") return true;
-    return catName.toLowerCase().startsWith("purchase");
+    const lower = catName.toLowerCase();
+    return lower.includes("purchase") || lower.includes("token advance") || lower.includes("sale deed");
   };
 
   // Capital Inflows (External Funding)
@@ -339,10 +343,17 @@ export function calculateCommercialMetrics(
         ? (p.targetSalePrice || 0) - totalProjectOutlay
         : 0;
 
-    const realizedProfit =
-      totalReceiptsCollected > 0
-        ? totalReceiptsCollected - totalOutflowsPaid
-        : 0;
+    const isSoldOrClosed = p.status === "sold" || p.status === "closed";
+
+    // Cost Recovery Realized Profit on Sold Assets:
+    // Recognized strictly after cumulative receipts exceed total project cost basis.
+    // In-progress or open assets recognize 0 realized profit.
+    const realizedProfit = isSoldOrClosed
+      ? Math.max(0, totalReceiptsCollected - totalProjectOutlay)
+      : 0;
+
+    // Remaining profit pending collection from buyer
+    const pendingProfit = Math.max(0, projectedProfit - realizedProfit);
 
     return {
       property: p,
@@ -359,6 +370,7 @@ export function calculateCommercialMetrics(
       pendingInflow,
       projectedProfit,
       realizedProfit,
+      pendingProfit,
       transactions: pTx.sort(
         (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
       ),
@@ -393,6 +405,18 @@ export function calculateCommercialMetrics(
   );
   const totalRealizedProfit = propertyMetrics.reduce(
     (sum, pm) => sum + pm.realizedProfit,
+    0
+  );
+
+  // Active pipeline projected profit (unsold properties only - Question 2 Option A)
+  const totalProjectedProfit = propertyMetrics
+    .filter(
+      (pm) => pm.property.status !== "sold" && pm.property.status !== "closed"
+    )
+    .reduce((sum, pm) => sum + Math.max(0, pm.projectedProfit), 0);
+
+  const totalPendingProfit = propertyMetrics.reduce(
+    (sum, pm) => sum + pm.pendingProfit,
     0
   );
 
@@ -535,6 +559,8 @@ export function calculateCommercialMetrics(
     totalPendingPayable: Math.round(totalPendingPayable),
     totalPendingReceivable: Math.round(totalPendingReceivable),
     totalRealizedProfit: Math.round(totalRealizedProfit),
+    totalProjectedProfit: Math.round(totalProjectedProfit),
+    totalPendingProfit: Math.round(totalPendingProfit),
     propertyMetrics,
     loanMetrics,
   };
