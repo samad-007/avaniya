@@ -26,11 +26,12 @@ export const ProfitKpiCard: React.FC<ProfitKpiCardProps> = ({
 }) => {
   return (
     <CyclingKpiCard
+      cardAccentColor="emerald"
       panelA={{
         title: "Actual Profit",
         badge: "REALIZED",
         badgeColor: "bg-emerald-950/60 text-emerald-400 border border-emerald-800/40",
-        titleColor: "text-white",
+        titleColor: "text-emerald-400",
         value: formatINR(totalRealizedProfit),
         subtitle:
           totalPendingProfit > 0 ? (
@@ -46,13 +47,13 @@ export const ProfitKpiCard: React.FC<ProfitKpiCardProps> = ({
             </span>
           ),
         icon: TrendingUp,
-        iconColor: "text-white",
+        iconColor: "text-[#22C55E]",
       }}
       panelB={{
         title: "Projected Profit",
         badge: "PIPELINE",
-        badgeColor: "bg-purple-950/60 text-purple-400 border border-purple-800/40",
-        titleColor: "text-purple-400",
+        badgeColor: "bg-emerald-950/60 text-emerald-400 border border-emerald-800/40",
+        titleColor: "text-emerald-400",
         value: formatINR(totalProjectedProfit),
         subtitle: (
           <span>
@@ -61,7 +62,7 @@ export const ProfitKpiCard: React.FC<ProfitKpiCardProps> = ({
           </span>
         ),
         icon: Target,
-        iconColor: "text-purple-400",
+        iconColor: "text-[#22C55E]",
       }}
       {...cyclingProps}
     />

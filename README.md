@@ -108,7 +108,7 @@ The top KPI strip features intelligent, touch-swipeable dual-state cards across 
   3. **Bank Readiness**: Available Bank Reserve (`[ BANK BUFFER ]`) vs Total Liquid Buffer (`[ TOTAL CASH ]`).
   4. **Site Cash & Dues**: Physical Cash in Hand (`[ VAULT CASH ]`) vs Next Milestone Commitments (`[ NEXT MILESTONES ]`).
 - **4-Row Cohesive Executive Layout**:
-  - **Row 1**: Status badge (left) paired with the dual-pill switcher and icon indicator (right).
+  - **Row 1**: Status badge (left) paired with the dual-pill switcher and icon indicator (right). Both switcher points dynamically use the card's dedicated accent color (Blue, Emerald, Cyan, Amber, Rose, Purple) while retaining their 16px (`w-4`) expansion and smooth easing.
   - **Row 2**: Full-width topic title (`text-xs font-semibold uppercase tracking-wider`) with zero horizontal truncation across desktop and mobile.
   - **Row 3**: Primary bold monospace financial metric (`text-xl md:text-2xl font-bold font-mono`).
   - **Row 4**: Contextual subtitle and reconciliation detail.

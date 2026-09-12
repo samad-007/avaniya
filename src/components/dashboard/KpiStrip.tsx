@@ -139,6 +139,7 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
       >
         {/* Card 1: Bank Position & Inflow Velocity */}
         <CyclingKpiCard
+          cardAccentColor="blue"
           activePanel={activePanel}
           isFlipping={isFlipping}
           onClick={handleCardClick}
@@ -159,17 +160,18 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
           panelB={{
             title: "Bank Inflow Volume",
             badge: "INFLOWS",
-            badgeColor: "bg-emerald-950/60 text-emerald-400 border border-emerald-800/40",
-            titleColor: "text-emerald-400",
+            badgeColor: "bg-blue-950/60 text-blue-400 border border-blue-800/40",
+            titleColor: "text-blue-400",
             value: formatINR(bankInflowsGross),
             subtitle: "Gross Bank Credits Received",
             icon: ArrowDownLeft,
-            iconColor: "text-[#22C55E]",
+            iconColor: "text-[#3B82F6]",
           }}
         />
 
         {/* Card 2: Liquid Cash & Site Outflow Burn */}
         <CyclingKpiCard
+          cardAccentColor="emerald"
           activePanel={activePanel}
           isFlipping={isFlipping}
           onClick={handleCardClick}
@@ -190,17 +192,18 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
           panelB={{
             title: "Cash Outflow Burn",
             badge: "CASH BURN",
-            badgeColor: "bg-amber-950/60 text-amber-400 border border-amber-800/40",
-            titleColor: "text-amber-400",
+            badgeColor: "bg-emerald-950/60 text-emerald-400 border border-emerald-800/40",
+            titleColor: "text-emerald-400",
             value: formatINR(outflowsCash),
             subtitle: "Site Labor, Legal & Registration",
             icon: TrendingDown,
-            iconColor: "text-[#F59E0B]",
+            iconColor: "text-[#22C55E]",
           }}
         />
 
         {/* Card 3: Combined Liquidity vs Invested Capital */}
         <CyclingKpiCard
+          cardAccentColor="cyan"
           activePanel={activePanel}
           isFlipping={isFlipping}
           onClick={handleCardClick}
@@ -211,12 +214,12 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
           panelA={{
             title: "Total Liquidity",
             badge: "AVAILABLE",
-            badgeColor: "bg-zinc-800 text-zinc-300 border border-zinc-700/50",
-            titleColor: "text-white",
+            badgeColor: "bg-cyan-950/60 text-cyan-400 border border-cyan-800/40",
+            titleColor: "text-cyan-400",
             value: formatINR(currentNetLiquidity),
             subtitle: `Bank: ${formatINR(netBankLiquidity)} | Cash: ${formatINR(netCashLiquidity)}`,
             icon: Wallet,
-            iconColor: "text-white",
+            iconColor: "text-[#06B6D4]",
           }}
           panelB={{
             title: "Net Retained Capital",
@@ -226,12 +229,13 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
             value: formatINR(netCapitalInjected),
             subtitle: `Gross Cap: ${formatINR(capitalInjectedTotal)} - Refunds`,
             icon: Coins,
-            iconColor: "text-cyan-400",
+            iconColor: "text-[#06B6D4]",
           }}
         />
 
         {/* Card 4: Seller Liabilities vs Full Outlay */}
         <CyclingKpiCard
+          cardAccentColor="amber"
           activePanel={activePanel}
           isFlipping={isFlipping}
           onClick={handleCardClick}
@@ -253,18 +257,19 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
           panelB={{
             title: "Committed Project Outlay",
             badge: "FULL OUTLAY",
-            badgeColor: "bg-yellow-950/60 text-yellow-400 border border-yellow-800/40",
-            titleColor: "text-yellow-400",
+            badgeColor: "bg-amber-950/60 text-amber-400 border border-amber-800/40",
+            titleColor: "text-amber-400",
             value: formatINR(totalProjectOutlay),
-            valueColor: "text-yellow-400",
+            valueColor: "text-amber-400",
             subtitle: `Buy: ${formatINR(totalAgreedBuyPrice)} + Exp: ${formatINR(totalPropertyExpenses)}`,
             icon: Landmark,
-            iconColor: "text-yellow-400",
+            iconColor: "text-[#F59E0B]",
           }}
         />
 
         {/* Card 5: External Debt vs Incoming Buyer Receivables */}
         <CyclingKpiCard
+          cardAccentColor="rose"
           activePanel={activePanel}
           isFlipping={isFlipping}
           onClick={handleCardClick}
@@ -285,23 +290,24 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
                 ? `Finance Cost: ${formatINR(totalFinanceCosts)}`
                 : "Principal Outstanding",
             icon: Landmark,
-            iconColor: "text-rose-400",
+            iconColor: "text-[#F43F5E]",
           }}
           panelB={{
             title: "Buyer Receivables",
             badge: "RECEIVABLES",
-            badgeColor: "bg-emerald-950/60 text-emerald-400 border border-emerald-800/40",
-            titleColor: "text-[#22C55E]",
+            badgeColor: "bg-rose-950/60 text-rose-400 border border-rose-800/40",
+            titleColor: "text-rose-400",
             value: formatINR(totalPendingReceivable),
-            valueColor: "text-[#22C55E]",
+            valueColor: "text-rose-400",
             subtitle: "Agreed Selling Pipeline",
             icon: ArrowDownLeft,
-            iconColor: "text-[#22C55E]",
+            iconColor: "text-[#F43F5E]",
           }}
         />
 
         {/* Card 6: Auto-Switching Actual vs Projected Profit KPI Card (Synchronized 7s Interval + Touch Swipe) */}
         <ProfitKpiCard
+          cardAccentColor="emerald"
           totalRealizedProfit={totalRealizedProfit}
           totalProjectedProfit={totalProjectedProfit}
           totalPendingProfit={totalPendingProfit}
@@ -348,6 +354,7 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
       >
         {/* Card 1: Total Investment Paid vs Committed Value */}
         <CyclingKpiCard
+          cardAccentColor="blue"
           activePanel={activePanel}
           isFlipping={isFlipping}
           onClick={handleCardClick}
@@ -358,12 +365,12 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
           panelA={{
             title: "Total Invested",
             badge: "PAID",
-            badgeColor: "bg-zinc-800 text-zinc-300 border border-zinc-700/50",
-            titleColor: "text-white",
+            badgeColor: "bg-blue-950/60 text-blue-400 border border-blue-800/40",
+            titleColor: "text-blue-400",
             value: formatINR(totalInvestmentDone),
             subtitle: `Across ${properties.length} Personal Properties`,
             icon: Wallet,
-            iconColor: "text-white",
+            iconColor: "text-[#3B82F6]",
           }}
           panelB={{
             title: "Committed Value",
@@ -373,12 +380,13 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
             value: formatINR(totalAgreedValue),
             subtitle: `Pending: ${formatINR(totalPendingCommitment)}`,
             icon: Building2,
-            iconColor: "text-blue-400",
+            iconColor: "text-[#3B82F6]",
           }}
         />
 
         {/* Card 2: Savings Inflows vs Capital Withdrawn */}
         <CyclingKpiCard
+          cardAccentColor="purple"
           activePanel={activePanel}
           isFlipping={isFlipping}
           onClick={handleCardClick}
@@ -389,13 +397,13 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
           panelA={{
             title: "Inflows Allocated",
             badge: "SAVINGS",
-            badgeColor: "bg-blue-950/60 text-blue-400 border border-blue-800/40",
-            titleColor: "text-[#3B82F6]",
+            badgeColor: "bg-purple-950/60 text-purple-400 border border-purple-800/40",
+            titleColor: "text-purple-400",
             value: formatINR(inflowsTotal),
-            valueColor: "text-[#3B82F6]",
+            valueColor: "text-purple-400",
             subtitle: "Personal Savings & Income",
             icon: Landmark,
-            iconColor: "text-[#3B82F6]",
+            iconColor: "text-[#A855F7]",
           }}
           panelB={{
             title: "Funds Withdrawn",
@@ -406,12 +414,13 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
             valueColor: "text-purple-400",
             subtitle: "Personal Refunds & Drawings",
             icon: Coins,
-            iconColor: "text-purple-400",
+            iconColor: "text-[#A855F7]",
           }}
         />
 
         {/* Card 3: Bank Available vs Combined Liquidity */}
         <CyclingKpiCard
+          cardAccentColor="emerald"
           activePanel={activePanel}
           isFlipping={isFlipping}
           onClick={handleCardClick}
@@ -433,17 +442,18 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
           panelB={{
             title: "Total Liquid Buffer",
             badge: "TOTAL CASH",
-            badgeColor: "bg-zinc-800 text-zinc-300 border border-zinc-700/50",
-            titleColor: "text-white",
+            badgeColor: "bg-emerald-950/60 text-emerald-400 border border-emerald-800/40",
+            titleColor: "text-emerald-400",
             value: formatINR(netPersonalLiquidity),
             subtitle: `Cash in Hand: ${formatINR(currentCashBalance)}`,
             icon: Wallet,
-            iconColor: "text-white",
+            iconColor: "text-[#22C55E]",
           }}
         />
 
         {/* Card 4: Cash in Hand vs Pending Commitments */}
         <CyclingKpiCard
+          cardAccentColor="amber"
           activePanel={activePanel}
           isFlipping={isFlipping}
           onClick={handleCardClick}
@@ -464,13 +474,13 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
           panelB={{
             title: "Pending Payments",
             badge: "NEXT MILESTONES",
-            badgeColor: "bg-orange-950/60 text-orange-400 border border-orange-800/40",
-            titleColor: "text-orange-400",
+            badgeColor: "bg-amber-950/60 text-amber-400 border border-amber-800/40",
+            titleColor: "text-amber-400",
             value: formatINR(totalPendingCommitment),
-            valueColor: "text-orange-400",
+            valueColor: "text-amber-400",
             subtitle: "Builder Construction Milestones",
             icon: Building2,
-            iconColor: "text-orange-400",
+            iconColor: "text-[#F59E0B]",
           }}
         />
       </div>

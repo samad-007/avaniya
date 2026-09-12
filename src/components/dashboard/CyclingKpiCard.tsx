@@ -13,11 +13,13 @@ export interface KpiPanelConfig {
   icon: LucideIcon;
   iconColor?: string;
   valueColor?: string;
+  pillColor?: string;
 }
 
 export interface CyclingKpiCardProps {
   panelA: KpiPanelConfig;
   panelB: KpiPanelConfig;
+  cardAccentColor?: string;
   activePanel?: "A" | "B";
   isFlipping?: boolean;
   cycleIntervalMs?: number;
@@ -30,9 +32,78 @@ export interface CyclingKpiCardProps {
   onHoverEnd?: () => void;
 }
 
+const COLOR_CLASSES: Record<
+  string,
+  { activePill: string; text: string; badge: string }
+> = {
+  blue: {
+    activePill: "bg-[#3B82F6]",
+    text: "text-blue-400",
+    badge: "bg-blue-950/60 text-blue-400 border border-blue-800/40",
+  },
+  emerald: {
+    activePill: "bg-[#22C55E]",
+    text: "text-emerald-400",
+    badge: "bg-emerald-950/60 text-emerald-400 border border-emerald-800/40",
+  },
+  cyan: {
+    activePill: "bg-[#06B6D4]",
+    text: "text-cyan-400",
+    badge: "bg-cyan-950/60 text-cyan-400 border border-cyan-800/40",
+  },
+  amber: {
+    activePill: "bg-[#F59E0B]",
+    text: "text-amber-400",
+    badge: "bg-amber-950/60 text-amber-400 border border-amber-800/40",
+  },
+  rose: {
+    activePill: "bg-[#F43F5E]",
+    text: "text-rose-400",
+    badge: "bg-rose-950/60 text-rose-400 border border-rose-800/40",
+  },
+  purple: {
+    activePill: "bg-[#A855F7]",
+    text: "text-purple-400",
+    badge: "bg-purple-950/60 text-purple-400 border border-purple-800/40",
+  },
+  yellow: {
+    activePill: "bg-[#EAB308]",
+    text: "text-yellow-400",
+    badge: "bg-yellow-950/60 text-yellow-400 border border-yellow-800/40",
+  },
+  white: {
+    activePill: "bg-white",
+    text: "text-white",
+    badge: "bg-zinc-800 text-zinc-300 border border-zinc-700/50",
+  },
+};
+
+const resolveActivePillBg = (
+  panel: KpiPanelConfig,
+  cardAccent?: string
+): string => {
+  if (panel.pillColor) return panel.pillColor;
+
+  if (cardAccent) {
+    const key = cardAccent.toLowerCase();
+    if (COLOR_CLASSES[key]) return COLOR_CLASSES[key].activePill;
+    if (cardAccent.startsWith("bg-")) return cardAccent;
+  }
+
+  const combined = `${panel.titleColor || ""} ${panel.badgeColor || ""} ${
+    panel.iconColor || ""
+  }`.toLowerCase();
+  for (const [k, v] of Object.entries(COLOR_CLASSES)) {
+    if (combined.includes(k)) return v.activePill;
+  }
+
+  return "bg-white";
+};
+
 export const CyclingKpiCard: React.FC<CyclingKpiCardProps> = ({
   panelA,
   panelB,
+  cardAccentColor,
   activePanel: activePanelProp,
   isFlipping: isFlippingProp,
   cycleIntervalMs = 7000,
@@ -162,6 +233,14 @@ export const CyclingKpiCard: React.FC<CyclingKpiCardProps> = ({
   const currentPanel = currentPanelKey === "A" ? panelA : panelB;
   const IconComponent = currentPanel.icon;
 
+  // Resolve accent color for both points (same color matching the card)
+  const pillAActiveBg = resolveActivePillBg(panelA, cardAccentColor);
+  const pillBActiveBg = resolveActivePillBg(panelB, cardAccentColor);
+
+  const cardAccentText = cardAccentColor
+    ? COLOR_CLASSES[cardAccentColor.toLowerCase()]?.text
+    : undefined;
+
   return (
     <div
       onMouseEnter={() => {
@@ -184,15 +263,17 @@ export const CyclingKpiCard: React.FC<CyclingKpiCardProps> = ({
             isFlipping ? "opacity-0 scale-95" : "opacity-100 scale-100"
           } ${
             currentPanel.badgeColor ||
-            (currentPanelKey === "A"
+            (cardAccentColor && COLOR_CLASSES[cardAccentColor.toLowerCase()]
+              ? COLOR_CLASSES[cardAccentColor.toLowerCase()].badge
+              : currentPanelKey === "A"
               ? "bg-zinc-800 text-zinc-300 border border-zinc-700/50"
-              : "bg-purple-950/60 text-purple-400 border border-purple-800/40")
+              : "bg-zinc-800 text-zinc-300 border border-zinc-700/50")
           }`}
         >
           {currentPanel.badge}
         </span>
 
-        {/* Dual-Pill Visual Switcher Controls */}
+        {/* Dual-Pill Visual Switcher Controls with Synchronized Expanding Accent Colors */}
         <div
           className="flex items-center gap-1 bg-[#141414] px-1.5 py-1 rounded border border-[#2a2a2a] shrink-0"
           onClick={(e) => e.stopPropagation()}
@@ -206,7 +287,7 @@ export const CyclingKpiCard: React.FC<CyclingKpiCardProps> = ({
             }}
             className={`h-1.5 rounded-full transition-all duration-300 ease-out ${
               currentPanelKey === "A"
-                ? "w-4 bg-white"
+                ? `w-4 ${pillAActiveBg}`
                 : "w-1.5 bg-[#444444] hover:bg-[#666666]"
             }`}
           />
@@ -219,7 +300,7 @@ export const CyclingKpiCard: React.FC<CyclingKpiCardProps> = ({
             }}
             className={`h-1.5 rounded-full transition-all duration-300 ease-out ${
               currentPanelKey === "B"
-                ? "w-4 bg-purple-400"
+                ? `w-4 ${pillBActiveBg}`
                 : "w-1.5 bg-[#444444] hover:bg-[#666666]"
             }`}
           />
@@ -227,7 +308,7 @@ export const CyclingKpiCard: React.FC<CyclingKpiCardProps> = ({
             <IconComponent
               className={`w-3.5 h-3.5 transition-all duration-200 ease-out ${
                 isFlipping ? "opacity-0 scale-90" : "opacity-100 scale-100"
-              } ${currentPanel.iconColor || "text-white"}`}
+              } ${currentPanel.iconColor || cardAccentText || "text-white"}`}
             />
           </div>
         </div>
@@ -243,7 +324,8 @@ export const CyclingKpiCard: React.FC<CyclingKpiCardProps> = ({
         <div
           className={`text-xs font-semibold uppercase tracking-wider truncate transition-colors duration-200 ${
             currentPanel.titleColor ||
-            (currentPanelKey === "A" ? "text-[#A1A1AA]" : "text-purple-400")
+            cardAccentText ||
+            (currentPanelKey === "A" ? "text-[#A1A1AA]" : "text-white")
           }`}
           title={currentPanel.title}
         >
