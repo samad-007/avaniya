@@ -386,13 +386,15 @@ export function calculateCommercialMetrics(
     let daysToDeadline: number | undefined = undefined;
     if (p.agreementDueDate) {
       const due = new Date(p.agreementDueDate).getTime();
-      const now = new Date().setHours(0, 0, 0, 0);
-      const diffDays = Math.ceil((due - now) / (1000 * 60 * 60 * 24));
-      daysToDeadline = diffDays;
-      if (diffDays < 0) deadlineStatus = "overdue";
-      else if (diffDays <= 14) deadlineStatus = "urgent";
-      else if (diffDays <= 45) deadlineStatus = "upcoming";
-      else deadlineStatus = "safe";
+      if (!isNaN(due)) {
+        const now = new Date().setHours(0, 0, 0, 0);
+        const diffDays = Math.ceil((due - now) / (1000 * 60 * 60 * 24));
+        daysToDeadline = diffDays;
+        if (diffDays < 0) deadlineStatus = "overdue";
+        else if (diffDays <= 14) deadlineStatus = "urgent";
+        else if (diffDays <= 45) deadlineStatus = "upcoming";
+        else deadlineStatus = "safe";
+      }
     }
 
     let subPlotStats: PropertyFinancialMetrics["subPlotStats"] = undefined;

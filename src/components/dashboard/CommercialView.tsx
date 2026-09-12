@@ -334,6 +334,8 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                     >
                       {alert.daysLeft < 0
                         ? `${Math.abs(alert.daysLeft)}d OVERDUE`
+                        : alert.daysLeft === 0
+                        ? "DUE TODAY"
                         : `${alert.daysLeft}d LEFT`}
                     </span>
                   </div>
@@ -612,7 +614,10 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                               {pm.subPlotStats.sold}/{pm.subPlotStats.totalPlots} Plots Sold
                             </span>
                           )}
-                          {pm.deadlineStatus && pm.deadlineStatus !== "safe" && (
+                          {pm.deadlineStatus &&
+                            pm.deadlineStatus !== "safe" &&
+                            pm.deadlineStatus !== "none" &&
+                            pm.daysToDeadline !== undefined && (
                             <span
                               className={`font-mono text-xs font-bold px-2 py-0.5 rounded flex items-center gap-1 ${
                                 pm.deadlineStatus === "overdue"
@@ -624,8 +629,10 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                             >
                               <Clock className="w-3 h-3" />
                               <span>
-                                {pm.daysToDeadline !== undefined && pm.daysToDeadline < 0
+                                {pm.daysToDeadline < 0
                                   ? `${Math.abs(pm.daysToDeadline)}d Overdue`
+                                  : pm.daysToDeadline === 0
+                                  ? "Due Today"
                                   : `Due in ${pm.daysToDeadline}d`}
                               </span>
                             </span>

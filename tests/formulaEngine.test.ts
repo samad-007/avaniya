@@ -7,6 +7,7 @@ import {
   INITIAL_PROPERTIES,
   INITIAL_TRANSACTIONS,
   INITIAL_CATEGORIES,
+  SeedProperty,
 } from "../src/lib/seedData";
 import { generateCSV, generateExcelWorkbook, generateExecutivePDF } from "../src/lib/exportEngine";
 import { hashPassword, verifyPassword, signSessionToken, verifySessionToken } from "../src/lib/auth";
@@ -509,5 +510,45 @@ describe("Financial Formula Engine & Export Tests", () => {
     // Partner 2 (40%): 40% of 1.10 Cr = 44 Lakhs cost share, 40% of 40L = 16 Lakhs projected profit
     expect(pm.partnerAllocations?.[1].costShare).toBe(4400000);
     expect(pm.partnerAllocations?.[1].projectedProfitShare).toBe(1600000);
+  });
+
+  it("should safely handle properties without deadline or with invalid dates", () => {
+    const propsWithoutDeadlines: SeedProperty[] = [
+      {
+        id: "prop-no-deadline",
+        type: "commercial",
+        propertyCode: "LND-NO-DEADLINE",
+        name: "Plot Without Due Date",
+        acquisitionDate: "2026-01-01",
+        agreedPurchasePrice: 5000000,
+        status: "open",
+      },
+      {
+        id: "prop-invalid-deadline",
+        type: "commercial",
+        propertyCode: "LND-INVALID-DEADLINE",
+        name: "Plot With Corrupted Date",
+        acquisitionDate: "2026-01-01",
+        agreedPurchasePrice: 5000000,
+        agreementDueDate: "invalid-date-string",
+        status: "open",
+      },
+    ];
+
+    const metrics = calculateCommercialMetrics(
+      propsWithoutDeadlines,
+      [],
+      INITIAL_CATEGORIES
+    );
+
+    expect(metrics.propertyMetrics[0].deadlineStatus).toBe("none");
+    expect(metrics.propertyMetrics[0].daysToDeadline).toBeUndefined();
+
+    expect(metrics.propertyMetrics[1].deadlineStatus).toBe("none");
+    expect(metrics.propertyMetrics[1].daysToDeadline).toBeUndefined();
+
+    expect(metrics.deadlineAlerts.length).toBe(0);
+    expect(metrics.upcomingDeadlinesCount).toBe(0);
+    expect(metrics.overdueDeadlinesCount).toBe(0);
   });
 });

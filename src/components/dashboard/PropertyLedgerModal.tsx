@@ -125,6 +125,8 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                       <span className="text-[10px]">
                         ({propertyMetrics.daysToDeadline < 0
                           ? `${Math.abs(propertyMetrics.daysToDeadline)}d overdue`
+                          : propertyMetrics.daysToDeadline === 0
+                          ? "due today"
                           : `${propertyMetrics.daysToDeadline}d left`})
                       </span>
                     )}
