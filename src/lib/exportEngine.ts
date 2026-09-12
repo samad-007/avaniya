@@ -323,6 +323,10 @@ export async function generateExcelWorkbook(
     { header: "Pending to Seller", key: "pending_out", width: 22 },
     { header: "Pending from Buyer", key: "pending_in", width: 22 },
     { header: "Realized Profit / Loss", key: "pnl", width: 22 },
+    { header: "Agreement Due Date", key: "due_date", width: 18 },
+    { header: "Sub-Plots (Sold/Total)", key: "sub_plots", width: 20 },
+    { header: "JV Partners", key: "partners", width: 18 },
+    { header: "Doc Proof Link", key: "proof_url", width: 32 },
   ];
 
   wsLand.spliceRows(1, 0, ["Commercial Land Inventory & Deal Master Ledger"]);
@@ -391,6 +395,10 @@ export async function generateExcelWorkbook(
         formula: `IF(N${rowNum}>0, N${rowNum}-K${rowNum}, 0)`,
         result: pm?.realizedProfit || 0,
       },
+      p.agreementDueDate || "-",
+      pm?.subPlotStats ? `${pm.subPlotStats.sold} / ${pm.subPlotStats.totalPlots} sold` : "-",
+      p.partners && p.partners.length > 0 ? `${p.partners.length} Partners` : "-",
+      p.attachmentUrl || "",
     ]);
 
     const r = wsLand.getRow(rowNum);
@@ -418,6 +426,10 @@ export async function generateExcelWorkbook(
     { formula: `SUM(O$4:O$${landEnd})`, result: commMetrics.totalPendingPayable },
     { formula: `SUM(P$4:P$${landEnd})`, result: commMetrics.totalPendingReceivable },
     { formula: `SUM(Q$4:Q$${landEnd})`, result: commMetrics.totalRealizedProfit },
+    "",
+    "",
+    "",
+    "",
   ]);
 
   const tLandRow = wsLand.getRow(landTotalRow);
@@ -445,6 +457,8 @@ export async function generateExcelWorkbook(
     { header: "Payment Mode", width: 16 },
     { header: "Amount Paid", width: 22 },
     { header: "Paid To / Notes", width: 38 },
+    { header: "Sub-Plot #", width: 14 },
+    { header: "Attachment URL", width: 32 },
   ];
   wsOut.spliceRows(1, 0, ["Commercial Land Outflows & Expenses Log"]);
   wsOut.getCell("A1").font = { name: "Arial", size: 14, bold: true };
@@ -465,6 +479,8 @@ export async function generateExcelWorkbook(
       t.mode,
       t.amount,
       t.remarks || t.recipientOrSource || "",
+      t.subPlotNumber ? `Plot #${t.subPlotNumber}` : "-",
+      t.attachmentUrl || "",
     ]);
   });
   wsOut.eachRow((row, rowNum) => {
@@ -480,6 +496,8 @@ export async function generateExcelWorkbook(
     "",
     "",
     { formula: `SUM(F$4:F$${outEnd})`, result: commMetrics.outflowsTotal },
+    "",
+    "",
     "",
   ]);
   wsOut.getRow(outTotalRow).font = { bold: true };
@@ -499,6 +517,8 @@ export async function generateExcelWorkbook(
     { header: "Payment Mode", width: 16 },
     { header: "Amount Received", width: 22 },
     { header: "Received From / Notes", width: 38 },
+    { header: "Sub-Plot #", width: 14 },
+    { header: "Attachment URL", width: 32 },
   ];
   wsIn.spliceRows(1, 0, ["Property Sale Receipts & Deal Collections Log"]);
   wsIn.getCell("A1").font = { name: "Arial", size: 14, bold: true };
@@ -519,6 +539,8 @@ export async function generateExcelWorkbook(
       t.mode,
       t.amount,
       t.remarks || t.recipientOrSource || "",
+      t.subPlotNumber ? `Plot #${t.subPlotNumber}` : "-",
+      t.attachmentUrl || "",
     ]);
   });
   wsIn.eachRow((row, rowNum) => {
@@ -534,6 +556,8 @@ export async function generateExcelWorkbook(
     "",
     "",
     { formula: `SUM(F$4:F$${dealInEnd})`, result: commMetrics.dealInflowsTotal },
+    "",
+    "",
     "",
   ]);
   wsIn.getRow(dealInTotalRow).font = { bold: true };
@@ -1496,6 +1520,8 @@ export function generateCSV(transactions: SeedTransaction[]): string {
     "Amount (INR)",
     "Recipient / Source",
     "Remarks",
+    "Sub-Plot Number",
+    "Attachment URL",
   ];
 
   const rows = transactions.map((t) => [
@@ -1511,6 +1537,8 @@ export function generateCSV(transactions: SeedTransaction[]): string {
     t.amount,
     `"${(t.recipientOrSource || "").replace(/"/g, '""')}"`,
     `"${(t.remarks || "").replace(/"/g, '""')}"`,
+    `"${t.subPlotNumber || ""}"`,
+    `"${(t.attachmentUrl || "").replace(/"/g, '""')}"`,
   ]);
 
   return (

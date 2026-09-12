@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { X, Save, Trash2, Calendar, AlertTriangle, ArrowRightLeft, DollarSign } from "lucide-react";
+import { X, Save, Trash2, Calendar, AlertTriangle, ArrowRightLeft, DollarSign, Link2, ExternalLink } from "lucide-react";
 import { SeedTransaction, SeedProperty, SeedCategory, SeedLoan } from "@/lib/seedData";
 import { formatINRCompact } from "@/lib/formatters";
 
@@ -39,6 +39,8 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
         scope: transaction.scope || "commercial",
         transactionType: transaction.transactionType || "outflow",
         propertyCode: transaction.propertyCode || "",
+        subPlotNumber: transaction.subPlotNumber || "",
+        attachmentUrl: transaction.attachmentUrl || "",
         loanId: transaction.loanId,
         loanCode: transaction.loanCode || "",
         category: transaction.category || "",
@@ -52,6 +54,17 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
       setShowDeleteConfirm(false);
     }
   }, [transaction]);
+
+  const selectedProp = useMemo(() => {
+    if (!formData.propertyCode) return null;
+    return (
+      properties.find(
+        (p) =>
+          p.propertyCode.toLowerCase() ===
+          (formData.propertyCode || "").toLowerCase()
+      ) || null
+    );
+  }, [properties, formData.propertyCode]);
 
   const filteredCategories = useMemo(() => {
     if (!categories) return [];
@@ -333,6 +346,29 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                       </option>
                     ))}
                 </select>
+
+                {/* Sub-Plot Dropdown (if land deal has sub-plots) */}
+                {selectedProp?.subPlots && selectedProp.subPlots.length > 0 && (
+                  <div className="flex flex-col gap-1 mt-2">
+                    <label className="text-[11px] font-semibold text-emerald-400 uppercase tracking-wider">
+                      Tag to Sub-Plot
+                    </label>
+                    <select
+                      value={formData.subPlotNumber || ""}
+                      onChange={(e) =>
+                        setFormData({ ...formData, subPlotNumber: e.target.value })
+                      }
+                      className="bg-[#161616] border border-[#333333] rounded-lg px-2.5 py-1.5 text-white text-xs outline-none focus:border-emerald-500 cursor-pointer"
+                    >
+                      <option value="">(None / Deal Level)</option>
+                      {selectedProp.subPlots.map((sp) => (
+                        <option key={sp.id} value={sp.plotNumber}>
+                          Plot #{sp.plotNumber} ({sp.sqftArea.toLocaleString("en-IN")} sqft - {sp.status.toUpperCase()}{sp.buyerName ? ` - ${sp.buyerName}` : ""})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
             )}
 
@@ -438,6 +474,36 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                 setFormData({ ...formData, remarks: e.target.value })
               }
               placeholder="e.g. Advance paid against survey no. 442/1B, Cheque #004521"
+              className="bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
+            />
+          </div>
+
+          {/* Row 6: Attachment URL */}
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider flex items-center gap-1.5">
+                <Link2 className="w-3.5 h-3.5 text-[#A1A1AA]" />
+                <span>Document / Receipt Proof URL</span>
+              </label>
+              {formData.attachmentUrl && (
+                <a
+                  href={formData.attachmentUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-blue-400 hover:text-blue-300 hover:underline flex items-center gap-1"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  <span>Open Link</span>
+                </a>
+              )}
+            </div>
+            <input
+              type="url"
+              value={formData.attachmentUrl || ""}
+              onChange={(e) =>
+                setFormData({ ...formData, attachmentUrl: e.target.value })
+              }
+              placeholder="https://drive.google.com/... or Dropbox / iCloud link"
               className="bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
             />
           </div>

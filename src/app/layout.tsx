@@ -23,6 +23,12 @@ export const metadata: Metadata = {
   },
   description:
     "Indian Real Estate Liquidity, Deal Pipeline & Asset Portfolio Management System",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Avaniya",
+  },
   icons: {
     icon: "/icon",
     apple: "/apple-icon",

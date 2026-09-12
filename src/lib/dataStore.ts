@@ -95,6 +95,15 @@ export async function getProperties(
         agreedSellingPrice: d.agreedSellingPrice,
         status: d.status,
         milestones: d.milestones,
+        agreementDueDate: d.agreementDueDate
+          ? new Date(d.agreementDueDate).toISOString().split("T")[0]
+          : undefined,
+        targetSettlementDate: d.targetSettlementDate
+          ? new Date(d.targetSettlementDate).toISOString().split("T")[0]
+          : undefined,
+        attachmentUrl: d.attachmentUrl,
+        subPlots: d.subPlots,
+        partners: d.partners,
         notes: d.notes,
       }));
     }
@@ -216,6 +225,15 @@ export async function updateProperty(
           agreedSellingPrice: updated.agreedSellingPrice,
           status: updated.status,
           milestones: updated.milestones,
+          agreementDueDate: updated.agreementDueDate
+            ? new Date(updated.agreementDueDate).toISOString().split("T")[0]
+            : undefined,
+          targetSettlementDate: updated.targetSettlementDate
+            ? new Date(updated.targetSettlementDate).toISOString().split("T")[0]
+            : undefined,
+          attachmentUrl: updated.attachmentUrl,
+          subPlots: updated.subPlots,
+          partners: updated.partners,
           notes: updated.notes,
         };
 
@@ -302,6 +320,8 @@ export async function getTransactions(
         mode: d.mode,
         transferType: d.transferType,
         amount: d.amount,
+        subPlotNumber: d.subPlotNumber,
+        attachmentUrl: d.attachmentUrl,
         recipientOrSource: d.recipientOrSource,
         remarks: d.remarks,
       }));
@@ -411,12 +431,16 @@ export async function updateTransaction(
           scope: updated.scope,
           transactionType: updated.transactionType,
           transCode: updated.transCode,
+          loanId: updated.loanId,
+          loanCode: updated.loanCode,
           propertyCode: updated.propertyCode,
           date: new Date(updated.date).toISOString().split("T")[0],
           category: updated.category,
           mode: updated.mode,
           transferType: updated.transferType,
           amount: updated.amount,
+          subPlotNumber: updated.subPlotNumber,
+          attachmentUrl: updated.attachmentUrl,
           recipientOrSource: updated.recipientOrSource,
           remarks: updated.remarks,
         };

@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { amountToVerbalSummary } from "@/lib/formatters";
 import { SeedProperty, SeedCategory, SeedTransaction, SeedLoan } from "@/lib/seedData";
-import { X, Banknote, Landmark, Plus, Edit3, HandCoins } from "lucide-react";
+import { PropertyFinancialMetrics, LoanFinancialMetrics } from "@/lib/formulaEngine";
+import { X, Banknote, Landmark, Plus, Edit3, HandCoins, Zap, Link2 } from "lucide-react";
 
 interface QuickEntryModalProps {
   isOpen: boolean;
@@ -15,6 +16,8 @@ interface QuickEntryModalProps {
   properties: SeedProperty[];
   loans?: SeedLoan[];
   categories: SeedCategory[];
+  propertyMetrics?: PropertyFinancialMetrics[];
+  loanMetrics?: LoanFinancialMetrics[];
   onSave: (transactionData: Omit<SeedTransaction, "id">) => Promise<void>;
   onOpenCategoryModal: () => void;
 }
@@ -29,6 +32,8 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
   properties,
   loans = [],
   categories,
+  propertyMetrics,
+  loanMetrics,
   onSave,
   onOpenCategoryModal,
 }) => {
@@ -49,6 +54,8 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
   const [loanCode, setLoanCode] = useState<string>(
     defaultLoanCode || ""
   );
+  const [subPlotNumber, setSubPlotNumber] = useState<string>("");
+  const [attachmentUrl, setAttachmentUrl] = useState<string>("");
   const [category, setCategory] = useState<string>("");
   const [isCustomCategory, setIsCustomCategory] = useState(false);
   const [customCategoryInput, setCustomCategoryInput] = useState("");
@@ -65,9 +72,84 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
   >("Bank Withdrawal to Cash");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const selectedProperty = useMemo(() => {
+    return properties.find(
+      (p) => p.propertyCode.toLowerCase() === (propertyCode || "").toLowerCase()
+    );
+  }, [properties, propertyCode]);
+
+  const activePropMetric = useMemo(() => {
+    if (!propertyMetrics || !propertyCode) return undefined;
+    return propertyMetrics.find(
+      (m) => m.property.propertyCode.toLowerCase() === propertyCode.toLowerCase()
+    );
+  }, [propertyMetrics, propertyCode]);
+
+  const activeLoanMetric = useMemo(() => {
+    if (!loanMetrics || !loanCode) return undefined;
+    return loanMetrics.find(
+      (lm) => lm.loan.loanCode.toLowerCase() === loanCode.toLowerCase()
+    );
+  }, [loanMetrics, loanCode]);
+
+  const suggestedFill = useMemo(() => {
+    if (activeType === "outflow") {
+      if (activePropMetric && activePropMetric.pendingOutflow > 0) {
+        return {
+          label: `Pay Deal Balance Due (${activePropMetric.property.propertyCode})`,
+          amount: activePropMetric.pendingOutflow,
+          remarks: `Balance settlement for ${activePropMetric.property.propertyCode}`,
+        };
+      }
+    } else if (activeType === "inflow") {
+      if (activePropMetric && activePropMetric.pendingInflow > 0) {
+        return {
+          label: `Collect Remaining Sale Value (${activePropMetric.property.propertyCode})`,
+          amount: activePropMetric.pendingInflow,
+          remarks: `Sale value settlement for ${activePropMetric.property.propertyCode}`,
+        };
+      }
+    } else if (activeType === "loan") {
+      if (loanSubtype === "loan_repayment") {
+        if (activeLoanMetric && activeLoanMetric.outstandingPrincipal > 0) {
+          return {
+            label: `Settle Loan Principal (${activeLoanMetric.loan.loanCode})`,
+            amount: activeLoanMetric.outstandingPrincipal,
+            remarks: `Principal settlement for ${activeLoanMetric.loan.loanCode}`,
+          };
+        }
+      } else if (loanSubtype === "loan_interest") {
+        const rate = activeLoanMetric?.loan.interestRatePct;
+        if (activeLoanMetric && rate && rate > 0) {
+          const principal =
+            activeLoanMetric.outstandingPrincipal ||
+            activeLoanMetric.loan.principalAmount;
+          const annualInt = Math.round((principal * rate) / 100);
+          const monthlyInt = Math.round(annualInt / 12);
+          return {
+            label: `Pay Monthly Interest (${activeLoanMetric.loan.loanCode})`,
+            amount: monthlyInt,
+            remarks: `Monthly interest payment for ${activeLoanMetric.loan.loanCode}`,
+          };
+        }
+      } else if (loanSubtype === "loan_profit_share") {
+        if (activeLoanMetric && (activeLoanMetric.loan.profitSharePct || 0) > 0) {
+          return {
+            label: `Pay Profit Share (${activeLoanMetric.loan.loanCode})`,
+            amount: 0,
+            remarks: `Profit share for ${activeLoanMetric.loan.loanCode}`,
+          };
+        }
+      }
+    }
+    return null;
+  }, [activeType, loanSubtype, activePropMetric, activeLoanMetric]);
+
   useEffect(() => {
     if (isOpen) {
       setActiveType(initialEntryType);
+      setSubPlotNumber("");
+      setAttachmentUrl("");
       if (defaultLoanCode) {
         setLoanCode(defaultLoanCode);
       } else if (loans.length > 0) {
@@ -77,6 +159,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
   }, [isOpen, initialEntryType, defaultLoanCode, loans]);
 
   useEffect(() => {
+    setSubPlotNumber("");
     if (defaultPropertyCode) {
       setPropertyCode(defaultPropertyCode);
     } else if (properties.length > 0) {
@@ -433,6 +516,13 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
         mode,
         transferType: activeType === "transfer" ? transferType : undefined,
         amount,
+        subPlotNumber:
+          activeType === "withdrawal" ||
+          activeType === "transfer" ||
+          activeType === "loan"
+            ? undefined
+            : subPlotNumber || undefined,
+        attachmentUrl: attachmentUrl.trim() || undefined,
         recipientOrSource: recipient,
         remarks,
         date,
@@ -696,6 +786,28 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
               {amountToVerbalSummary(amount)}
             </div>
 
+            {/* Smart 1-Click Pay/Collect Balance Pre-fill */}
+            {suggestedFill && (
+              <button
+                type="button"
+                onClick={() => {
+                  setAmount(suggestedFill.amount);
+                  if (suggestedFill.remarks && !remarks) {
+                    setRemarks(suggestedFill.remarks);
+                  }
+                }}
+                className="flex items-center justify-between px-3 py-2 rounded-lg bg-emerald-950/40 border border-emerald-500/50 text-emerald-300 text-xs font-semibold hover:bg-emerald-900/50 hover:border-emerald-400 transition-all duration-150 text-left"
+              >
+                <div className="flex items-center gap-1.5">
+                  <Zap className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                  <span>{suggestedFill.label}</span>
+                </div>
+                <span className="font-mono font-bold text-white whitespace-nowrap ml-2">
+                  ₹{suggestedFill.amount.toLocaleString("en-IN")}
+                </span>
+              </button>
+            )}
+
             {/* Quick Amount Increment Preset Chips */}
             <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-1">
               {[
@@ -805,6 +917,27 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                     </option>
                   ))}
               </select>
+
+              {/* Sub-Plot Dropdown (if land deal has sub-plots) */}
+              {selectedProperty?.subPlots && selectedProperty.subPlots.length > 0 && (
+                <div className="flex flex-col gap-1.5 mt-2 bg-[#141414] p-2.5 rounded-lg border border-[#262626]">
+                  <label className="text-[11px] font-semibold text-emerald-400 uppercase tracking-wider">
+                    Tag to Sub-Plot / Unit (Optional)
+                  </label>
+                  <select
+                    value={subPlotNumber}
+                    onChange={(e) => setSubPlotNumber(e.target.value)}
+                    className="w-full bg-[#1c1c1c] border border-[#333333] rounded-lg p-2 text-white text-xs outline-none focus:border-emerald-500 cursor-pointer"
+                  >
+                    <option value="">-- Deal Level (Whole Land Parcel) --</option>
+                    {selectedProperty.subPlots.map((sp) => (
+                      <option key={sp.id} value={sp.plotNumber}>
+                        Plot #{sp.plotNumber} ({sp.sqftArea.toLocaleString("en-IN")} sqft - {sp.status.toUpperCase()}{sp.buyerName ? ` - ${sp.buyerName}` : ""})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
           )}
 
@@ -922,6 +1055,21 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
               placeholder="e.g. Token advance paid at lawyer office, Cheque #004521"
+              className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
+            />
+          </div>
+
+          {/* Document / Receipt Proof URL */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider flex items-center gap-1.5">
+              <Link2 className="w-3.5 h-3.5 text-[#A1A1AA]" />
+              <span>Document / Receipt Proof URL (Optional)</span>
+            </label>
+            <input
+              type="url"
+              value={attachmentUrl}
+              onChange={(e) => setAttachmentUrl(e.target.value)}
+              placeholder="https://drive.google.com/... or Dropbox / iCloud link"
               className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
             />
           </div>

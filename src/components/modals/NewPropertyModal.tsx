@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import { amountToVerbalSummary } from "@/lib/formatters";
-import { SeedProperty } from "@/lib/seedData";
-import { X, Building2, Home, Calculator } from "lucide-react";
+import { SeedProperty, SeedSubPlot, SeedPartner } from "@/lib/seedData";
+import { X, Building2, Home, Calculator, Plus, Trash2, Calendar, Link2, Users, Grid } from "lucide-react";
 
 interface NewPropertyModalProps {
   isOpen: boolean;
@@ -29,6 +29,9 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
   const [acquisitionDate, setAcquisitionDate] = useState(
     new Date().toISOString().split("T")[0]
   );
+  const [agreementDueDate, setAgreementDueDate] = useState("");
+  const [targetSettlementDate, setTargetSettlementDate] = useState("");
+  const [attachmentUrl, setAttachmentUrl] = useState("");
   const [sqftArea, setSqftArea] = useState<number | "">("");
   const [ratePerSqft, setRatePerSqft] = useState<number | "">("");
   const [agreedPurchasePrice, setAgreedPurchasePrice] = useState<number>(0);
@@ -38,6 +41,8 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
     "open" | "in_progress" | "registered" | "sold" | "closed"
   >("open");
   const [notes, setNotes] = useState("");
+  const [subPlots, setSubPlots] = useState<SeedSubPlot[]>([]);
+  const [partners, setPartners] = useState<SeedPartner[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
@@ -52,6 +57,55 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
     if (newSqft && newRate && typeof newSqft === "number" && typeof newRate === "number") {
       setAgreedPurchasePrice(Math.round(newSqft * newRate));
     }
+  };
+
+  const handleAddSubPlot = () => {
+    const nextNum = String(subPlots.length + 1);
+    setSubPlots([
+      ...subPlots,
+      {
+        id: `plot-${Date.now()}-${nextNum}`,
+        plotNumber: nextNum,
+        sqftArea: 1200,
+        targetPrice: 1500000,
+        status: "available",
+      },
+    ]);
+  };
+
+  const handleUpdateSubPlot = (idx: number, updates: Partial<SeedSubPlot>) => {
+    const current = [...subPlots];
+    current[idx] = { ...current[idx], ...updates };
+    setSubPlots(current);
+  };
+
+  const handleRemoveSubPlot = (idx: number) => {
+    const current = [...subPlots];
+    current.splice(idx, 1);
+    setSubPlots(current);
+  };
+
+  const handleAddPartner = () => {
+    setPartners([
+      ...partners,
+      {
+        name: `Partner ${partners.length + 1}`,
+        equityPct: 20,
+        capitalCommitted: 0,
+      },
+    ]);
+  };
+
+  const handleUpdatePartner = (idx: number, updates: Partial<SeedPartner>) => {
+    const current = [...partners];
+    current[idx] = { ...current[idx], ...updates };
+    setPartners(current);
+  };
+
+  const handleRemovePartner = (idx: number) => {
+    const current = [...partners];
+    current.splice(idx, 1);
+    setPartners(current);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -108,6 +162,9 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
         propertyCode: propertyCode.trim() || undefined,
         location,
         acquisitionDate,
+        agreementDueDate: agreementDueDate || undefined,
+        targetSettlementDate: targetSettlementDate || undefined,
+        attachmentUrl: attachmentUrl.trim() || undefined,
         sqftArea: sqftArea ? Number(sqftArea) : undefined,
         ratePerSqft: ratePerSqft ? Number(ratePerSqft) : undefined,
         agreedPurchasePrice,
@@ -115,6 +172,8 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
         agreedSellingPrice: agreedSellingPrice || undefined,
         status,
         notes,
+        subPlots: subPlots.length > 0 ? subPlots : undefined,
+        partners: partners.length > 0 ? partners : undefined,
         milestones: defaultMilestones,
       });
       onClose();
@@ -234,6 +293,47 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                 className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
               />
             </div>
+          </div>
+
+          {/* Agreement Due Date & Target Settlement Date */}
+          <div className="grid grid-cols-2 gap-3.5">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
+                Agreement Due Date
+              </label>
+              <input
+                type="date"
+                value={agreementDueDate}
+                onChange={(e) => setAgreementDueDate(e.target.value)}
+                className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-amber-500"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-blue-400 uppercase tracking-wider">
+                Target Settlement Date
+              </label>
+              <input
+                type="date"
+                value={targetSettlementDate}
+                onChange={(e) => setTargetSettlementDate(e.target.value)}
+                className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-blue-500"
+              />
+            </div>
+          </div>
+
+          {/* Document / Cloud Proof URL */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider flex items-center gap-1.5">
+              <Link2 className="w-3.5 h-3.5 text-[#A1A1AA]" />
+              <span>Document / Proof URL (Optional)</span>
+            </label>
+            <input
+              type="url"
+              value={attachmentUrl}
+              onChange={(e) => setAttachmentUrl(e.target.value)}
+              placeholder="https://drive.google.com/... or Dropbox / iCloud link"
+              className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
+            />
           </div>
 
           {/* Sq.ft and Rate Calculator */}
@@ -374,6 +474,159 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
               className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555] resize-none"
             />
           </div>
+
+          {/* Sub-Plots Inventory (Commercial Only) */}
+          {type === "commercial" && (
+            <div className="pt-3 border-t border-[#1a1a1a] flex flex-col gap-2.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Grid className="w-4 h-4 text-emerald-400" />
+                  <label className="text-xs font-bold text-[#E4E4E7] uppercase tracking-wider">
+                    Sub-Plots Inventory ({subPlots.length} Units)
+                  </label>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAddSubPlot}
+                  className="btn-action-primary px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add Plot</span>
+                </button>
+              </div>
+
+              {subPlots.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  {subPlots.map((sp, idx) => (
+                    <div
+                      key={sp.id || idx}
+                      className="grid grid-cols-1 sm:grid-cols-6 gap-2 bg-[#121212] border border-[#262626] p-2 rounded-lg items-center text-xs"
+                    >
+                      <input
+                        type="text"
+                        value={sp.plotNumber}
+                        onChange={(e) =>
+                          handleUpdateSubPlot(idx, { plotNumber: e.target.value })
+                        }
+                        placeholder="Plot #"
+                        className="bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white font-mono font-bold"
+                      />
+                      <input
+                        type="number"
+                        value={sp.sqftArea ?? ""}
+                        onChange={(e) =>
+                          handleUpdateSubPlot(idx, {
+                            sqftArea: parseFloat(e.target.value) || 0,
+                          })
+                        }
+                        placeholder="Sq.ft"
+                        className="bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white font-mono"
+                      />
+                      <input
+                        type="number"
+                        value={sp.targetPrice ?? ""}
+                        onChange={(e) =>
+                          handleUpdateSubPlot(idx, {
+                            targetPrice: parseFloat(e.target.value) || 0,
+                          })
+                        }
+                        placeholder="Target ₹"
+                        className="bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white font-mono font-semibold sm:col-span-2"
+                      />
+                      <select
+                        value={sp.status}
+                        onChange={(e) =>
+                          handleUpdateSubPlot(idx, {
+                            status: e.target.value as "available" | "booked" | "sold",
+                          })
+                        }
+                        className="bg-[#1a1a1a] border border-[#333333] rounded px-1.5 py-1 text-xs font-semibold text-white"
+                      >
+                        <option value="available">Available</option>
+                        <option value="booked">Booked</option>
+                        <option value="sold">Sold</option>
+                      </select>
+                      <div className="flex items-center gap-1 justify-end">
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveSubPlot(idx)}
+                          className="text-[#71717A] hover:text-rose-400 p-1"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Joint Venture Partners (Commercial Only) */}
+          {type === "commercial" && (
+            <div className="pt-3 border-t border-[#1a1a1a] flex flex-col gap-2.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-purple-400" />
+                  <label className="text-xs font-bold text-[#E4E4E7] uppercase tracking-wider">
+                    JV Partners ({partners.length})
+                  </label>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAddPartner}
+                  className="btn-action-primary px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add Partner</span>
+                </button>
+              </div>
+
+              {partners.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  {partners.map((p, idx) => (
+                    <div
+                      key={idx}
+                      className="grid grid-cols-1 sm:grid-cols-4 gap-2 bg-[#121212] border border-[#262626] p-2 rounded-lg items-center text-xs"
+                    >
+                      <input
+                        type="text"
+                        value={p.name}
+                        onChange={(e) =>
+                          handleUpdatePartner(idx, { name: e.target.value })
+                        }
+                        placeholder="Partner Name"
+                        className="bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white text-xs font-semibold sm:col-span-2"
+                      />
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number"
+                          value={p.equityPct ?? ""}
+                          onChange={(e) =>
+                            handleUpdatePartner(idx, {
+                              equityPct: parseFloat(e.target.value) || 0,
+                            })
+                          }
+                          placeholder="Equity %"
+                          className="w-full bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white text-xs font-mono font-bold"
+                        />
+                        <span className="text-[#71717A] font-bold">%</span>
+                      </div>
+                      <div className="flex items-center gap-1 justify-end">
+                        <button
+                          type="button"
+                          onClick={() => handleRemovePartner(idx)}
+                          className="text-[#71717A] hover:text-rose-400 p-1"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Buttons (Key Action: Create Property with Hover-to-White) */}
           <div className="flex items-center gap-2.5 pt-2.5 border-t border-[#262626]">

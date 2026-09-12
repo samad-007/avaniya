@@ -800,6 +800,8 @@ export default function DashboardPage() {
         properties={properties}
         loans={loans}
         categories={categories}
+        propertyMetrics={commercialMetrics?.propertyMetrics}
+        loanMetrics={commercialMetrics?.loanMetrics}
         onSave={handleSaveTransaction}
         onOpenCategoryModal={() => {
           setIsEntryModalOpen(false);

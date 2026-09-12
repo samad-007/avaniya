@@ -5,6 +5,10 @@ import { formatINR, formatDateIN } from "@/lib/formatters";
 import { PropertyFinancialMetrics } from "@/lib/formulaEngine";
 import { SeedProperty, SeedTransaction } from "@/lib/seedData";
 import {
+  formatPropertyWhatsApp,
+  openWhatsAppShare,
+} from "@/lib/whatsappSummary";
+import {
   X,
   Calendar,
   MapPin,
@@ -17,6 +21,10 @@ import {
   Clock,
   AlertCircle,
   Pencil,
+  Share2,
+  Link2,
+  Users,
+  LayoutGrid,
 } from "lucide-react";
 
 interface PropertyLedgerModalProps {
@@ -101,6 +109,27 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                 >
                   {prop.status}
                 </span>
+                {prop.agreementDueDate && (
+                  <span
+                    className={`flex items-center gap-1 font-mono text-xs font-semibold px-2 py-0.5 rounded border ${
+                      propertyMetrics?.deadlineStatus === "overdue"
+                        ? "bg-rose-950/50 text-rose-300 border-rose-800/50"
+                        : propertyMetrics?.deadlineStatus === "urgent"
+                        ? "bg-amber-950/50 text-amber-300 border-amber-800/50"
+                        : "bg-[#181818] text-[#A1A1AA] border-[#2e2e2e]"
+                    }`}
+                  >
+                    <Clock className="w-3 h-3" />
+                    Due: {formatDateIN(prop.agreementDueDate)}
+                    {propertyMetrics?.daysToDeadline !== undefined && (
+                      <span className="text-[10px]">
+                        ({propertyMetrics.daysToDeadline < 0
+                          ? `${Math.abs(propertyMetrics.daysToDeadline)}d overdue`
+                          : `${propertyMetrics.daysToDeadline}d left`})
+                      </span>
+                    )}
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-4 text-xs text-[#A1A1AA] mt-1.5 flex-wrap font-medium">
                 {prop.location && (
@@ -129,6 +158,31 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
+            {isCommercial && propertyMetrics && (
+              <button
+                type="button"
+                onClick={() => openWhatsAppShare(formatPropertyWhatsApp(propertyMetrics))}
+                className="p-2 rounded-lg bg-emerald-950/40 border border-emerald-800/40 text-emerald-400 hover:bg-emerald-900/60 transition-all duration-150 flex items-center gap-1.5 text-xs font-semibold"
+                title="Share Property Snapshot on WhatsApp"
+              >
+                <Share2 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">WhatsApp</span>
+              </button>
+            )}
+
+            {prop.attachmentUrl && (
+              <a
+                href={prop.attachmentUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-lg bg-blue-950/40 border border-blue-800/40 text-blue-400 hover:bg-blue-900/60 transition-all duration-150 flex items-center gap-1.5 text-xs font-semibold"
+                title="Open Cloud Proof Documents"
+              >
+                <Link2 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Docs</span>
+              </a>
+            )}
+
             {onEditProperty && (
               <button
                 onClick={() => onEditProperty(prop)}
@@ -348,6 +402,134 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
             </div>
           )}
 
+          {/* Commercial Mode: Sub-Plots Inventory Grid */}
+          {isCommercial && prop.subPlots && prop.subPlots.length > 0 && (
+            <div className="flex flex-col gap-2.5">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                  <LayoutGrid className="w-4 h-4 text-emerald-400" />
+                  <span>Sub-Plot Inventory ({prop.subPlots.length} Plots)</span>
+                </div>
+                {propertyMetrics?.subPlotStats && (
+                  <div className="flex items-center gap-2 text-xs font-mono">
+                    <span className="px-2 py-0.5 rounded bg-emerald-950/40 text-emerald-400 border border-emerald-800/40 font-semibold">
+                      {propertyMetrics.subPlotStats.sold} Sold
+                    </span>
+                    <span className="px-2 py-0.5 rounded bg-amber-950/40 text-amber-400 border border-amber-800/40 font-semibold">
+                      {propertyMetrics.subPlotStats.booked} Booked
+                    </span>
+                    <span className="px-2 py-0.5 rounded bg-[#181818] text-[#A1A1AA] border border-[#2c2c2c] font-semibold">
+                      {propertyMetrics.subPlotStats.available} Available
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="border border-[#262626] rounded-xl overflow-x-auto bg-[#050505]">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-[#111111] border-b border-[#262626] text-[#A1A1AA] uppercase font-bold tracking-wider">
+                      <th className="py-2.5 px-3">Plot #</th>
+                      <th className="py-2.5 px-3">Area (Sq.ft)</th>
+                      <th className="py-2.5 px-3 text-right">Target Price</th>
+                      <th className="py-2.5 px-3">Status</th>
+                      <th className="py-2.5 px-3">Buyer</th>
+                      <th className="py-2.5 px-3 text-right">Sold Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#181818]">
+                    {prop.subPlots.map((sp, idx) => (
+                      <tr key={idx} className="hover:bg-[#101010]">
+                        <td className="py-2.5 px-3 font-mono font-bold text-white">
+                          Plot #{sp.plotNumber}
+                        </td>
+                        <td className="py-2.5 px-3 font-mono text-[#D4D4D8]">
+                          {sp.sqftArea ? `${sp.sqftArea.toLocaleString("en-IN")} sqft` : "-"}
+                        </td>
+                        <td className="py-2.5 px-3 text-right font-mono text-white">
+                          {sp.targetPrice ? formatINR(sp.targetPrice) : "-"}
+                        </td>
+                        <td className="py-2.5 px-3">
+                          <span
+                            className={`font-mono text-[10px] font-semibold px-2 py-0.5 rounded border uppercase ${
+                              sp.status === "sold"
+                                ? "bg-emerald-950/40 text-emerald-400 border-emerald-800/40"
+                                : sp.status === "booked"
+                                ? "bg-amber-950/40 text-amber-400 border-amber-800/40"
+                                : "bg-[#161616] text-[#A1A1AA] border-[#2c2c2c]"
+                            }`}
+                          >
+                            {sp.status}
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 text-[#D4D4D8]">
+                          {sp.buyerName || "-"}
+                        </td>
+                        <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-400">
+                          {sp.status === "sold" ? formatINR(sp.targetPrice) : "-"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Commercial Mode: Multi-Partner JV Equity Distribution */}
+          {isCommercial && prop.partners && prop.partners.length > 0 && (
+            <div className="flex flex-col gap-2.5">
+              <div className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <Users className="w-4 h-4 text-purple-400" />
+                <span>Joint Venture (JV) Partners Equity Split ({prop.partners.length} Partners)</span>
+              </div>
+
+              <div className="border border-[#262626] rounded-xl overflow-x-auto bg-[#050505]">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-[#111111] border-b border-[#262626] text-[#A1A1AA] uppercase font-bold tracking-wider">
+                      <th className="py-2.5 px-3">Partner Name</th>
+                      <th className="py-2.5 px-3 text-right">Equity %</th>
+                      <th className="py-2.5 px-3 text-right">Committed Capital</th>
+                      <th className="py-2.5 px-3 text-right">Cost Outlay Share</th>
+                      <th className="py-2.5 px-3 text-right">Realized Profit Share</th>
+                      <th className="py-2.5 px-3 text-right">Projected Profit Share</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#181818]">
+                    {prop.partners.map((partner, idx) => {
+                      const alloc = propertyMetrics?.partnerAllocations?.find(
+                        (pa) => pa.name === partner.name
+                      );
+                      return (
+                        <tr key={idx} className="hover:bg-[#101010]">
+                          <td className="py-2.5 px-3 font-semibold text-white">
+                            {partner.name}
+                          </td>
+                          <td className="py-2.5 px-3 text-right font-mono font-bold text-purple-400">
+                            {partner.equityPct}%
+                          </td>
+                          <td className="py-2.5 px-3 text-right font-mono text-[#D4D4D8]">
+                            {partner.capitalCommitted ? formatINR(partner.capitalCommitted) : "-"}
+                          </td>
+                          <td className="py-2.5 px-3 text-right font-mono text-[#A1A1AA]">
+                            {alloc ? formatINR(alloc.costShare) : "-"}
+                          </td>
+                          <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-400">
+                            {alloc ? formatINR(alloc.realizedProfitShare) : "-"}
+                          </td>
+                          <td className="py-2.5 px-3 text-right font-mono text-white">
+                            {alloc ? formatINR(alloc.projectedProfitShare) : "-"}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
           {/* Action Row & Transaction Ledger Table */}
           <div className="flex flex-col gap-3.5">
             <div className="flex items-center justify-between flex-wrap gap-2.5">
@@ -415,7 +597,14 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                           {formatDateIN(t.date)}
                         </td>
                         <td className="py-3 px-3.5 font-semibold text-white">
-                          {t.category}
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span>{t.category}</span>
+                            {t.subPlotNumber && (
+                              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/40 text-emerald-400 border border-emerald-800/40">
+                                Plot #{t.subPlotNumber}
+                              </span>
+                            )}
+                          </div>
                         </td>
                         <td className="py-3 px-3.5">
                           <span
@@ -443,8 +632,21 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                           {t.transactionType === "deal_inflow" ? "+ " : ""}
                           {formatINR(t.amount)}
                         </td>
-                        <td className="py-3 px-3.5 text-[#A1A1AA] max-w-[200px] truncate">
-                          {t.remarks || t.recipientOrSource || "-"}
+                        <td className="py-3 px-3.5 text-[#A1A1AA]">
+                          <div className="flex items-center gap-2">
+                            <span className="max-w-[200px] truncate">{t.remarks || t.recipientOrSource || "-"}</span>
+                            {t.attachmentUrl && (
+                              <a
+                                href={t.attachmentUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-400 hover:text-blue-300 flex-shrink-0"
+                                title="Open Attachment Proof"
+                              >
+                                <Link2 className="w-3.5 h-3.5" />
+                              </a>
+                            )}
+                          </div>
                         </td>
                         <td className="py-3 px-3.5 text-right">
                           {onEditTransaction && (

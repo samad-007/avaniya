@@ -9,6 +9,24 @@ export interface IMilestone {
   remarks?: string;
 }
 
+export interface ISubPlot {
+  id: string;
+  plotNumber: string;
+  sqftArea: number;
+  ratePerSqft?: number;
+  targetPrice: number;
+  status: "available" | "booked" | "sold";
+  buyerName?: string;
+  notes?: string;
+}
+
+export interface IPartner {
+  name: string;
+  equityPct: number;
+  capitalCommitted?: number;
+  notes?: string;
+}
+
 export interface IProperty extends Document {
   userId: string;
   datasetId?: string;
@@ -24,6 +42,11 @@ export interface IProperty extends Document {
   agreedSellingPrice?: number;
   status: "open" | "in_progress" | "registered" | "sold" | "closed";
   milestones?: IMilestone[];
+  agreementDueDate?: Date;
+  targetSettlementDate?: Date;
+  attachmentUrl?: string;
+  subPlots?: ISubPlot[];
+  partners?: IPartner[];
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -41,6 +64,34 @@ const MilestoneSchema = new Schema<IMilestone>(
       default: "pending",
     },
     remarks: { type: String },
+  },
+  { _id: false }
+);
+
+const SubPlotSchema = new Schema<ISubPlot>(
+  {
+    id: { type: String, required: true },
+    plotNumber: { type: String, required: true },
+    sqftArea: { type: Number, required: true, default: 0 },
+    ratePerSqft: { type: Number, default: 0 },
+    targetPrice: { type: Number, required: true, default: 0 },
+    status: {
+      type: String,
+      enum: ["available", "booked", "sold"],
+      default: "available",
+    },
+    buyerName: { type: String },
+    notes: { type: String },
+  },
+  { _id: false }
+);
+
+const PartnerSchema = new Schema<IPartner>(
+  {
+    name: { type: String, required: true },
+    equityPct: { type: Number, required: true, default: 0 },
+    capitalCommitted: { type: Number, default: 0 },
+    notes: { type: String },
   },
   { _id: false }
 );
@@ -70,6 +121,11 @@ const PropertySchema = new Schema<IProperty>(
       default: "open",
     },
     milestones: [MilestoneSchema],
+    agreementDueDate: { type: Date },
+    targetSettlementDate: { type: Date },
+    attachmentUrl: { type: String },
+    subPlots: [SubPlotSchema],
+    partners: [PartnerSchema],
     notes: { type: String },
   },
   { timestamps: true }

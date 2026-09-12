@@ -21,6 +21,24 @@ export interface PropertyFinancialMetrics {
   projectedProfit: number; // Selling/Target Price - Total Project Outlay
   realizedProfit: number; // Total Receipts Collected - Total Outflows Paid
   pendingProfit: number; // Remaining profit to be received from buyer
+  deadlineStatus?: "overdue" | "urgent" | "upcoming" | "safe" | "none";
+  daysToDeadline?: number;
+  subPlotStats?: {
+    totalPlots: number;
+    available: number;
+    booked: number;
+    sold: number;
+    totalAreaSqft: number;
+    targetRevenue: number;
+  };
+  partnerAllocations?: Array<{
+    name: string;
+    equityPct: number;
+    costShare: number;
+    realizedProfitShare: number;
+    projectedProfitShare: number;
+    receiptsShare: number;
+  }>;
   transactions: SeedTransaction[];
 }
 
@@ -91,6 +109,15 @@ export interface CommercialDashboardMetrics {
   totalRealizedProfit: number;
   totalProjectedProfit: number;
   totalPendingProfit: number;
+  upcomingDeadlinesCount: number;
+  overdueDeadlinesCount: number;
+  deadlineAlerts: Array<{
+    propertyCode: string;
+    propertyName: string;
+    dueDate: string;
+    daysLeft: number;
+    status: "overdue" | "urgent" | "upcoming";
+  }>;
   propertyMetrics: PropertyFinancialMetrics[];
   loanMetrics: LoanFinancialMetrics[];
 }
@@ -355,6 +382,45 @@ export function calculateCommercialMetrics(
     // Remaining profit pending collection from buyer
     const pendingProfit = Math.max(0, projectedProfit - realizedProfit);
 
+    let deadlineStatus: "overdue" | "urgent" | "upcoming" | "safe" | "none" = "none";
+    let daysToDeadline: number | undefined = undefined;
+    if (p.agreementDueDate) {
+      const due = new Date(p.agreementDueDate).getTime();
+      const now = new Date().setHours(0, 0, 0, 0);
+      const diffDays = Math.ceil((due - now) / (1000 * 60 * 60 * 24));
+      daysToDeadline = diffDays;
+      if (diffDays < 0) deadlineStatus = "overdue";
+      else if (diffDays <= 14) deadlineStatus = "urgent";
+      else if (diffDays <= 45) deadlineStatus = "upcoming";
+      else deadlineStatus = "safe";
+    }
+
+    let subPlotStats: PropertyFinancialMetrics["subPlotStats"] = undefined;
+    if (p.subPlots && p.subPlots.length > 0) {
+      const totalPlots = p.subPlots.length;
+      const available = p.subPlots.filter((sp) => sp.status === "available").length;
+      const booked = p.subPlots.filter((sp) => sp.status === "booked").length;
+      const sold = p.subPlots.filter((sp) => sp.status === "sold").length;
+      const totalAreaSqft = p.subPlots.reduce((sum, sp) => sum + (sp.sqftArea || 0), 0);
+      const targetRevenue = p.subPlots.reduce((sum, sp) => sum + (sp.targetPrice || 0), 0);
+      subPlotStats = { totalPlots, available, booked, sold, totalAreaSqft, targetRevenue };
+    }
+
+    let partnerAllocations: PropertyFinancialMetrics["partnerAllocations"] = undefined;
+    if (p.partners && p.partners.length > 0) {
+      partnerAllocations = p.partners.map((partner) => {
+        const pct = (partner.equityPct || 0) / 100;
+        return {
+          name: partner.name,
+          equityPct: partner.equityPct,
+          costShare: Math.round(totalProjectOutlay * pct),
+          realizedProfitShare: Math.round(realizedProfit * pct),
+          projectedProfitShare: Math.round(projectedProfit * pct),
+          receiptsShare: Math.round(totalReceiptsCollected * pct),
+        };
+      });
+    }
+
     return {
       property: p,
       purchasePaidCash,
@@ -371,6 +437,10 @@ export function calculateCommercialMetrics(
       projectedProfit,
       realizedProfit,
       pendingProfit,
+      deadlineStatus,
+      daysToDeadline,
+      subPlotStats,
+      partnerAllocations,
       transactions: pTx.sort(
         (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
       ),
@@ -511,6 +581,31 @@ export function calculateCommercialMetrics(
     };
   });
 
+  const deadlineAlerts: CommercialDashboardMetrics["deadlineAlerts"] = [];
+  propertyMetrics.forEach((pm) => {
+    if (
+      pm.property.agreementDueDate &&
+      (pm.deadlineStatus === "overdue" ||
+        pm.deadlineStatus === "urgent" ||
+        pm.deadlineStatus === "upcoming")
+    ) {
+      deadlineAlerts.push({
+        propertyCode: pm.property.propertyCode,
+        propertyName: pm.property.name,
+        dueDate: pm.property.agreementDueDate,
+        daysLeft: pm.daysToDeadline ?? 0,
+        status: pm.deadlineStatus as "overdue" | "urgent" | "upcoming",
+      });
+    }
+  });
+  deadlineAlerts.sort((a, b) => a.daysLeft - b.daysLeft);
+  const upcomingDeadlinesCount = deadlineAlerts.filter(
+    (a) => a.status === "urgent" || a.status === "upcoming"
+  ).length;
+  const overdueDeadlinesCount = deadlineAlerts.filter(
+    (a) => a.status === "overdue"
+  ).length;
+
   const totalLiabilitiesAndObligations =
     totalPendingPayable + outstandingLoansPrincipal;
 
@@ -561,6 +656,9 @@ export function calculateCommercialMetrics(
     totalRealizedProfit: Math.round(totalRealizedProfit),
     totalProjectedProfit: Math.round(totalProjectedProfit),
     totalPendingProfit: Math.round(totalPendingProfit),
+    upcomingDeadlinesCount,
+    overdueDeadlinesCount,
+    deadlineAlerts,
     propertyMetrics,
     loanMetrics,
   };

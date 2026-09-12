@@ -5,10 +5,18 @@ import { formatINR, formatINRCompact, formatDateIN } from "@/lib/formatters";
 import { PersonalDashboardMetrics } from "@/lib/formulaEngine";
 import { SeedProperty, SeedTransaction } from "@/lib/seedData";
 import {
+  formatPersonalPropertyWhatsApp,
+  openWhatsAppShare,
+} from "@/lib/whatsappSummary";
+import {
   Home,
   Plus,
   MapPin,
   Pencil,
+  Share2,
+  Link2,
+  Search,
+  Clock,
 } from "lucide-react";
 
 interface PersonalViewProps {
@@ -42,6 +50,12 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
     "properties" | "outflows" | "inflows" | "categories"
   >("properties");
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dateFilter, setDateFilter] = useState<
+    "all" | "this_month" | "last_30_days" | "fy_24_25"
+  >("all");
+  const [modeFilter, setModeFilter] = useState<"all" | "Bank" | "Cash">("all");
+
   const personalOutflows = useMemo(
     () =>
       transactions.filter(
@@ -60,6 +74,117 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
             t.transactionType === "capital_withdrawal")
       ),
     [transactions]
+  );
+
+  const filterTransactions = (txs: SeedTransaction[]) => {
+    return txs.filter((t) => {
+      if (modeFilter !== "all" && t.mode !== modeFilter) return false;
+      if (dateFilter !== "all" && t.date) {
+        const tDate = new Date(t.date);
+        const now = new Date();
+        if (dateFilter === "this_month") {
+          if (
+            tDate.getMonth() !== now.getMonth() ||
+            tDate.getFullYear() !== now.getFullYear()
+          )
+            return false;
+        } else if (dateFilter === "last_30_days") {
+          const thirtyDaysAgo = new Date();
+          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+          if (tDate < thirtyDaysAgo) return false;
+        } else if (dateFilter === "fy_24_25") {
+          const fyStart = new Date(2024, 3, 1);
+          const fyEnd = new Date(2025, 2, 31, 23, 59, 59);
+          if (tDate < fyStart || tDate > fyEnd) return false;
+        }
+      }
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const match =
+          (t.transCode && t.transCode.toLowerCase().includes(q)) ||
+          (t.propertyCode && t.propertyCode.toLowerCase().includes(q)) ||
+          (t.category && t.category.toLowerCase().includes(q)) ||
+          (t.recipientOrSource &&
+            t.recipientOrSource.toLowerCase().includes(q)) ||
+          (t.remarks && t.remarks.toLowerCase().includes(q));
+        if (!match) return false;
+      }
+      return true;
+    });
+  };
+
+  const filteredOutflows = useMemo(
+    () => filterTransactions(personalOutflows),
+    [personalOutflows, searchQuery, dateFilter, modeFilter]
+  );
+
+  const filteredInflowsAndWithdrawals = useMemo(
+    () => filterTransactions(personalInflowsAndWithdrawals),
+    [personalInflowsAndWithdrawals, searchQuery, dateFilter, modeFilter]
+  );
+
+  const renderFilterBar = () => (
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 bg-[#0e0e0e] p-2.5 rounded-xl border border-[#262626]">
+      <div className="relative flex-1">
+        <Search className="w-4 h-4 text-[#71717A] absolute left-3 top-1/2 -translate-y-1/2" />
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Filter personal entries by ID, property, category, remarks..."
+          className="w-full bg-[#161616] border border-[#282828] rounded-lg pl-9 pr-3.5 py-1.5 text-xs text-white outline-none focus:border-[#555555]"
+        />
+      </div>
+
+      <div className="flex items-center gap-2 overflow-x-auto pb-0.5">
+        <div className="flex items-center gap-1 bg-[#141414] p-1 rounded-lg border border-[#262626]">
+          {(
+            [
+              { id: "all", label: "All" },
+              { id: "this_month", label: "This Month" },
+              { id: "last_30_days", label: "30 Days" },
+              { id: "fy_24_25", label: "FY 24-25" },
+            ] as const
+          ).map((chip) => (
+            <button
+              key={chip.id}
+              type="button"
+              onClick={() => setDateFilter(chip.id)}
+              className={`px-2 py-1 rounded text-[11px] font-medium transition-all ${
+                dateFilter === chip.id
+                  ? "bg-[#282828] text-white font-bold"
+                  : "text-[#A1A1AA] hover:text-white"
+              }`}
+            >
+              {chip.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-1 bg-[#141414] p-1 rounded-lg border border-[#262626]">
+          {(
+            [
+              { id: "all", label: "All Modes" },
+              { id: "Bank", label: "Bank" },
+              { id: "Cash", label: "Cash" },
+            ] as const
+          ).map((m) => (
+            <button
+              key={m.id}
+              type="button"
+              onClick={() => setModeFilter(m.id)}
+              className={`px-2 py-1 rounded text-[11px] font-medium transition-all ${
+                modeFilter === m.id
+                  ? "bg-[#282828] text-white font-bold"
+                  : "text-[#A1A1AA] hover:text-white"
+              }`}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 
   return (
@@ -187,10 +312,39 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                       {p.acquisitionDate && (
                         <span>Acquired {formatDateIN(p.acquisitionDate)}</span>
                       )}
+                      {p.agreementDueDate && (
+                        <span className="flex items-center gap-1 font-mono text-[10px] font-semibold px-2 py-0.5 rounded bg-[#181818] text-[#A1A1AA] border border-[#2a2a2a]">
+                          <Clock className="w-3 h-3 text-amber-400" />
+                          Due: {formatDateIN(p.agreementDueDate)}
+                        </span>
+                      )}
                     </div>
                   </div>
 
                   <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openWhatsAppShare(formatPersonalPropertyWhatsApp(pData));
+                      }}
+                      className="p-2 rounded-lg bg-emerald-950/40 border border-emerald-800/40 text-emerald-400 hover:bg-emerald-900/60 transition-all duration-150"
+                      title="Share Property Snapshot on WhatsApp"
+                    >
+                      <Share2 className="w-3.5 h-3.5" />
+                    </button>
+                    {p.attachmentUrl && (
+                      <a
+                        href={p.attachmentUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="p-2 rounded-lg bg-blue-950/40 border border-blue-800/40 text-blue-400 hover:bg-blue-900/60 transition-all duration-150"
+                        title="Open Cloud Proof Documents"
+                      >
+                        <Link2 className="w-3.5 h-3.5" />
+                      </a>
+                    )}
                     {onEditProperty && (
                       <button
                         type="button"
@@ -272,133 +426,66 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
 
       {/* SubTab 2: Outflows */}
       {activeSubTab === "outflows" && (
-        <div className="border border-[#262626] rounded-xl overflow-x-auto bg-[#0a0a0a]">
-          <table className="w-full text-left text-sm border-collapse">
-            <thead>
-              <tr className="bg-[#111111] border-b border-[#262626] text-[#D4D4D8] uppercase text-xs font-bold tracking-wider">
-                <th className="py-3 px-3.5">Date</th>
-                <th className="py-3 px-3.5">Property</th>
-                <th className="py-3 px-3.5">Expense Category</th>
-                <th className="py-3 px-3.5">Mode</th>
-                <th className="py-3 px-3.5 text-right">Amount (INR)</th>
-                <th className="py-3 px-3.5">Remarks</th>
-                <th className="py-3 px-3.5 text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#181818]">
-              {personalOutflows.map((t) => (
-                <tr key={t.id} className="hover:bg-[#141414] transition-colors">
-                  <td className="py-3 px-3.5 text-[#D4D4D8]">
-                    {formatDateIN(t.date)}
-                  </td>
-                  <td className="py-3 px-3.5 font-mono font-bold text-white">
-                    {t.propertyCode || "-"}
-                  </td>
-                  <td className="py-3 px-3.5 font-semibold text-white">
-                    {t.category}
-                  </td>
-                  <td className="py-3 px-3.5">
-                    <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded border bg-blue-950/20 text-blue-400 border-blue-800/30">
-                      {t.mode}
-                    </span>
-                  </td>
-                  <td className="py-3 px-3.5 text-right font-mono font-bold text-white">
-                    {formatINR(t.amount)}
-                  </td>
-                  <td className="py-3 px-3.5 text-[#A1A1AA]">
-                    {t.remarks || "-"}
-                  </td>
-                  <td className="py-3 px-3.5 text-right">
-                    {onEditTransaction && (
-                      <button
-                        onClick={() => onEditTransaction(t)}
-                        className="btn-action-primary p-1.5 rounded-md inline-flex items-center justify-center"
-                        title="Edit Transaction"
-                      >
-                        <Pencil className="w-3.5 h-3.5 text-[#22C55E]" />
-                      </button>
-                    )}
-                  </td>
+        <div className="flex flex-col gap-3">
+          {renderFilterBar()}
+          <div className="border border-[#262626] rounded-xl overflow-x-auto bg-[#0a0a0a]">
+            <table className="w-full text-left text-sm border-collapse">
+              <thead>
+                <tr className="bg-[#111111] border-b border-[#262626] text-[#D4D4D8] uppercase text-xs font-bold tracking-wider">
+                  <th className="py-3 px-3.5">Date</th>
+                  <th className="py-3 px-3.5">Property</th>
+                  <th className="py-3 px-3.5">Expense Category</th>
+                  <th className="py-3 px-3.5">Mode</th>
+                  <th className="py-3 px-3.5 text-right">Amount (INR)</th>
+                  <th className="py-3 px-3.5">Remarks</th>
+                  <th className="py-3 px-3.5 text-right">Action</th>
                 </tr>
-              ))}
-            </tbody>
-            <tfoot>
-              <tr className="bg-[#0e0e0e] border-t-2 border-[#262626] font-bold text-white text-sm">
-                <td colSpan={4} className="py-3.5 px-3.5">
-                  Total Personal Outflows
-                </td>
-                <td className="py-3.5 px-3.5 text-right font-mono text-[#22C55E]">
-                  {formatINR(metrics.outflowsTotal)}
-                </td>
-                <td colSpan={2}></td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-      )}
-
-      {/* SubTab 3: Inflows & Withdrawals */}
-      {activeSubTab === "inflows" && (
-        <div className="border border-[#262626] rounded-xl overflow-x-auto bg-[#0a0a0a]">
-          <table className="w-full text-left text-sm border-collapse">
-            <thead>
-              <tr className="bg-[#111111] border-b border-[#262626] text-[#D4D4D8] uppercase text-xs font-bold tracking-wider">
-                <th className="py-3 px-3.5">Date</th>
-                <th className="py-3 px-3.5">Type</th>
-                <th className="py-3 px-3.5">Source / Purpose</th>
-                <th className="py-3 px-3.5">Payment Mode</th>
-                <th className="py-3 px-3.5 text-right">Amount (INR)</th>
-                <th className="py-3 px-3.5">Remarks</th>
-                <th className="py-3 px-3.5 text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#181818]">
-              {personalInflowsAndWithdrawals.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={7}
-                    className="py-8 text-center text-[#71717A] text-sm font-medium"
-                  >
-                    No personal inflows or withdrawals logged yet.
-                  </td>
-                </tr>
-              ) : (
-                personalInflowsAndWithdrawals.map((t) => {
-                  const isInflow = t.transactionType === "capital_inflow";
-                  return (
+              </thead>
+              <tbody className="divide-y divide-[#181818]">
+                {filteredOutflows.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={7}
+                      className="py-8 text-center text-[#71717A] text-sm font-medium"
+                    >
+                      No personal outflows match current filters.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredOutflows.map((t) => (
                     <tr key={t.id} className="hover:bg-[#141414] transition-colors">
                       <td className="py-3 px-3.5 text-[#D4D4D8]">
                         {formatDateIN(t.date)}
                       </td>
-                      <td className="py-3 px-3.5">
-                        <span
-                          className={`font-mono text-xs font-semibold px-2 py-0.5 rounded border ${
-                            isInflow
-                              ? "bg-emerald-950/30 text-emerald-400 border-emerald-800/30"
-                              : "bg-rose-950/30 text-rose-400 border-rose-800/30"
-                          }`}
-                        >
-                          {isInflow ? "Inflow" : "Withdrawal"}
-                        </span>
+                      <td className="py-3 px-3.5 font-mono font-bold text-white">
+                        {t.propertyCode || "-"}
                       </td>
-                      <td className="py-3 px-3.5 font-bold text-white">
-                        {t.recipientOrSource || t.category}
+                      <td className="py-3 px-3.5 font-semibold text-white">
+                        {t.category}
                       </td>
                       <td className="py-3 px-3.5">
                         <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded border bg-blue-950/20 text-blue-400 border-blue-800/30">
                           {t.mode}
                         </span>
                       </td>
-                      <td
-                        className={`py-3 px-3.5 text-right font-mono font-bold ${
-                          isInflow ? "text-[#22C55E]" : "text-rose-400"
-                        }`}
-                      >
-                        {isInflow ? "+" : "-"}
+                      <td className="py-3 px-3.5 text-right font-mono font-bold text-white">
                         {formatINR(t.amount)}
                       </td>
                       <td className="py-3 px-3.5 text-[#A1A1AA]">
-                        {t.remarks || "-"}
+                        <div className="flex items-center gap-2">
+                          <span>{t.remarks || "-"}</span>
+                          {t.attachmentUrl && (
+                            <a
+                              href={t.attachmentUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-400 hover:text-blue-300 flex-shrink-0"
+                              title="Open Attachment Proof"
+                            >
+                              <Link2 className="w-3.5 h-3.5" />
+                            </a>
+                          )}
+                        </div>
                       </td>
                       <td className="py-3 px-3.5 text-right">
                         {onEditTransaction && (
@@ -412,11 +499,137 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                         )}
                       </td>
                     </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+                  ))
+                )}
+              </tbody>
+              <tfoot>
+                <tr className="bg-[#0e0e0e] border-t-2 border-[#262626] font-bold text-white text-sm">
+                  <td colSpan={4} className="py-3.5 px-3.5">
+                    Total Personal Outflows (Filtered)
+                  </td>
+                  <td className="py-3.5 px-3.5 text-right font-mono text-[#22C55E]">
+                    {formatINR(filteredOutflows.reduce((sum, x) => sum + x.amount, 0))}
+                  </td>
+                  <td colSpan={2}></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* SubTab 3: Inflows & Withdrawals */}
+      {activeSubTab === "inflows" && (
+        <div className="flex flex-col gap-3">
+          {renderFilterBar()}
+          <div className="border border-[#262626] rounded-xl overflow-x-auto bg-[#0a0a0a]">
+            <table className="w-full text-left text-sm border-collapse">
+              <thead>
+                <tr className="bg-[#111111] border-b border-[#262626] text-[#D4D4D8] uppercase text-xs font-bold tracking-wider">
+                  <th className="py-3 px-3.5">Date</th>
+                  <th className="py-3 px-3.5">Type</th>
+                  <th className="py-3 px-3.5">Source / Purpose</th>
+                  <th className="py-3 px-3.5">Payment Mode</th>
+                  <th className="py-3 px-3.5 text-right">Amount (INR)</th>
+                  <th className="py-3 px-3.5">Remarks</th>
+                  <th className="py-3 px-3.5 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#181818]">
+                {filteredInflowsAndWithdrawals.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={7}
+                      className="py-8 text-center text-[#71717A] text-sm font-medium"
+                    >
+                      No personal inflows or withdrawals match current filters.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredInflowsAndWithdrawals.map((t) => {
+                    const isInflow = t.transactionType === "capital_inflow";
+                    return (
+                      <tr key={t.id} className="hover:bg-[#141414] transition-colors">
+                        <td className="py-3 px-3.5 text-[#D4D4D8]">
+                          {formatDateIN(t.date)}
+                        </td>
+                        <td className="py-3 px-3.5">
+                          <span
+                            className={`font-mono text-xs font-semibold px-2 py-0.5 rounded border ${
+                              isInflow
+                                ? "bg-emerald-950/30 text-emerald-400 border-emerald-800/30"
+                                : "bg-rose-950/30 text-rose-400 border-rose-800/30"
+                            }`}
+                          >
+                            {isInflow ? "Inflow" : "Withdrawal"}
+                          </span>
+                        </td>
+                        <td className="py-3 px-3.5 font-bold text-white">
+                          {t.recipientOrSource || t.category}
+                        </td>
+                        <td className="py-3 px-3.5">
+                          <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded border bg-blue-950/20 text-blue-400 border-blue-800/30">
+                            {t.mode}
+                          </span>
+                        </td>
+                        <td
+                          className={`py-3 px-3.5 text-right font-mono font-bold ${
+                            isInflow ? "text-[#22C55E]" : "text-rose-400"
+                          }`}
+                        >
+                          {isInflow ? "+" : "-"}
+                          {formatINR(t.amount)}
+                        </td>
+                        <td className="py-3 px-3.5 text-[#A1A1AA]">
+                          <div className="flex items-center gap-2">
+                            <span>{t.remarks || "-"}</span>
+                            {t.attachmentUrl && (
+                              <a
+                                href={t.attachmentUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-400 hover:text-blue-300 flex-shrink-0"
+                                title="Open Attachment Proof"
+                              >
+                                <Link2 className="w-3.5 h-3.5" />
+                              </a>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-3 px-3.5 text-right">
+                          {onEditTransaction && (
+                            <button
+                              onClick={() => onEditTransaction(t)}
+                              className="btn-action-primary p-1.5 rounded-md inline-flex items-center justify-center"
+                              title="Edit Transaction"
+                            >
+                              <Pencil className="w-3.5 h-3.5 text-[#22C55E]" />
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+              <tfoot>
+                <tr className="bg-[#0e0e0e] border-t-2 border-[#262626] font-bold text-white text-sm">
+                  <td colSpan={4} className="py-3.5 px-3.5">
+                    Net Personal Cash Flow (Filtered)
+                  </td>
+                  <td className="py-3.5 px-3.5 text-right font-mono text-[#22C55E]">
+                    {formatINR(
+                      filteredInflowsAndWithdrawals.reduce((sum, x) => {
+                        if (x.transactionType === "capital_inflow") return sum + x.amount;
+                        return sum - x.amount;
+                      }, 0)
+                    )}
+                  </td>
+                  <td colSpan={2}></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
       )}
 

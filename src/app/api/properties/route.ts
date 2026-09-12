@@ -71,6 +71,11 @@ export async function POST(req: NextRequest) {
         status: body.status || "open",
         notes: body.notes ? String(body.notes).trim() : "",
         milestones: Array.isArray(body.milestones) ? body.milestones : [],
+        agreementDueDate: body.agreementDueDate ? String(body.agreementDueDate).trim() : undefined,
+        targetSettlementDate: body.targetSettlementDate ? String(body.targetSettlementDate).trim() : undefined,
+        attachmentUrl: body.attachmentUrl ? String(body.attachmentUrl).trim() : undefined,
+        subPlots: Array.isArray(body.subPlots) ? body.subPlots : undefined,
+        partners: Array.isArray(body.partners) ? body.partners : undefined,
       },
       datasetId,
       userId

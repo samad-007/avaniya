@@ -13,6 +13,24 @@ export type FinancialRole =
   | "personal_milestone"
   | "personal_overhead";
 
+export interface SeedSubPlot {
+  id: string;
+  plotNumber: string;
+  sqftArea: number;
+  ratePerSqft?: number;
+  targetPrice: number;
+  status: "available" | "booked" | "sold";
+  buyerName?: string;
+  notes?: string;
+}
+
+export interface SeedPartner {
+  name: string;
+  equityPct: number;
+  capitalCommitted?: number;
+  notes?: string;
+}
+
 export interface SeedProperty {
   id: string;
   type: "commercial" | "personal";
@@ -27,6 +45,11 @@ export interface SeedProperty {
   agreedSellingPrice?: number;
   status: "open" | "in_progress" | "registered" | "sold" | "closed";
   notes?: string;
+  agreementDueDate?: string;
+  targetSettlementDate?: string;
+  attachmentUrl?: string;
+  subPlots?: SeedSubPlot[];
+  partners?: SeedPartner[];
   milestones?: {
     name: string;
     targetAmount?: number;
@@ -72,6 +95,8 @@ export interface SeedTransaction {
   loanId?: string;
   loanCode?: string;
   propertyCode?: string;
+  subPlotNumber?: string;
+  attachmentUrl?: string;
   date: string;
   category: string;
   mode: "Bank" | "Cash";

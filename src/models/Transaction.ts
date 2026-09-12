@@ -29,6 +29,8 @@ export interface ITransaction extends Document {
     | "Cash to Bank"
     | "Bank to Cash";
   amount: number;
+  subPlotNumber?: string;
+  attachmentUrl?: string;
   recipientOrSource?: string;
   remarks?: string;
   createdAt: Date;
@@ -80,6 +82,8 @@ const TransactionSchema = new Schema<ITransaction>(
       ],
     },
     amount: { type: Number, required: true },
+    subPlotNumber: { type: String },
+    attachmentUrl: { type: String },
     recipientOrSource: { type: String },
     remarks: { type: String },
   },

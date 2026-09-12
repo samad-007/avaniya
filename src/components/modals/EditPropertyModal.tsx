@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, Building2, Save, Trash2, Plus, Calendar, MapPin } from "lucide-react";
-import { SeedProperty } from "@/lib/seedData";
+import { X, Building2, Save, Trash2, Plus, Calendar, MapPin, Link2, ExternalLink, Users, Grid } from "lucide-react";
+import { SeedProperty, SeedSubPlot, SeedPartner } from "@/lib/seedData";
 import { formatINRCompact } from "@/lib/formatters";
 
 interface EditPropertyModalProps {
@@ -30,6 +30,9 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
         type: property.type || "commercial",
         location: property.location || "",
         acquisitionDate: property.acquisitionDate || "",
+        agreementDueDate: property.agreementDueDate || "",
+        targetSettlementDate: property.targetSettlementDate || "",
+        attachmentUrl: property.attachmentUrl || "",
         sqftArea: property.sqftArea || 0,
         ratePerSqft: property.ratePerSqft || 0,
         agreedPurchasePrice: property.agreedPurchasePrice || 0,
@@ -38,6 +41,8 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
         status: property.status || "open",
         notes: property.notes || "",
         milestones: property.milestones ? [...property.milestones] : [],
+        subPlots: property.subPlots ? [...property.subPlots] : [],
+        partners: property.partners ? [...property.partners] : [],
       });
       setErrorMsg("");
     }
@@ -100,6 +105,69 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
     const current = [...(formData.milestones || [])];
     current.splice(idx, 1);
     setFormData({ ...formData, milestones: current });
+  };
+
+  const handleAddSubPlot = () => {
+    const current = formData.subPlots || [];
+    const nextNum = String(current.length + 1);
+    setFormData({
+      ...formData,
+      subPlots: [
+        ...current,
+        {
+          id: `plot-${Date.now()}-${nextNum}`,
+          plotNumber: nextNum,
+          sqftArea: 1200,
+          targetPrice: 1500000,
+          status: "available",
+        },
+      ],
+    });
+  };
+
+  const handleUpdateSubPlot = (
+    idx: number,
+    updates: Partial<SeedSubPlot>
+  ) => {
+    const current = [...(formData.subPlots || [])];
+    current[idx] = { ...current[idx], ...updates };
+    setFormData({ ...formData, subPlots: current });
+  };
+
+  const handleRemoveSubPlot = (idx: number) => {
+    const current = [...(formData.subPlots || [])];
+    current.splice(idx, 1);
+    setFormData({ ...formData, subPlots: current });
+  };
+
+  const handleAddPartner = () => {
+    const current = formData.partners || [];
+    setFormData({
+      ...formData,
+      partners: [
+        ...current,
+        {
+          name: `Partner ${current.length + 1}`,
+          equityPct: 20,
+          capitalCommitted: 0,
+        },
+      ],
+    });
+  };
+
+  const handleUpdatePartner = (
+    idx: number,
+    updates: Partial<SeedPartner>
+  ) => {
+    const current = [...(formData.partners || [])];
+    current[idx] = { ...current[idx], ...updates };
+    setFormData({ ...formData, partners: current });
+  };
+
+  const handleRemovePartner = (idx: number) => {
+    const current = [...(formData.partners || [])];
+    current.splice(idx, 1);
+    setFormData({ ...formData, partners: current });
   };
 
   return (
@@ -244,6 +312,69 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                   className="w-full bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555]"
                 />
               </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
+                Agreement Due Date / Deadline
+              </label>
+              <div className="relative">
+                <Calendar className="w-4 h-4 text-amber-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="date"
+                  value={formData.agreementDueDate || ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, agreementDueDate: e.target.value })
+                  }
+                  className="w-full bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3.5 py-2.5 text-white text-sm outline-none focus:border-amber-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-blue-400 uppercase tracking-wider">
+                Target Settlement / Exit Date
+              </label>
+              <div className="relative">
+                <Calendar className="w-4 h-4 text-blue-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="date"
+                  value={formData.targetSettlementDate || ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, targetSettlementDate: e.target.value })
+                  }
+                  className="w-full bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3.5 py-2.5 text-white text-sm outline-none focus:border-blue-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5 sm:col-span-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider flex items-center gap-1.5">
+                  <Link2 className="w-3.5 h-3.5 text-[#A1A1AA]" />
+                  <span>Document / Title Proof URL (Google Drive / Cloud)</span>
+                </label>
+                {formData.attachmentUrl && (
+                  <a
+                    href={formData.attachmentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-blue-400 hover:text-blue-300 hover:underline flex items-center gap-1"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    <span>Open Link</span>
+                  </a>
+                )}
+              </div>
+              <input
+                type="url"
+                value={formData.attachmentUrl || ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, attachmentUrl: e.target.value })
+                }
+                placeholder="https://drive.google.com/... or Dropbox folder"
+                className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555]"
+              />
             </div>
           </div>
 
@@ -450,6 +581,201 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
             ) : (
               <div className="text-xs text-[#A1A1AA] italic">
                 No custom milestones defined yet. Click "Add Milestone" to track payment stages.
+              </div>
+            )}
+          </div>
+
+          {/* Section 6: Sub-Plot Inventory & Layout Plotting Engine */}
+          <div className="pt-3 border-t border-[#1a1a1a] flex flex-col gap-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Grid className="w-4 h-4 text-emerald-400" />
+                <label className="text-xs font-bold text-[#E4E4E7] uppercase tracking-wider">
+                  Sub-Plots Inventory ({formData.subPlots?.length || 0} Units)
+                </label>
+              </div>
+              <button
+                type="button"
+                onClick={handleAddSubPlot}
+                className="btn-action-primary px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add Sub-Plot</span>
+              </button>
+            </div>
+
+            {formData.subPlots && formData.subPlots.length > 0 ? (
+              <div className="flex flex-col gap-2">
+                {formData.subPlots.map((sp, idx) => (
+                  <div
+                    key={sp.id || idx}
+                    className="grid grid-cols-1 sm:grid-cols-6 gap-2 bg-[#121212] border border-[#262626] p-2.5 rounded-lg items-center text-xs"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[#71717A] font-mono">#</span>
+                      <input
+                        type="text"
+                        value={sp.plotNumber}
+                        onChange={(e) =>
+                          handleUpdateSubPlot(idx, { plotNumber: e.target.value })
+                        }
+                        placeholder="Plot No"
+                        className="w-16 bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white font-mono font-bold"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[10px] text-[#71717A]">Sqft</span>
+                      <input
+                        type="number"
+                        value={sp.sqftArea ?? ""}
+                        onChange={(e) =>
+                          handleUpdateSubPlot(idx, {
+                            sqftArea: parseFloat(e.target.value) || 0,
+                          })
+                        }
+                        placeholder="Sq.ft"
+                        className="bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white font-mono"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-0.5 sm:col-span-2">
+                      <span className="text-[10px] text-[#71717A]">Target Price (₹)</span>
+                      <input
+                        type="number"
+                        value={sp.targetPrice ?? ""}
+                        onChange={(e) =>
+                          handleUpdateSubPlot(idx, {
+                            targetPrice: parseFloat(e.target.value) || 0,
+                          })
+                        }
+                        placeholder="Target Price"
+                        className="bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white font-mono font-semibold"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[10px] text-[#71717A]">Status</span>
+                      <select
+                        value={sp.status}
+                        onChange={(e) =>
+                          handleUpdateSubPlot(idx, {
+                            status: e.target.value as "available" | "booked" | "sold",
+                          })
+                        }
+                        className={`bg-[#1a1a1a] border border-[#333333] rounded px-1.5 py-1 text-xs font-semibold ${
+                          sp.status === "sold"
+                            ? "text-emerald-400"
+                            : sp.status === "booked"
+                            ? "text-amber-400"
+                            : "text-[#A1A1AA]"
+                        }`}
+                      >
+                        <option value="available">Available</option>
+                        <option value="booked">Booked</option>
+                        <option value="sold">Sold</option>
+                      </select>
+                    </div>
+                    <div className="flex items-center gap-1.5 justify-end">
+                      <input
+                        type="text"
+                        value={sp.buyerName || ""}
+                        onChange={(e) =>
+                          handleUpdateSubPlot(idx, { buyerName: e.target.value })
+                        }
+                        placeholder="Buyer name"
+                        className="w-full bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white text-xs"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSubPlot(idx)}
+                        className="text-[#71717A] hover:text-rose-400 p-1 transition-all duration-150"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-xs text-[#A1A1AA] italic">
+                No sub-plots created. Click "Add Sub-Plot" to plot units or layout layouts.
+              </div>
+            )}
+          </div>
+
+          {/* Section 7: Multi-Partner Joint Venture (JV) Equity Splitter */}
+          <div className="pt-3 border-t border-[#1a1a1a] flex flex-col gap-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-purple-400" />
+                <label className="text-xs font-bold text-[#E4E4E7] uppercase tracking-wider">
+                  Joint Venture (JV) Partners ({formData.partners?.length || 0})
+                </label>
+              </div>
+              <button
+                type="button"
+                onClick={handleAddPartner}
+                className="btn-action-primary px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add Partner</span>
+              </button>
+            </div>
+
+            {formData.partners && formData.partners.length > 0 ? (
+              <div className="flex flex-col gap-2">
+                {formData.partners.map((p, idx) => (
+                  <div
+                    key={idx}
+                    className="grid grid-cols-1 sm:grid-cols-4 gap-2 bg-[#121212] border border-[#262626] p-2.5 rounded-lg items-center text-xs"
+                  >
+                    <input
+                      type="text"
+                      value={p.name}
+                      onChange={(e) =>
+                        handleUpdatePartner(idx, { name: e.target.value })
+                      }
+                      placeholder="Partner Name"
+                      className="bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white text-xs font-semibold sm:col-span-2"
+                    />
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="number"
+                        value={p.equityPct ?? ""}
+                        onChange={(e) =>
+                          handleUpdatePartner(idx, {
+                            equityPct: parseFloat(e.target.value) || 0,
+                          })
+                        }
+                        placeholder="Equity %"
+                        className="w-full bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white text-xs font-mono font-bold"
+                      />
+                      <span className="text-[#71717A] font-bold">%</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 justify-end">
+                      <input
+                        type="number"
+                        value={p.capitalCommitted ?? ""}
+                        onChange={(e) =>
+                          handleUpdatePartner(idx, {
+                            capitalCommitted: parseFloat(e.target.value) || 0,
+                          })
+                        }
+                        placeholder="₹ Committed"
+                        className="w-full bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white text-xs font-mono"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemovePartner(idx)}
+                        className="text-[#71717A] hover:text-rose-400 p-1 transition-all duration-150"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-xs text-[#A1A1AA] italic">
+                No external JV partners tagged (100% single ownership). Click "Add Partner" to set up equity splits.
               </div>
             )}
           </div>

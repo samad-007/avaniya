@@ -441,4 +441,73 @@ describe("Financial Formula Engine & Export Tests", () => {
     const tamperedVerified = await verifySessionToken(tamperedToken);
     expect(tamperedVerified).toBeNull();
   });
+
+  it("correctly computes agreement deadlines, sub-plot stats, and JV partner allocations", () => {
+    const testProps = [
+      {
+        id: "prop-deadlines-test",
+        type: "commercial" as const,
+        propertyCode: "LND-DEADLINE-01",
+        name: "Hosur Highway Layout",
+        acquisitionDate: "2026-01-10",
+        agreedPurchasePrice: 10000000,
+        targetSalePrice: 15000000,
+        status: "open" as const,
+        // Set agreement due date in 10 days (urgent)
+        agreementDueDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+        subPlots: [
+          { id: "sp-1", plotNumber: "Plot 1", sqftArea: 1200, targetPrice: 1800000, status: "available" as const },
+          { id: "sp-2", plotNumber: "Plot 2", sqftArea: 1500, targetPrice: 2200000, status: "booked" as const, buyerName: "Ramesh" },
+          { id: "sp-3", plotNumber: "Plot 3", sqftArea: 2000, targetPrice: 3000000, status: "sold" as const, buyerName: "Suresh" },
+        ],
+        partners: [
+          { name: "Mohammed Yousuf", equityPct: 60 },
+          { name: "Farooq Partner", equityPct: 40 },
+        ],
+      },
+    ];
+
+    const testTxs = [
+      {
+        id: "tx-out-fencing",
+        scope: "commercial" as const,
+        transactionType: "outflow" as const,
+        propertyCode: "LND-DEADLINE-01",
+        date: "2026-01-15",
+        category: "Boundary Fencing & Development",
+        mode: "Bank" as const,
+        amount: 1000000, // 10L expense -> Outlay = 1.10 Cr
+      },
+    ];
+
+    const metrics = calculateCommercialMetrics(testProps, testTxs, INITIAL_CATEGORIES);
+    const pm = metrics.propertyMetrics[0];
+
+    // 1. Deadline verification
+    expect(pm.deadlineStatus).toBe("urgent");
+    expect(pm.daysToDeadline).toBeGreaterThanOrEqual(9);
+    expect(pm.daysToDeadline).toBeLessThanOrEqual(11);
+    expect(metrics.upcomingDeadlinesCount).toBe(1);
+    expect(metrics.deadlineAlerts.length).toBe(1);
+    expect(metrics.deadlineAlerts[0].status).toBe("urgent");
+
+    // 2. Sub-Plot stats verification
+    expect(pm.subPlotStats).toBeDefined();
+    expect(pm.subPlotStats?.totalPlots).toBe(3);
+    expect(pm.subPlotStats?.available).toBe(1);
+    expect(pm.subPlotStats?.booked).toBe(1);
+    expect(pm.subPlotStats?.sold).toBe(1);
+    expect(pm.subPlotStats?.totalAreaSqft).toBe(4700);
+    expect(pm.subPlotStats?.targetRevenue).toBe(7000000);
+
+    // 3. JV Partner Allocations (Outlay = 1.10 Cr, Projected Profit = 1.50 Cr - 1.10 Cr = 40 Lakhs)
+    expect(pm.partnerAllocations).toBeDefined();
+    expect(pm.partnerAllocations?.length).toBe(2);
+    // Partner 1 (60%): 60% of 1.10 Cr = 66 Lakhs cost share, 60% of 40L = 24 Lakhs projected profit
+    expect(pm.partnerAllocations?.[0].costShare).toBe(6600000);
+    expect(pm.partnerAllocations?.[0].projectedProfitShare).toBe(2400000);
+    // Partner 2 (40%): 40% of 1.10 Cr = 44 Lakhs cost share, 40% of 40L = 16 Lakhs projected profit
+    expect(pm.partnerAllocations?.[1].costShare).toBe(4400000);
+    expect(pm.partnerAllocations?.[1].projectedProfitShare).toBe(1600000);
+  });
 });

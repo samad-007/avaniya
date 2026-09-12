@@ -17,8 +17,17 @@
    - [The 4-Price Valuation Matrix & Cost Recovery Profit Recognition](#b-the-4-price-valuation-matrix--cost-recovery-profit-recognition)
    - [Recording Outflows, Inflows & Transfers](#c-recording-outflows-inflows--transfers)
    - [Editing Properties & Managing Milestones](#d-editing-properties--managing-milestones)
-   - [Multi-Format Exports (Excel, PDF, CSV)](#e-multi-format-exports-excel-pdf-csv)
-   - [Session Security, Inactivity Timeout & Sign Out](#f-session-security-inactivity-timeout--sign-out)
+   - [Loans, Debt Financing & Profit Sharing](#e-loans-debt-financing--profit-sharing)
+   - [Sub-Plot Layout Inventory Engine](#f-sub-plot-layout-inventory-engine)
+   - [Joint Venture (JV) Multi-Partner Equity Splitter](#g-joint-venture-jv-multi-partner-equity-splitter)
+   - [Agreement Deadlines & Regulatory Alerts](#h-agreement-deadlines--regulatory-alerts)
+   - [1-Tap WhatsApp Business Snapshot Generator](#i-1-tap-whatsapp-business-snapshot-generator)
+   - [Multi-Criteria Ledger Filtering](#j-multi-criteria-ledger-filtering)
+   - [Smart 1-Click Pay Balance Pre-fill](#k-smart-1-click-pay-balance-pre-fill)
+   - [Document & Receipt Proof Linker](#l-document--receipt-proof-linker)
+   - [Progressive Web App (PWA) Mobile Setup](#m-progressive-web-app-pwa-mobile-setup)
+   - [Multi-Format Exports (Excel, PDF, CSV)](#n-multi-format-exports-excel-pdf-csv)
+   - [Session Security, Inactivity Timeout & Sign Out](#o-session-security-inactivity-timeout--sign-out)
 3. [Developer & DevOps Engineering Guide](#3-developer--devops-engineering-guide)
    - [Architecture & Tech Stack](#a-architecture--tech-stack)
    - [Project Directory Structure](#b-project-directory-structure)
@@ -105,15 +114,56 @@ Click **Record Outflow** or **Add Inflow** from the header:
 ### E. Loans, Debt Financing & Profit Sharing
 - **Facility Registry**: Register Bank Loans (term loans, overdrafts, mortgage credit) and Family/Friend Private Financing with clear terms (interest % p.a. and/or profit share % on deals).
 - **Dual-Channel Borrowing & Repayment**: Borrow funds directly into Bank or Cash liquidity; log principal repayments, interest expenses, and profit bonuses with complete historical ledger tracking.
-- **Dynamic Liability Reconciliation**: Real-time calculation of outstanding debt liability ($\max(0, \sum \text{Borrowed} - \sum \text{Repaid})$) and total finance costs without distorting base equity or land acquisition outlays.
+- **Dynamic Liability Reconciliation**: Real-time calculation of outstanding debt liability (max(0, Borrowed - Repaid)) and total finance costs without distorting base equity or land acquisition outlays.
 
-### F. Multi-Format Exports (Excel, PDF, CSV)
+### F. Sub-Plot Layout Inventory Engine
+- **Plot-by-Plot Segmentation**: Split commercial land parcels into individual numbered sub-plots with dedicated square-footage area, rate per sq.ft, target price, and buyer allocation.
+- **Dynamic Status Tracking**: Mark plots as `available`, `booked`, or `sold`. Deal cards and itemized ledgers display real-time progress indicators (e.g. `12/20 Plots Sold`).
+- **Revenue Mapping**: Attribute buyer receipts directly to specific plot numbers during transaction logging, creating an itemized audit trail for each sub-plot sale.
+
+### G. Joint Venture (JV) Multi-Partner Equity Splitter
+- **Partner Cap Table**: Configure multiple equity partners per land deal, recording their name, equity percentage, and committed investment amount.
+- **Automated Profit & Cost Allocations**: Mathematical allocation of total project outlays, realized profit, and projected pipeline gain based on agreed equity percentages.
+- **Visual Equity Ledger**: Review partner distributions in dedicated summary tables inside the Property Ledger modal and multi-tab Excel export.
+
+### H. Agreement Deadlines & Regulatory Alerts
+- **Sale Deed Expiry Monitoring**: Set agreement expiry dates and target registration deadlines on commercial land deals.
+- **Proactive Visual Warning Banner**: Color-coded top alert banner flags overdue registration deadlines and agreements expiring within 15 days, providing 1-click modal navigation to the relevant deal.
+- **Automatic Urgency Tags**: Deal cards display real-time deadline badges (`Overdue`, `Urgent`, `Upcoming`) with exact days remaining.
+
+### I. 1-Tap WhatsApp Business Snapshot Generator
+- **Zero-Cost Client-Side Sharing**: Instant 1-tap generation of formatted WhatsApp text updates for land deals, loan facilities, personal assets, and the overall business portfolio.
+- **Universal Compatibility**: Works across iOS, Android, macOS, and Windows browsers using WhatsApp Web and mobile app universal links (`https://api.whatsapp.com/send?text=...`) with clipboard fallback.
+- **Professional Plain-Text Format**: Cleanly structured without emojis or markup bloat, summarizing agreed prices, total payments, pending balances, profit gains, and registration deadlines.
+
+### J. Multi-Criteria Ledger Filtering
+- **Unified Filter Bar**: Filter transaction ledgers instantly across Outflows, Sale Receipts, Capital/Withdrawals, Loans, and Transfers.
+- **Full-Text Live Search**: Search by Transaction Code, Property Code, Loan Code, Category, Recipient, or Notes.
+- **Time Horizon Chips**: One-click filtering by `All`, `This Month`, `30 Days`, and `FY 24-25` (Indian Financial Year: April 1 to March 31).
+- **Payment Mode Segregation**: Instantly isolate `Bank` vs `Cash` transactions.
+- **Dynamic Filtered Footers**: Table footers recompute totals dynamically based on active filter parameters.
+
+### K. Smart 1-Click Pay Balance Pre-fill
+- **Context-Aware Balance Detection**: When logging outflows, inflows, or loan repayments, the quick entry modal detects the exact outstanding obligation.
+- **1-Tap Settlement Button**: Displays a suggested fill button (e.g. `Pay Deal Balance Due (LND-001): ₹ 45,00,000` or `Settle Loan Principal (LN-001): ₹ 10,00,000`) that auto-fills amount, notes, and category.
+
+### L. Document & Receipt Proof Linker
+- **Decentralized Cloud Storage Linking**: Paste shareable document URLs (Google Drive, Dropbox, iCloud, OneDrive) directly into properties, land deals, and transactions.
+- **Zero Upload Overhead**: Eliminates slow file uploads, heavy cloud bucket costs, and storage bloat while maintaining instant 1-click access to registration deeds, legal opinions, and bank payment receipts.
+- **Quick Preview Links**: Interactive document icons in ledger tables and modals open the original cloud documents in a new tab.
+
+### M. Progressive Web App (PWA) Mobile Setup
+- **Native App Experience**: Install Avaniya directly to your iPhone or Android home screen without an app store download.
+- **Full-Screen Standalone UI**: Launches without browser URL bars, tabs, or navigation chrome for a distraction-free native mobile experience.
+- **Offline Shell & Fast Launch**: Configured with a web app manifest (`/manifest.webmanifest`), Apple touch icons, and theme-color meta tags.
+
+### N. Multi-Format Exports (Excel, PDF, CSV)
 Click **Export** in the top bar to generate offline files:
-- **Multi-Tab Excel (`.xlsx`)**: Interactive spreadsheet containing `Dashboard`, `Land_Master`, `Outflows`, `Deal_Inflows`, `Capital_Inflows`, `Loans_and_Debt`, and `Transfers` with live `SUMIFS` formulas and formatted INR numbers.
-- **Executive Statement (`.pdf`)**: Print-ready 7-page executive overview including liquidity overview, land deals, loans/debt ledger, personal assets, and itemized transaction ledgers.
-- **Normalized Ledger (`.csv`)**: Clean CSV with `Loan Code` ready for import into Tally or accountant software.
+- **Multi-Tab Excel (`.xlsx`)**: Interactive spreadsheet containing `Dashboard`, `Land_Master`, `Outflows`, `Deal_Inflows`, `Capital_Inflows`, `Loans_and_Debt`, and `Transfers` with live `SUMIFS` formulas, sub-plot stats, JV partner splits, proof links, and formatted INR numbers.
+- **Executive Statement (`.pdf`)**: Print-ready executive overview including liquidity overview, land deals, loans/debt ledger, personal assets, and itemized transaction ledgers.
+- **Normalized Ledger (`.csv`)**: Universal CSV with sub-plot numbers, loan codes, and attachment URLs ready for import into accounting software.
 
-### G. Session Security, Inactivity Timeout & Sign Out
+### O. Session Security, Inactivity Timeout & Sign Out
 - **Auto-Logout on Idle**: If the tab remains inactive for 30 minutes, you will be logged out automatically.
 - **Swipe / Back Button Protection**: Swiping back on mobile or pressing the browser back button prompts a logout confirmation modal to prevent accidental session termination.
 
