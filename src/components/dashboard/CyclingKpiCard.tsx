@@ -125,31 +125,21 @@ export const CyclingKpiCard: React.FC<CyclingKpiCardProps> = ({
         resumeAfterDelay();
         if (onClick) onClick();
       }}
-      className={`bg-[#0a0a0a] border border-[#262626] rounded-lg p-3.5 flex flex-col justify-between hover:border-[#383838] transition-standard shadow-sm relative overflow-hidden select-none min-h-[108px] cursor-pointer ${className}`}
+      className={`bg-[#0a0a0a] border border-[#262626] rounded-lg p-3.5 flex flex-col justify-between hover:border-[#383838] transition-standard shadow-sm relative overflow-hidden select-none min-h-[118px] cursor-pointer ${className}`}
       title="Click or swipe to switch views (auto-cycles every 7s)"
     >
-      {/* Top Header Row */}
-      <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wider mb-1.5">
-        <div className="flex items-center gap-1.5 min-w-0 pr-1">
-          <span
-            className={`truncate ${
-              currentPanel.titleColor ||
-              (activePanel === "A" ? "text-[#A1A1AA]" : "text-purple-400")
-            }`}
-          >
-            {currentPanel.title}
-          </span>
-          <span
-            className={`text-[10px] px-1.5 py-0.2 rounded font-mono font-bold tracking-normal shrink-0 ${
-              currentPanel.badgeColor ||
-              (activePanel === "A"
-                ? "bg-zinc-800 text-zinc-300 border border-zinc-700/50"
-                : "bg-purple-950/60 text-purple-400 border border-purple-800/40")
-            }`}
-          >
-            {currentPanel.badge}
-          </span>
-        </div>
+      {/* Row 1: Status Badge + Pill Switcher */}
+      <div className="flex items-center justify-between gap-2 mb-1">
+        <span
+          className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold tracking-normal shrink-0 ${
+            currentPanel.badgeColor ||
+            (activePanel === "A"
+              ? "bg-zinc-800 text-zinc-300 border border-zinc-700/50"
+              : "bg-purple-950/60 text-purple-400 border border-purple-800/40")
+          }`}
+        >
+          {currentPanel.badge}
+        </span>
 
         {/* Dual-Pill Visual Switcher Controls */}
         <div
@@ -194,9 +184,20 @@ export const CyclingKpiCard: React.FC<CyclingKpiCardProps> = ({
         </div>
       </div>
 
-      {/* Main KPI Value */}
+      {/* Row 2: Full Width Topic Title */}
       <div
-        className={`text-xl md:text-2xl font-bold font-mono tracking-tight ${
+        className={`text-xs font-semibold uppercase tracking-wider truncate transition-colors duration-200 ${
+          currentPanel.titleColor ||
+          (activePanel === "A" ? "text-[#A1A1AA]" : "text-purple-400")
+        }`}
+        title={currentPanel.title}
+      >
+        {currentPanel.title}
+      </div>
+
+      {/* Row 3: Main KPI Value */}
+      <div
+        className={`text-xl md:text-2xl font-bold font-mono tracking-tight my-0.5 ${
           currentPanel.valueColor || "text-white"
         }`}
       >
