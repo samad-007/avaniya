@@ -383,6 +383,7 @@ Whenever adding categories, assign one of the predefined `financialRole` types:
 - **No Em Dashes**: Never use em dashes in user-facing copy or component titles.
 - **Legibility Standard**: Do NOT use text sizes smaller than `text-xs` (12px). Body and form inputs must default to comfortable `text-sm` (14px).
 - **Tabular Numerals**: Always wrap financial amounts in `font-mono` (`font-family: var(--font-jetbrains-mono)`).
+- **Mobile Subwindow & Modal Viewport Containment**: All dialog backdrops and modal cards enforce `overflow-y-auto overflow-x-hidden`, `max-w-full`, and `min-w-0` on form parents, flex children, and table wrappers, ensuring strictly vertical scrolling and zero horizontal drift on mobile screens.
 
 ---
 
