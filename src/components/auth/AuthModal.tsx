@@ -87,15 +87,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           onClose();
         }
       }}
-      className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-backdrop"
+      className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto overflow-x-hidden animate-backdrop"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-md w-full p-6 sm:p-8 shadow-2xl flex flex-col gap-5 my-auto animate-modal"
+        className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-md w-full max-w-full min-w-0 p-6 sm:p-8 shadow-2xl flex flex-col gap-5 my-auto overflow-y-auto overflow-x-hidden animate-modal"
       >
         {/* Brand Header with Logo */}
-        <div className="flex flex-col items-center text-center gap-2.5">
-          <div className="relative w-16 h-16 rounded-xl overflow-hidden border border-[#383838] bg-[#0c120e] p-0.5 shadow-md">
+        <div className="flex flex-col items-center text-center gap-2.5 min-w-0">
+          <div className="relative w-16 h-16 rounded-xl overflow-hidden border border-[#383838] bg-[#0c120e] p-0.5 shadow-md flex-shrink-0">
             <Image
               src="/logo.jpg"
               alt="Avaniya Emblem"
@@ -105,25 +105,25 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               priority
             />
           </div>
-          <div className="mt-1">
-            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+          <div className="mt-1 min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight break-words">
               Avaniya
             </h1>
-            <p className="text-xs sm:text-sm text-[#A1A1AA] mt-1 font-medium">
+            <p className="text-xs sm:text-sm text-[#A1A1AA] mt-1 font-medium break-words">
               Indian Real Estate &amp; Land Portfolio Management
             </p>
           </div>
         </div>
 
         {/* Auth Tab Switcher */}
-        <div className="grid grid-cols-2 gap-1.5 bg-[#111111] p-1.5 rounded-lg border border-[#262626]">
+        <div className="grid grid-cols-2 gap-1.5 bg-[#111111] p-1.5 rounded-lg border border-[#262626] min-w-0">
           <button
             type="button"
             onClick={() => {
               setTab("login");
               setErrorMsg("");
             }}
-            className={`py-2 rounded-md text-xs sm:text-sm font-semibold transition-all duration-150 ${
+            className={`py-2 rounded-md text-xs sm:text-sm font-semibold transition-all duration-150 truncate ${
               tab === "login"
                 ? "bg-[#262626] text-white shadow-sm font-bold"
                 : "text-[#A1A1AA] hover:text-white"
@@ -137,7 +137,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               setTab("signup");
               setErrorMsg("");
             }}
-            className={`py-2 rounded-md text-xs sm:text-sm font-semibold transition-all duration-150 ${
+            className={`py-2 rounded-md text-xs sm:text-sm font-semibold transition-all duration-150 truncate ${
               tab === "signup"
                 ? "bg-[#262626] text-white shadow-sm font-bold"
                 : "text-[#A1A1AA] hover:text-white"
@@ -149,61 +149,61 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Error Banner */}
         {errorMsg && (
-          <div className="bg-rose-950/30 border border-rose-800/40 text-rose-300 text-xs sm:text-sm px-3.5 py-2.5 rounded-md font-medium">
+          <div className="bg-rose-950/30 border border-rose-800/40 text-rose-300 text-xs sm:text-sm px-3.5 py-2.5 rounded-md font-medium break-words">
             {errorMsg}
           </div>
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-sm">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-sm min-w-0">
           {tab === "signup" && (
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Full Name / Entity
               </label>
-              <div className="relative">
-                <UserIcon className="w-4 h-4 text-[#71717A] absolute left-3 top-1/2 -translate-y-1/2" />
+              <div className="relative min-w-0">
+                <UserIcon className="w-4 h-4 text-[#71717A] absolute left-3 top-1/2 -translate-y-1/2 flex-shrink-0" />
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Samad Real Estate"
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555] transition-all duration-150"
+                  className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555] transition-all duration-150"
                   required={tab === "signup"}
                 />
               </div>
             </div>
           )}
 
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 min-w-0">
             <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
               Email Address
             </label>
-            <div className="relative">
-              <Mail className="w-4 h-4 text-[#71717A] absolute left-3 top-1/2 -translate-y-1/2" />
+            <div className="relative min-w-0">
+              <Mail className="w-4 h-4 text-[#71717A] absolute left-3 top-1/2 -translate-y-1/2 flex-shrink-0" />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@business.com"
-                className="w-full bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555] transition-all duration-150"
+                className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555] transition-all duration-150"
                 required
               />
             </div>
           </div>
 
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 min-w-0">
             <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
               Password
             </label>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-[#71717A] absolute left-3 top-1/2 -translate-y-1/2" />
+            <div className="relative min-w-0">
+              <Lock className="w-4 h-4 text-[#71717A] absolute left-3 top-1/2 -translate-y-1/2 flex-shrink-0" />
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-10 py-2.5 text-white text-sm outline-none focus:border-[#555555] transition-all duration-150"
+                className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-10 py-2.5 text-white text-sm outline-none focus:border-[#555555] transition-all duration-150"
                 required
               />
               <button

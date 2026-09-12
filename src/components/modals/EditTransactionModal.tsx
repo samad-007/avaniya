@@ -150,28 +150,28 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
           onClose();
         }
       }}
-      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto animate-backdrop"
+      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto overflow-x-hidden animate-backdrop"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-xl w-full p-4 sm:p-6 shadow-2xl flex flex-col gap-4 my-auto max-h-[92vh] overflow-y-auto animate-modal"
+        className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-xl w-full max-w-full p-4 sm:p-6 shadow-2xl flex flex-col gap-4 my-auto max-h-[92vh] overflow-y-auto overflow-x-hidden animate-modal min-w-0"
       >
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-[#262626]">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-[#161616] border border-[#333333] text-white flex items-center justify-center font-mono font-bold text-xs">
+        <div className="flex items-start justify-between pb-3 border-b border-[#262626] gap-3">
+          <div className="flex items-start gap-3 min-w-0 flex-1">
+            <div className="w-9 h-9 rounded-lg bg-[#161616] border border-[#333333] text-white flex items-center justify-center font-mono font-bold text-xs flex-shrink-0 mt-0.5">
               {transaction.transCode ? transaction.transCode.slice(0, 3) : "TX"}
             </div>
-            <div>
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
-                <span>Edit Transaction</span>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2 flex-wrap">
+                <span className="break-words">Edit Transaction</span>
                 {transaction.transCode && (
-                  <span className="text-xs font-mono font-semibold text-[#A1A1AA] bg-[#161616] border border-[#262626] px-2 py-0.5 rounded">
+                  <span className="text-xs font-mono font-semibold text-[#A1A1AA] bg-[#161616] border border-[#262626] px-2 py-0.5 rounded flex-shrink-0">
                     {transaction.transCode}
                   </span>
                 )}
               </h2>
-              <p className="text-xs text-[#A1A1AA] font-medium">
+              <p className="text-xs text-[#A1A1AA] font-medium break-words mt-0.5">
                 Correct financial amounts, categories, modes, and dates
               </p>
             </div>
@@ -179,7 +179,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="text-[#A1A1AA] hover:text-white p-1 rounded-md transition-all duration-150"
+            className="text-[#A1A1AA] hover:text-white p-1 rounded-md transition-all duration-150 flex-shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
@@ -195,7 +195,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
         <form onSubmit={handleSubmit} className="flex flex-col gap-3.5 text-sm">
           {/* Row 1: Scope & Transaction Type */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Portfolio Scope
               </label>
@@ -207,14 +207,14 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                     scope: e.target.value as "commercial" | "personal",
                   })
                 }
-                className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
+                className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555] min-w-0"
               >
                 <option value="commercial">Commercial Land Business</option>
                 <option value="personal">Personal Asset Investment</option>
               </select>
             </div>
 
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Transaction Type
               </label>
@@ -236,7 +236,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                       | "loan_profit_share",
                   })
                 }
-                className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
+                className="w-full max-w-full bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555] min-w-0 truncate"
               >
                 <option value="outflow">Property Outflow / Expense</option>
                 <option value="deal_inflow">Property Sale Receipt</option>
@@ -254,7 +254,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
 
           {/* Row 2: Date & Amount */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Transaction Date
               </label>
@@ -266,13 +266,13 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                   onChange={(e) =>
                     setFormData({ ...formData, date: e.target.value })
                   }
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
+                  className="w-full bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555] min-w-0"
                   required
                 />
               </div>
             </div>
 
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Amount (₹ INR)
               </label>
@@ -286,7 +286,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                       amount: parseFloat(e.target.value) || 0,
                     })
                   }
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm font-mono font-bold outline-none focus:border-[#555555]"
+                  className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm font-mono font-bold outline-none focus:border-[#555555] min-w-0"
                   placeholder="e.g. 500000"
                   required
                 />
@@ -300,7 +300,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
           {/* Row 3: Linked Property / Loan & Category */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {formData.transactionType?.startsWith("loan_") ? (
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-1.5 min-w-0">
                 <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                   Linked Loan Agreement
                 </label>
@@ -315,7 +315,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                       loanId: matched?.id,
                     });
                   }}
-                  className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-emerald-500"
+                  className="w-full max-w-full bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-emerald-500 min-w-0 truncate"
                 >
                   <option value="">(None / Unlinked Debt)</option>
                   {loans.map((l) => (
@@ -326,7 +326,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                 </select>
               </div>
             ) : (
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-1.5 min-w-0">
                 <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                   Linked Property
                 </label>
@@ -335,7 +335,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                   onChange={(e) =>
                     setFormData({ ...formData, propertyCode: e.target.value })
                   }
-                  className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
+                  className="w-full max-w-full bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555] min-w-0 truncate"
                 >
                   <option value="">(None / General Liquidity)</option>
                   {properties
@@ -349,7 +349,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
 
                 {/* Sub-Plot Dropdown (if land deal has sub-plots) */}
                 {selectedProp?.subPlots && selectedProp.subPlots.length > 0 && (
-                  <div className="flex flex-col gap-1 mt-2">
+                  <div className="flex flex-col gap-1 mt-2 min-w-0">
                     <label className="text-[11px] font-semibold text-emerald-400 uppercase tracking-wider">
                       Tag to Sub-Plot
                     </label>
@@ -358,7 +358,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                       onChange={(e) =>
                         setFormData({ ...formData, subPlotNumber: e.target.value })
                       }
-                      className="bg-[#161616] border border-[#333333] rounded-lg px-2.5 py-1.5 text-white text-xs outline-none focus:border-emerald-500 cursor-pointer"
+                      className="w-full max-w-full bg-[#161616] border border-[#333333] rounded-lg px-2.5 py-1.5 text-white text-xs outline-none focus:border-emerald-500 cursor-pointer min-w-0 truncate"
                     >
                       <option value="">(None / Deal Level)</option>
                       {selectedProp.subPlots.map((sp) => (
@@ -372,7 +372,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
               </div>
             )}
 
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Category
               </label>
@@ -384,7 +384,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                   setFormData({ ...formData, category: e.target.value })
                 }
                 placeholder="Select or enter category..."
-                className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
+                className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555] min-w-0"
                 required
               />
               <datalist id="category-suggestions">
@@ -397,7 +397,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
 
           {/* Row 4: Mode & Transfer Type */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Payment Mode
               </label>
@@ -409,7 +409,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                     mode: e.target.value as "Bank" | "Cash",
                   })
                 }
-                className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
+                className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555] min-w-0"
               >
                 <option value="Bank">Bank Account (NEFT / RTGS / Cheque)</option>
                 <option value="Cash">Cash in Hand</option>
@@ -417,7 +417,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
             </div>
 
             {formData.transactionType === "transfer" ? (
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-1.5 min-w-0">
                 <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                   Transfer Direction
                 </label>
@@ -431,7 +431,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                         | "Cash Deposit to Bank",
                     })
                   }
-                  className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
+                  className="w-full max-w-full bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555] min-w-0 truncate"
                 >
                   <option value="Bank Withdrawal to Cash">
                     Bank Withdrawal to Cash (-Bank / +Cash)
@@ -442,7 +442,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                 </select>
               </div>
             ) : (
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-1.5 min-w-0">
                 <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                   Beneficiary / Source Name
                 </label>
@@ -456,14 +456,14 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                     })
                   }
                   placeholder="e.g. Land Owner, Advocate, Contractor"
-                  className="bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
+                  className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555] min-w-0"
                 />
               </div>
             )}
           </div>
 
           {/* Row 5: Remarks / Notes */}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 min-w-0">
             <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
               Remarks &amp; Audit Notes
             </label>
@@ -474,12 +474,12 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                 setFormData({ ...formData, remarks: e.target.value })
               }
               placeholder="e.g. Advance paid against survey no. 442/1B, Cheque #004521"
-              className="bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
+              className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555] min-w-0 resize-none"
             />
           </div>
 
           {/* Row 6: Attachment URL */}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 min-w-0">
             <div className="flex items-center justify-between">
               <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider flex items-center gap-1.5">
                 <Link2 className="w-3.5 h-3.5 text-[#A1A1AA]" />
@@ -504,23 +504,23 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                 setFormData({ ...formData, attachmentUrl: e.target.value })
               }
               placeholder="https://drive.google.com/... or Dropbox / iCloud link"
-              className="bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
+              className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555] min-w-0"
             />
           </div>
 
           {/* Delete Confirmation Alert */}
           {showDeleteConfirm && (
-            <div className="bg-rose-950/40 border border-rose-800/60 p-3 rounded-lg flex flex-col gap-2">
+            <div className="bg-rose-950/40 border border-rose-800/60 p-3 rounded-lg flex flex-col gap-2 min-w-0">
               <div className="flex items-center gap-2 text-rose-300 text-xs font-bold">
                 <AlertTriangle className="w-4 h-4 text-rose-400 flex-shrink-0" />
                 <span>Confirm Permanent Deletion?</span>
               </div>
-              <p className="text-xs text-rose-200/80">
+              <p className="text-xs text-rose-200/80 break-words">
                 This will remove transaction{" "}
                 <strong className="text-white font-mono">{transaction.transCode || transaction.id}</strong> (
                 {formData.amount ? formatINRCompact(formData.amount) : "₹ 0"}) and immediately recalculate portfolio liquidity.
               </p>
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex items-center gap-2 mt-1 flex-wrap">
                 <button
                   type="button"
                   onClick={handleDelete}
@@ -541,7 +541,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
           )}
 
           {/* Actions Footer */}
-          <div className="flex items-center justify-between gap-2.5 pt-3 border-t border-[#262626] mt-1">
+          <div className="flex items-center justify-between gap-2.5 pt-3 border-t border-[#262626] mt-1 flex-wrap">
             {onDelete && !showDeleteConfirm ? (
               <button
                 type="button"

@@ -177,26 +177,26 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
           onClose();
         }
       }}
-      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto animate-backdrop"
+      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto overflow-x-hidden animate-backdrop"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl flex flex-col gap-5 my-auto max-h-[90vh] overflow-y-auto animate-modal"
+        className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-2xl w-full max-w-full p-4 sm:p-6 shadow-2xl flex flex-col gap-4 sm:gap-5 my-auto max-h-[90vh] overflow-y-auto overflow-x-hidden animate-modal min-w-0"
       >
         {/* Header */}
-        <div className="flex items-center justify-between pb-3.5 border-b border-[#262626]">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-emerald-950/40 border border-emerald-800/40 text-emerald-400 flex items-center justify-center">
+        <div className="flex items-start justify-between pb-3.5 border-b border-[#262626] gap-3">
+          <div className="flex items-start gap-3 min-w-0 flex-1">
+            <div className="w-9 h-9 rounded-lg bg-emerald-950/40 border border-emerald-800/40 text-emerald-400 flex items-center justify-center flex-shrink-0 mt-0.5">
               <Building2 className="w-4 h-4" />
             </div>
-            <div>
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
-                <span>Edit Property: {property.name}</span>
-                <span className="text-xs font-mono font-semibold text-[#A1A1AA] bg-[#161616] border border-[#262626] px-2 py-0.5 rounded">
+            <div className="min-w-0 flex-1">
+              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2 flex-wrap">
+                <span className="break-words">Edit Property: {property.name}</span>
+                <span className="text-xs font-mono font-semibold text-[#A1A1AA] bg-[#161616] border border-[#262626] px-2 py-0.5 rounded flex-shrink-0">
                   {property.propertyCode}
                 </span>
               </h2>
-              <p className="text-xs text-[#A1A1AA] font-medium">
+              <p className="text-xs text-[#A1A1AA] font-medium break-words mt-0.5">
                 Update valuations, price consideration, land area, status, and milestone stages
               </p>
             </div>
@@ -204,7 +204,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="text-[#A1A1AA] hover:text-white p-1 rounded-md transition-all duration-150"
+            className="text-[#A1A1AA] hover:text-white p-1 rounded-md transition-all duration-150 flex-shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
@@ -220,7 +220,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-sm">
           {/* Section 1: Basic Information */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Property / Deal Name
               </label>
@@ -228,12 +228,12 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                 type="text"
                 value={formData.name || ""}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555]"
+                className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555] min-w-0"
                 required
               />
             </div>
 
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Asset Classification
               </label>
@@ -245,14 +245,14 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                     type: e.target.value as "commercial" | "personal",
                   })
                 }
-                className="bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555]"
+                className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555] min-w-0"
               >
                 <option value="commercial">Commercial Land / Joint Venture</option>
                 <option value="personal">Personal Apartment / Villa</option>
               </select>
             </div>
 
-            <div className="flex flex-col gap-1.5 sm:col-span-2">
+            <div className="flex flex-col gap-1.5 sm:col-span-2 min-w-0">
               <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Location / Survey District
               </label>
@@ -265,12 +265,12 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                     setFormData({ ...formData, location: e.target.value })
                   }
                   placeholder="e.g. OMR Sholinganallur, Survey No. 442/1B"
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555]"
+                  className="w-full bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555] min-w-0"
                 />
               </div>
             </div>
 
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Current Deal Status
               </label>
@@ -287,7 +287,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                       | "closed",
                   })
                 }
-                className="bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555]"
+                className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555] min-w-0"
               >
                 <option value="open">Open (Token / Advance Paid)</option>
                 <option value="in_progress">In Progress (Partially Paid)</option>
@@ -297,7 +297,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
               </select>
             </div>
 
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Acquisition / Token Date
               </label>
@@ -309,12 +309,12 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                   onChange={(e) =>
                     setFormData({ ...formData, acquisitionDate: e.target.value })
                   }
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555]"
+                  className="w-full bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555] min-w-0"
                 />
               </div>
             </div>
 
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
                 Agreement Due Date / Deadline
               </label>
@@ -326,12 +326,12 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                   onChange={(e) =>
                     setFormData({ ...formData, agreementDueDate: e.target.value })
                   }
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3.5 py-2.5 text-white text-sm outline-none focus:border-amber-500"
+                  className="w-full bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3.5 py-2.5 text-white text-sm outline-none focus:border-amber-500 min-w-0"
                 />
               </div>
             </div>
 
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-blue-400 uppercase tracking-wider">
                 Target Settlement / Exit Date
               </label>
@@ -343,12 +343,12 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                   onChange={(e) =>
                     setFormData({ ...formData, targetSettlementDate: e.target.value })
                   }
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3.5 py-2.5 text-white text-sm outline-none focus:border-blue-500"
+                  className="w-full bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3.5 py-2.5 text-white text-sm outline-none focus:border-blue-500 min-w-0"
                 />
               </div>
             </div>
 
-            <div className="flex flex-col gap-1.5 sm:col-span-2">
+            <div className="flex flex-col gap-1.5 sm:col-span-2 min-w-0">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider flex items-center gap-1.5">
                   <Link2 className="w-3.5 h-3.5 text-[#A1A1AA]" />
@@ -373,7 +373,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                   setFormData({ ...formData, attachmentUrl: e.target.value })
                 }
                 placeholder="https://drive.google.com/... or Dropbox folder"
-                className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555]"
+                className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555] min-w-0"
               />
             </div>
           </div>
@@ -384,7 +384,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
               Land Measurement &amp; Unit Rates
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-1.5 min-w-0">
                 <label className="text-xs font-medium text-[#A1A1AA]">
                   Total Area (Sq.Ft / Cents / Acres)
                 </label>
@@ -402,11 +402,11 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                     });
                   }}
                   placeholder="e.g. 5400"
-                  className="bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm font-mono outline-none focus:border-[#555555]"
+                  className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm font-mono outline-none focus:border-[#555555] min-w-0"
                 />
               </div>
 
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-1.5 min-w-0">
                 <label className="text-xs font-medium text-[#A1A1AA]">
                   Rate per Sq.Ft (₹)
                 </label>
@@ -424,7 +424,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                     });
                   }}
                   placeholder="e.g. 4500"
-                  className="bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm font-mono outline-none focus:border-[#555555]"
+                  className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm font-mono outline-none focus:border-[#555555] min-w-0"
                 />
               </div>
             </div>
@@ -436,7 +436,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
               Financial Valuations &amp; Agreed Prices
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-1.5 min-w-0">
                 <label className="text-xs font-medium text-[#A1A1AA]">
                   Agreed Purchase Price (₹)
                 </label>
@@ -449,14 +449,14 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                       agreedPurchasePrice: parseFloat(e.target.value) || 0,
                     })
                   }
-                  className="bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm font-mono font-bold outline-none focus:border-[#555555]"
+                  className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm font-mono font-bold outline-none focus:border-[#555555] min-w-0"
                 />
                 <span className="text-xs text-[#22C55E] font-mono font-semibold">
                   {formatINRCompact(formData.agreedPurchasePrice || 0)}
                 </span>
               </div>
 
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-1.5 min-w-0">
                 <label className="text-xs font-medium text-[#A1A1AA]">
                   Target Selling Price (₹)
                 </label>
@@ -469,14 +469,14 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                       targetSalePrice: parseFloat(e.target.value) || 0,
                     })
                   }
-                  className="bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm font-mono font-bold outline-none focus:border-[#555555]"
+                  className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm font-mono font-bold outline-none focus:border-[#555555] min-w-0"
                 />
                 <span className="text-xs text-[#3B82F6] font-mono font-semibold">
                   {formatINRCompact(formData.targetSalePrice || 0)}
                 </span>
               </div>
 
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-1.5 min-w-0">
                 <label className="text-xs font-medium text-[#A1A1AA]">
                   Agreed Selling Price (₹)
                 </label>
@@ -490,7 +490,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                     })
                   }
                   placeholder="Set once buyer is finalized"
-                  className="bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm font-mono font-bold outline-none focus:border-[#555555]"
+                  className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm font-mono font-bold outline-none focus:border-[#555555] min-w-0"
                 />
                 <span className="text-xs text-[#F59E0B] font-mono font-semibold">
                   {formData.agreedSellingPrice
@@ -502,7 +502,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
           </div>
 
           {/* Section 4: Notes */}
-          <div className="pt-3 border-t border-[#1a1a1a] flex flex-col gap-1.5">
+          <div className="pt-3 border-t border-[#1a1a1a] flex flex-col gap-1.5 min-w-0">
             <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
               Legal, EC &amp; Title Verification Notes
             </label>
@@ -511,7 +511,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
               value={formData.notes || ""}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               placeholder="e.g. Encumbrance certificate clear for 30 years. Agreement signed with seller."
-              className="bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555]"
+              className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555] min-w-0 resize-none"
             />
           </div>
 
@@ -536,7 +536,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                 {formData.milestones.map((m, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-2.5 bg-[#121212] border border-[#262626] p-2.5 rounded-lg"
+                    className="flex items-center gap-2 bg-[#121212] border border-[#262626] p-2.5 rounded-lg min-w-0"
                   >
                     <input
                       type="checkbox"
@@ -546,7 +546,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                           status: e.target.checked ? "completed" : "pending",
                         })
                       }
-                      className="rounded bg-black border-[#444444] cursor-pointer w-4 h-4"
+                      className="rounded bg-black border-[#444444] cursor-pointer w-4 h-4 flex-shrink-0"
                     />
                     <input
                       type="text"
@@ -555,7 +555,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                         handleUpdateMilestone(idx, { name: e.target.value })
                       }
                       placeholder="Milestone title"
-                      className="flex-1 bg-transparent text-sm text-white outline-none border-b border-transparent focus:border-[#555555]"
+                      className="flex-1 min-w-0 bg-transparent text-sm text-white outline-none border-b border-transparent focus:border-[#555555]"
                     />
                     <input
                       type="number"
@@ -566,12 +566,12 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                         })
                       }
                       placeholder="₹ Due"
-                      className="w-28 bg-[#181818] border border-[#282828] rounded-md px-2 py-1 text-sm font-mono text-right text-white font-bold"
+                      className="w-24 sm:w-28 bg-[#181818] border border-[#282828] rounded-md px-2 py-1 text-sm font-mono text-right text-white font-bold flex-shrink-0"
                     />
                     <button
                       type="button"
                       onClick={() => handleRemoveMilestone(idx)}
-                      className="text-[#71717A] hover:text-rose-400 p-1.5 transition-all duration-150"
+                      className="text-[#71717A] hover:text-rose-400 p-1.5 transition-all duration-150 flex-shrink-0"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -609,10 +609,10 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                 {formData.subPlots.map((sp, idx) => (
                   <div
                     key={sp.id || idx}
-                    className="grid grid-cols-1 sm:grid-cols-6 gap-2 bg-[#121212] border border-[#262626] p-2.5 rounded-lg items-center text-xs"
+                    className="grid grid-cols-1 sm:grid-cols-6 gap-2 bg-[#121212] border border-[#262626] p-2.5 rounded-lg items-center text-xs min-w-0"
                   >
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[#71717A] font-mono">#</span>
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="text-[#71717A] font-mono flex-shrink-0">#</span>
                       <input
                         type="text"
                         value={sp.plotNumber}
@@ -620,10 +620,10 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                           handleUpdateSubPlot(idx, { plotNumber: e.target.value })
                         }
                         placeholder="Plot No"
-                        className="w-16 bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white font-mono font-bold"
+                        className="w-full sm:w-16 bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white font-mono font-bold min-w-0"
                       />
                     </div>
-                    <div className="flex flex-col gap-0.5">
+                    <div className="flex flex-col gap-0.5 min-w-0">
                       <span className="text-[10px] text-[#71717A]">Sqft</span>
                       <input
                         type="number"
@@ -634,10 +634,10 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                           })
                         }
                         placeholder="Sq.ft"
-                        className="bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white font-mono"
+                        className="w-full bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white font-mono min-w-0"
                       />
                     </div>
-                    <div className="flex flex-col gap-0.5 sm:col-span-2">
+                    <div className="flex flex-col gap-0.5 sm:col-span-2 min-w-0">
                       <span className="text-[10px] text-[#71717A]">Target Price (₹)</span>
                       <input
                         type="number"
@@ -648,10 +648,10 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                           })
                         }
                         placeholder="Target Price"
-                        className="bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white font-mono font-semibold"
+                        className="w-full bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white font-mono font-semibold min-w-0"
                       />
                     </div>
-                    <div className="flex flex-col gap-0.5">
+                    <div className="flex flex-col gap-0.5 min-w-0">
                       <span className="text-[10px] text-[#71717A]">Status</span>
                       <select
                         value={sp.status}
@@ -660,7 +660,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                             status: e.target.value as "available" | "booked" | "sold",
                           })
                         }
-                        className={`bg-[#1a1a1a] border border-[#333333] rounded px-1.5 py-1 text-xs font-semibold ${
+                        className={`w-full bg-[#1a1a1a] border border-[#333333] rounded px-1.5 py-1 text-xs font-semibold min-w-0 ${
                           sp.status === "sold"
                             ? "text-emerald-400"
                             : sp.status === "booked"
@@ -673,7 +673,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                         <option value="sold">Sold</option>
                       </select>
                     </div>
-                    <div className="flex items-center gap-1.5 justify-end">
+                    <div className="flex items-center gap-1.5 justify-end min-w-0">
                       <input
                         type="text"
                         value={sp.buyerName || ""}
@@ -681,12 +681,12 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                           handleUpdateSubPlot(idx, { buyerName: e.target.value })
                         }
                         placeholder="Buyer name"
-                        className="w-full bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white text-xs"
+                        className="w-full bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white text-xs min-w-0"
                       />
                       <button
                         type="button"
                         onClick={() => handleRemoveSubPlot(idx)}
-                        className="text-[#71717A] hover:text-rose-400 p-1 transition-all duration-150"
+                        className="text-[#71717A] hover:text-rose-400 p-1 transition-all duration-150 flex-shrink-0"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -725,7 +725,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                 {formData.partners.map((p, idx) => (
                   <div
                     key={idx}
-                    className="grid grid-cols-1 sm:grid-cols-4 gap-2 bg-[#121212] border border-[#262626] p-2.5 rounded-lg items-center text-xs"
+                    className="grid grid-cols-1 sm:grid-cols-4 gap-2 bg-[#121212] border border-[#262626] p-2.5 rounded-lg items-center text-xs min-w-0"
                   >
                     <input
                       type="text"
@@ -734,9 +734,9 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                         handleUpdatePartner(idx, { name: e.target.value })
                       }
                       placeholder="Partner Name"
-                      className="bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white text-xs font-semibold sm:col-span-2"
+                      className="w-full bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white text-xs font-semibold sm:col-span-2 min-w-0"
                     />
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 min-w-0">
                       <input
                         type="number"
                         value={p.equityPct ?? ""}
@@ -746,11 +746,11 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                           })
                         }
                         placeholder="Equity %"
-                        className="w-full bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white text-xs font-mono font-bold"
+                        className="w-full min-w-0 bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white text-xs font-mono font-bold"
                       />
-                      <span className="text-[#71717A] font-bold">%</span>
+                      <span className="text-[#71717A] font-bold flex-shrink-0">%</span>
                     </div>
-                    <div className="flex items-center gap-1.5 justify-end">
+                    <div className="flex items-center gap-1.5 justify-end min-w-0">
                       <input
                         type="number"
                         value={p.capitalCommitted ?? ""}
@@ -760,12 +760,12 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                           })
                         }
                         placeholder="₹ Committed"
-                        className="w-full bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white text-xs font-mono"
+                        className="w-full min-w-0 bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white text-xs font-mono"
                       />
                       <button
                         type="button"
                         onClick={() => handleRemovePartner(idx)}
-                        className="text-[#71717A] hover:text-rose-400 p-1 transition-all duration-150"
+                        className="text-[#71717A] hover:text-rose-400 p-1 transition-all duration-150 flex-shrink-0"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -781,7 +781,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
           </div>
 
           {/* Actions (Key Action: Save Property Details with Hover-to-White) */}
-          <div className="flex items-center justify-end gap-2.5 pt-3.5 border-t border-[#262626] mt-2">
+          <div className="flex items-center justify-end gap-2.5 pt-3.5 border-t border-[#262626] mt-2 flex-wrap">
             <button
               type="button"
               onClick={onClose}

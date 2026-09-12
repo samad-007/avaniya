@@ -54,15 +54,15 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
           onClose();
         }
       }}
-      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto animate-backdrop"
+      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto overflow-x-hidden animate-backdrop"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-5 sm:p-6 shadow-2xl my-auto flex flex-col gap-5 animate-modal"
+        className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-w-full min-w-0 max-h-[92vh] overflow-y-auto overflow-x-hidden p-5 sm:p-6 shadow-2xl my-auto flex flex-col gap-5 animate-modal"
       >
-        <div className="flex items-center justify-between border-b border-[#262626] pb-3.5">
-          <div>
-            <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+        <div className="flex items-center justify-between border-b border-[#262626] pb-3.5 gap-2">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-base sm:text-lg font-bold text-white tracking-tight break-words">
               Dynamic Categories &amp; Financial Formula Engine
             </h2>
             <div className="text-xs text-[#A1A1AA] mt-0.5 font-medium">
@@ -71,14 +71,14 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a]"
+            className="p-1 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] flex-shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-sm">
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 min-w-0">
             <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
               Category Name
             </label>
@@ -87,13 +87,13 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Panchayat Approval Charges, Borewell Drilling"
-              className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
+              className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
               required
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3.5">
-            <div className="flex flex-col gap-1.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div className="flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Transaction Direction
               </label>
@@ -102,7 +102,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
                 onChange={(e) =>
                   setType(e.target.value as "outflow" | "inflow" | "transfer")
                 }
-                className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
+                className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555] truncate"
               >
                 <option value="outflow">Outflow (Expense / Payment)</option>
                 <option value="inflow">Inflow (Receipt / Revenue)</option>
@@ -110,7 +110,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
               </select>
             </div>
 
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Applicable Mode
               </label>
@@ -119,7 +119,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
                 onChange={(e) =>
                   setScope(e.target.value as "commercial" | "personal" | "both")
                 }
-                className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
+                className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555] truncate"
               >
                 <option value="both">Both Commercial &amp; Personal</option>
                 <option value="commercial">Commercial Land Only</option>
@@ -129,7 +129,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
           </div>
 
           {/* Mathematical Financial Role Mapping */}
-          <div className="flex flex-col gap-2 bg-[#050505] p-3.5 rounded-lg border border-[#262626]">
+          <div className="flex flex-col gap-2 bg-[#050505] p-3.5 rounded-lg border border-[#262626] min-w-0">
             <div className="flex items-center gap-1.5 text-xs font-bold text-[#22C55E]">
               <ShieldCheck className="w-4 h-4" />
               <span>Zero-Break Formula Role Mapping</span>
@@ -141,7 +141,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
             <select
               value={financialRole}
               onChange={(e) => setFinancialRole(e.target.value as FinancialRole)}
-              className="w-full bg-[#111111] border border-[#383838] rounded-lg p-2.5 text-white font-medium text-xs sm:text-sm mt-1 outline-none focus:border-[#555555]"
+              className="w-full max-w-full min-w-0 bg-[#111111] border border-[#383838] rounded-lg p-2.5 text-white font-medium text-xs sm:text-sm mt-1 outline-none focus:border-[#555555] truncate"
             >
               <option value="property_expense">
                 Property Deal Expense (Adds to Total Cost &amp; Reduces Profit)
@@ -185,7 +185,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
           </div>
 
           {/* Action Buttons (Key Ingress Action with Hover-to-White) */}
-          <div className="flex items-center gap-2.5 pt-2.5 border-t border-[#262626]">
+          <div className="flex items-center gap-2.5 pt-2.5 border-t border-[#262626] flex-wrap sm:flex-nowrap">
             <button
               type="submit"
               disabled={isSubmitting}

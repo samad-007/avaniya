@@ -191,20 +191,20 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
           onClose();
         }
       }}
-      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto animate-backdrop"
+      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto overflow-x-hidden animate-backdrop"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-5 sm:p-6 shadow-2xl my-auto flex flex-col gap-5 animate-modal"
+        className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-w-full min-w-0 max-h-[92vh] overflow-y-auto overflow-x-hidden p-5 sm:p-6 shadow-2xl my-auto flex flex-col gap-5 animate-modal"
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#262626] pb-3.5">
-          <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+        <div className="flex items-center justify-between border-b border-[#262626] pb-3.5 gap-2">
+          <h2 className="text-base sm:text-lg font-bold text-white tracking-tight break-words min-w-0 flex-1">
             + Add New Real Estate Property / Deal
           </h2>
           <button
             onClick={onClose}
-            className="p-1 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] transition-all duration-150"
+            className="p-1 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] transition-all duration-150 flex-shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
@@ -240,8 +240,8 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
           </div>
 
           {/* Property Name & Custom Code */}
-          <div className="grid grid-cols-3 gap-3.5">
-            <div className="col-span-2 flex flex-col gap-1.5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+            <div className="sm:col-span-2 flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Property / Site Name
               </label>
@@ -250,11 +250,11 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Andal Avenue, Prestige 3BHK"
-                className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
+                className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
                 required
               />
             </div>
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Custom Code
               </label>
@@ -263,14 +263,14 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                 value={propertyCode}
                 onChange={(e) => setPropertyCode(e.target.value)}
                 placeholder={type === "commercial" ? "LND-006" : "APT-002"}
-                className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white font-mono text-sm outline-none focus:border-[#555555]"
+                className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white font-mono text-sm outline-none focus:border-[#555555]"
               />
             </div>
           </div>
 
           {/* Location & Acquisition Date */}
-          <div className="grid grid-cols-2 gap-3.5">
-            <div className="flex flex-col gap-1.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div className="flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Location
               </label>
@@ -279,10 +279,10 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="e.g. OMR Chennai, Kalaimal Nagar"
-                className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
+                className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
               />
             </div>
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Acquisition Date
               </label>
@@ -290,14 +290,14 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                 type="date"
                 value={acquisitionDate}
                 onChange={(e) => setAcquisitionDate(e.target.value)}
-                className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
+                className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
               />
             </div>
           </div>
 
           {/* Agreement Due Date & Target Settlement Date */}
-          <div className="grid grid-cols-2 gap-3.5">
-            <div className="flex flex-col gap-1.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div className="flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
                 Agreement Due Date
               </label>
@@ -305,10 +305,10 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                 type="date"
                 value={agreementDueDate}
                 onChange={(e) => setAgreementDueDate(e.target.value)}
-                className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-amber-500"
+                className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-amber-500"
               />
             </div>
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-blue-400 uppercase tracking-wider">
                 Target Settlement Date
               </label>
@@ -316,13 +316,13 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                 type="date"
                 value={targetSettlementDate}
                 onChange={(e) => setTargetSettlementDate(e.target.value)}
-                className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-blue-500"
+                className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-blue-500"
               />
             </div>
           </div>
 
           {/* Document / Cloud Proof URL */}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 min-w-0">
             <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider flex items-center gap-1.5">
               <Link2 className="w-3.5 h-3.5 text-[#A1A1AA]" />
               <span>Document / Proof URL (Optional)</span>
@@ -332,7 +332,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
               value={attachmentUrl}
               onChange={(e) => setAttachmentUrl(e.target.value)}
               placeholder="https://drive.google.com/... or Dropbox / iCloud link"
-              className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
+              className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
             />
           </div>
 
@@ -342,8 +342,8 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
               <Calculator className="w-4 h-4" />
               <span>Square Feet Land Rate Calculator (Optional)</span>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="min-w-0">
                 <label className="text-xs text-[#A1A1AA] uppercase font-medium">
                   Area (sq.ft)
                 </label>
@@ -357,10 +357,10 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                     )
                   }
                   placeholder="e.g. 1122"
-                  className="w-full bg-[#111111] border border-[#262626] rounded-md p-2 text-white font-mono text-sm mt-1"
+                  className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-md p-2 text-white font-mono text-sm mt-1"
                 />
               </div>
-              <div>
+              <div className="min-w-0">
                 <label className="text-xs text-[#A1A1AA] uppercase font-medium">
                   Rate per sq.ft (₹)
                 </label>
@@ -374,14 +374,14 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                     )
                   }
                   placeholder="e.g. 9100"
-                  className="w-full bg-[#111111] border border-[#262626] rounded-md p-2 text-white font-mono text-sm mt-1"
+                  className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-md p-2 text-white font-mono text-sm mt-1"
                 />
               </div>
             </div>
           </div>
 
           {/* Agreed Purchase Price */}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 min-w-0">
             <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
               Agreed Purchase Price (₹ INR)
             </label>
@@ -392,7 +392,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                 setAgreedPurchasePrice(parseFloat(e.target.value) || 0)
               }
               placeholder="0"
-              className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-xl font-mono font-bold text-white outline-none focus:border-[#555555]"
+              className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-xl font-mono font-bold text-white outline-none focus:border-[#555555]"
               required
             />
             <div className="text-xs font-mono text-[#F59E0B] font-medium">
@@ -402,8 +402,8 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
 
           {/* Commercial Target Sale & Selling Price */}
           {type === "commercial" && (
-            <div className="grid grid-cols-2 gap-3.5">
-              <div className="flex flex-col gap-1.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div className="flex flex-col gap-1.5 min-w-0">
                 <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                   Target Sale Price (₹)
                 </label>
@@ -414,10 +414,10 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                     setTargetSalePrice(parseFloat(e.target.value) || 0)
                   }
                   placeholder="e.g. 13464000"
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white font-mono text-sm outline-none focus:border-[#555555]"
+                  className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white font-mono text-sm outline-none focus:border-[#555555]"
                 />
               </div>
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-1.5 min-w-0">
                 <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                   Agreed Selling Price (₹)
                 </label>
@@ -428,14 +428,14 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                     setAgreedSellingPrice(parseFloat(e.target.value) || 0)
                   }
                   placeholder="e.g. 12150000"
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white font-mono text-sm outline-none focus:border-[#555555]"
+                  className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white font-mono text-sm outline-none focus:border-[#555555]"
                 />
               </div>
             </div>
           )}
 
           {/* Status */}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 min-w-0">
             <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
               Deal / Acquisition Status
             </label>
@@ -451,7 +451,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                     | "closed"
                 )
               }
-              className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
+              className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555] truncate"
             >
               <option value="open">Open (Token / Advance Paid)</option>
               <option value="in_progress">In Progress (Partially Paid)</option>
@@ -462,7 +462,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
           </div>
 
           {/* Notes */}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 min-w-0">
             <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
               Notes &amp; Deal Details
             </label>
@@ -471,7 +471,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
               onChange={(e) => setNotes(e.target.value)}
               placeholder="e.g. 1122 sq.ft @ ₹9,100/sqft buy price..."
               rows={2}
-              className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555] resize-none"
+              className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555] resize-none"
             />
           </div>
 
@@ -509,7 +509,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                           handleUpdateSubPlot(idx, { plotNumber: e.target.value })
                         }
                         placeholder="Plot #"
-                        className="bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white font-mono font-bold"
+                        className="w-full max-w-full min-w-0 bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white font-mono font-bold"
                       />
                       <input
                         type="number"
@@ -520,7 +520,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                           })
                         }
                         placeholder="Sq.ft"
-                        className="bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white font-mono"
+                        className="w-full max-w-full min-w-0 bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white font-mono"
                       />
                       <input
                         type="number"
@@ -531,7 +531,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                           })
                         }
                         placeholder="Target ₹"
-                        className="bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white font-mono font-semibold sm:col-span-2"
+                        className="w-full max-w-full min-w-0 bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white font-mono font-semibold sm:col-span-2"
                       />
                       <select
                         value={sp.status}
@@ -540,17 +540,17 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                             status: e.target.value as "available" | "booked" | "sold",
                           })
                         }
-                        className="bg-[#1a1a1a] border border-[#333333] rounded px-1.5 py-1 text-xs font-semibold text-white"
+                        className="w-full max-w-full min-w-0 bg-[#1a1a1a] border border-[#333333] rounded px-1.5 py-1 text-xs font-semibold text-white truncate"
                       >
                         <option value="available">Available</option>
                         <option value="booked">Booked</option>
                         <option value="sold">Sold</option>
                       </select>
-                      <div className="flex items-center gap-1 justify-end">
+                      <div className="flex items-center gap-1 justify-end flex-shrink-0">
                         <button
                           type="button"
                           onClick={() => handleRemoveSubPlot(idx)}
-                          className="text-[#71717A] hover:text-rose-400 p-1"
+                          className="text-[#71717A] hover:text-rose-400 p-1 flex-shrink-0"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -596,9 +596,9 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                           handleUpdatePartner(idx, { name: e.target.value })
                         }
                         placeholder="Partner Name"
-                        className="bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white text-xs font-semibold sm:col-span-2"
+                        className="w-full max-w-full min-w-0 bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white text-xs font-semibold sm:col-span-2"
                       />
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 min-w-0">
                         <input
                           type="number"
                           value={p.equityPct ?? ""}
@@ -608,15 +608,15 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                             })
                           }
                           placeholder="Equity %"
-                          className="w-full bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white text-xs font-mono font-bold"
+                          className="w-full max-w-full min-w-0 bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white text-xs font-mono font-bold"
                         />
-                        <span className="text-[#71717A] font-bold">%</span>
+                        <span className="text-[#71717A] font-bold flex-shrink-0">%</span>
                       </div>
-                      <div className="flex items-center gap-1 justify-end">
+                      <div className="flex items-center gap-1 justify-end flex-shrink-0">
                         <button
                           type="button"
                           onClick={() => handleRemovePartner(idx)}
-                          className="text-[#71717A] hover:text-rose-400 p-1"
+                          className="text-[#71717A] hover:text-rose-400 p-1 flex-shrink-0"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -629,7 +629,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
           )}
 
           {/* Buttons (Key Action: Create Property with Hover-to-White) */}
-          <div className="flex items-center gap-2.5 pt-2.5 border-t border-[#262626]">
+          <div className="flex items-center gap-2.5 pt-2.5 border-t border-[#262626] flex-wrap sm:flex-nowrap">
             <button
               type="submit"
               disabled={isSubmitting}

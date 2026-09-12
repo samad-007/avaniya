@@ -78,21 +78,21 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
           onClose();
         }
       }}
-      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 md:p-6 overflow-y-auto animate-backdrop"
+      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 md:p-6 overflow-y-auto overflow-x-hidden animate-backdrop"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto animate-modal"
+        className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-4xl w-full max-w-full min-w-0 max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto animate-modal"
       >
         {/* Modal Header */}
-        <div className="p-4 md:p-5 border-b border-[#262626] flex items-start justify-between bg-[#0e0e0e] gap-3">
-          <div className="flex items-start gap-3.5">
-            <div className="w-11 h-11 rounded-lg bg-[#1a1a1a] border border-[#383838] flex items-center justify-center text-white font-bold font-mono text-base">
+        <div className="p-4 md:p-5 border-b border-[#262626] flex items-start justify-between bg-[#0e0e0e] gap-3 flex-wrap sm:flex-nowrap">
+          <div className="flex items-start gap-3.5 min-w-0 flex-1">
+            <div className="w-11 h-11 rounded-lg bg-[#1a1a1a] border border-[#383838] flex items-center justify-center text-white font-bold font-mono text-base flex-shrink-0">
               {prop.propertyCode.slice(0, 3)}
             </div>
-            <div>
+            <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight">
+                <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight break-words">
                   {prop.name}
                 </h2>
                 <span className="font-mono text-xs font-semibold px-2.5 py-0.5 rounded bg-[#161616] text-[#A1A1AA] border border-[#262626]">
@@ -159,7 +159,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0 flex-wrap justify-end">
             {isCommercial && propertyMetrics && (
               <button
                 type="button"
@@ -206,7 +206,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
         </div>
 
         {/* Modal Scrollable Body */}
-        <div className="p-4 md:p-6 overflow-y-auto flex-1 flex flex-col gap-5">
+        <div className="p-4 md:p-6 overflow-y-auto overflow-x-hidden flex-1 flex flex-col gap-5 w-full max-w-full min-w-0">
           {/* Financial Breakdown Cards */}
           {isCommercial && propertyMetrics && (
             <div className="flex flex-col gap-3.5">
@@ -427,7 +427,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                 )}
               </div>
 
-              <div className="border border-[#262626] rounded-xl overflow-x-auto bg-[#050505]">
+              <div className="w-full max-w-full min-w-0 border border-[#262626] rounded-xl overflow-x-auto bg-[#050505]">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
                     <tr className="bg-[#111111] border-b border-[#262626] text-[#A1A1AA] uppercase font-bold tracking-wider">
@@ -486,7 +486,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                 <span>Joint Venture (JV) Partners Equity Split ({prop.partners.length} Partners)</span>
               </div>
 
-              <div className="border border-[#262626] rounded-xl overflow-x-auto bg-[#050505]">
+              <div className="w-full max-w-full min-w-0 border border-[#262626] rounded-xl overflow-x-auto bg-[#050505]">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
                     <tr className="bg-[#111111] border-b border-[#262626] text-[#A1A1AA] uppercase font-bold tracking-wider">
@@ -566,7 +566,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
             </div>
 
             {/* Table */}
-            <div className="border border-[#262626] rounded-xl overflow-x-auto bg-[#050505]">
+            <div className="w-full max-w-full min-w-0 border border-[#262626] rounded-xl overflow-x-auto bg-[#050505]">
               <table className="w-full text-left text-sm border-collapse">
                 <thead>
                   <tr className="bg-[#111111] border-b border-[#262626] text-[#D4D4D8] uppercase text-xs font-bold tracking-wider">

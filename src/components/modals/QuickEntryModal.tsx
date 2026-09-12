@@ -542,16 +542,16 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           onClose();
         }
       }}
-      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-backdrop"
+      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto overflow-x-hidden animate-backdrop"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-4 sm:p-6 shadow-2xl my-auto flex flex-col gap-4 sm:gap-5 animate-modal"
+        className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-w-full min-w-0 max-h-[92vh] overflow-y-auto overflow-x-hidden p-4 sm:p-6 shadow-2xl my-auto flex flex-col gap-4 sm:gap-5 animate-modal"
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#262626] pb-3 sm:pb-3.5">
-          <div className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
-            <span>
+        <div className="flex items-center justify-between border-b border-[#262626] pb-3 sm:pb-3.5 gap-2">
+          <div className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2 flex-wrap min-w-0 flex-1">
+            <span className="break-words">
               {activeType === "outflow"
                 ? "Record Outflow / Expense"
                 : activeType === "inflow"
@@ -562,24 +562,24 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                 ? "Record Loan / Debt Transaction"
                 : "Internal Liquidity Transfer"}
             </span>
-            <span className="text-[10px] sm:text-xs font-mono font-semibold px-2 py-0.5 rounded bg-[#161616] text-[#A1A1AA] border border-[#262626]">
+            <span className="text-[10px] sm:text-xs font-mono font-semibold px-2 py-0.5 rounded bg-[#161616] text-[#A1A1AA] border border-[#262626] flex-shrink-0">
               {currentScope.toUpperCase()}
             </span>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] transition-all duration-150"
+            className="p-1.5 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] transition-all duration-150 flex-shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Entry Type Selector Tabs */}
-        <div className="grid grid-cols-5 gap-1 bg-[#111111] p-1 rounded-lg border border-[#262626]">
+        <div className="grid grid-cols-5 gap-1 bg-[#111111] p-1 rounded-lg border border-[#262626] min-w-0">
           <button
             type="button"
             onClick={() => setActiveType("outflow")}
-            className={`py-1.5 rounded-md text-xs font-semibold transition-all duration-150 ${
+            className={`py-1.5 px-1 rounded-md text-[11px] sm:text-xs font-semibold transition-all duration-150 truncate min-w-0 ${
               activeType === "outflow"
                 ? "bg-[#262626] text-white shadow-sm font-bold"
                 : "text-[#A1A1AA] hover:text-white"
@@ -590,7 +590,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveType("inflow")}
-            className={`py-1.5 rounded-md text-xs font-semibold transition-all duration-150 ${
+            className={`py-1.5 px-1 rounded-md text-[11px] sm:text-xs font-semibold transition-all duration-150 truncate min-w-0 ${
               activeType === "inflow"
                 ? "bg-[#262626] text-white shadow-sm font-bold text-[#22C55E]"
                 : "text-[#A1A1AA] hover:text-white"
@@ -601,7 +601,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveType("withdrawal")}
-            className={`py-1.5 rounded-md text-xs font-semibold transition-all duration-150 ${
+            className={`py-1.5 px-1 rounded-md text-[11px] sm:text-xs font-semibold transition-all duration-150 truncate min-w-0 ${
               activeType === "withdrawal"
                 ? "bg-[#262626] text-white shadow-sm font-bold text-amber-400"
                 : "text-[#A1A1AA] hover:text-white"
@@ -612,7 +612,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveType("loan")}
-            className={`py-1.5 rounded-md text-xs font-semibold transition-all duration-150 ${
+            className={`py-1.5 px-1 rounded-md text-[11px] sm:text-xs font-semibold transition-all duration-150 truncate min-w-0 ${
               activeType === "loan"
                 ? "bg-[#262626] text-white shadow-sm font-bold text-emerald-400"
                 : "text-[#A1A1AA] hover:text-white"
@@ -623,7 +623,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveType("transfer")}
-            className={`py-1.5 rounded-md text-xs font-semibold transition-all duration-150 ${
+            className={`py-1.5 px-1 rounded-md text-[11px] sm:text-xs font-semibold transition-all duration-150 truncate min-w-0 ${
               activeType === "transfer"
                 ? "bg-[#262626] text-white shadow-sm font-bold text-[#3B82F6]"
                 : "text-[#A1A1AA] hover:text-white"
@@ -715,7 +715,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                     setRecipient(selLoan.lenderName);
                   }
                 }}
-                className="w-full bg-[#161616] border border-[#2a2a2a] rounded-lg p-2 text-white text-xs outline-none focus:border-emerald-500 cursor-pointer"
+                className="w-full max-w-full min-w-0 bg-[#161616] border border-[#2a2a2a] rounded-lg p-2 text-white text-xs outline-none focus:border-emerald-500 cursor-pointer truncate"
               >
                 <option value="">-- General Unlinked Debt --</option>
                 {loans.map((l) => (
@@ -778,7 +778,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
               value={amount || ""}
               onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
               placeholder="0"
-              className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 sm:p-3 text-xl sm:text-2xl font-mono font-bold text-white outline-none focus:border-[#555555] transition-all duration-150"
+              className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 sm:p-3 text-xl sm:text-2xl font-mono font-bold text-white outline-none focus:border-[#555555] transition-all duration-150"
               required
             />
             {/* Verbal Converter Display */}
@@ -881,7 +881,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                       | "Bank to Cash"
                   )
                 }
-                className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
+                className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#555555] truncate"
               >
                 <option value="Bank Withdrawal to Cash">
                   Bank Withdrawal to Cash (Withdraw from Bank into Cash Hand)
@@ -902,7 +902,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
               <select
                 value={propertyCode}
                 onChange={(e) => setPropertyCode(e.target.value)}
-                className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
+                className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#555555] truncate"
               >
                 <option value="">-- General Portfolio (Unlinked) --</option>
                 {properties
@@ -927,7 +927,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   <select
                     value={subPlotNumber}
                     onChange={(e) => setSubPlotNumber(e.target.value)}
-                    className="w-full bg-[#1c1c1c] border border-[#333333] rounded-lg p-2 text-white text-xs outline-none focus:border-emerald-500 cursor-pointer"
+                    className="w-full max-w-full min-w-0 bg-[#1c1c1c] border border-[#333333] rounded-lg p-2 text-white text-xs outline-none focus:border-emerald-500 cursor-pointer truncate"
                   >
                     <option value="">-- Deal Level (Whole Land Parcel) --</option>
                     {selectedProperty.subPlots.map((sp) => (
@@ -981,7 +981,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                     onChange={(e) => setCustomCategoryInput(e.target.value)}
                     placeholder="Type custom category name..."
                     list="custom-inflow-suggestions"
-                    className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#22C55E]"
+                    className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#22C55E]"
                     required
                     autoFocus
                   />
@@ -995,7 +995,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#555555] cursor-pointer"
+                  className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#555555] cursor-pointer truncate"
                 >
                   {availableCategories.map((c, idx) => (
                     <option key={idx} value={c.name} className="bg-[#111111] text-white">
@@ -1009,7 +1009,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
 
           {/* Date & Recipient Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5">
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 Date
               </label>
@@ -1017,11 +1017,11 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
+                className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
                 required
               />
             </div>
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
                 {activeType === "inflow"
                   ? "Received From / Source"
@@ -1040,13 +1040,13 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                     ? "e.g. Samad (Draw), Partner A, Other Business LLC..."
                     : "e.g. Seller, Lawyer, Stalin..."
                 }
-                className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
+                className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
               />
             </div>
           </div>
 
           {/* Remarks */}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 min-w-0">
             <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
               Remarks / Transaction Notes
             </label>
@@ -1055,12 +1055,12 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
               placeholder="e.g. Token advance paid at lawyer office, Cheque #004521"
-              className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
+              className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
             />
           </div>
 
           {/* Document / Receipt Proof URL */}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 min-w-0">
             <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider flex items-center gap-1.5">
               <Link2 className="w-3.5 h-3.5 text-[#A1A1AA]" />
               <span>Document / Receipt Proof URL (Optional)</span>
@@ -1070,12 +1070,12 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
               value={attachmentUrl}
               onChange={(e) => setAttachmentUrl(e.target.value)}
               placeholder="https://drive.google.com/... or Dropbox / iCloud link"
-              className="w-full bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
+              className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
             />
           </div>
 
           {/* Submit Action Buttons */}
-          <div className="flex items-center gap-2.5 pt-2.5 border-t border-[#262626]">
+          <div className="flex items-center gap-2.5 pt-2.5 border-t border-[#262626] flex-wrap sm:flex-nowrap">
             <button
               type="submit"
               disabled={isSubmitting}
