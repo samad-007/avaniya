@@ -6,7 +6,17 @@ import {
   CommercialDashboardMetrics,
   PersonalDashboardMetrics,
 } from "@/lib/formulaEngine";
-import { Wallet, Banknote, Landmark, Clock, ArrowDownLeft, TrendingUp } from "lucide-react";
+import {
+  Wallet,
+  Banknote,
+  Landmark,
+  Clock,
+  ArrowDownLeft,
+  Coins,
+  TrendingDown,
+  Building2,
+} from "lucide-react";
+import { CyclingKpiCard } from "./CyclingKpiCard";
 import { ProfitKpiCard } from "./ProfitKpiCard";
 
 interface KpiStripProps {
@@ -31,9 +41,17 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
       totalProjectedProfit,
       totalPendingProfit,
       capitalInjectedTotal,
+      capitalInjectedBank,
       netCapitalInjected,
       profitWithdrawalsTotal,
       outstandingLoansPrincipal,
+      totalFinanceCosts,
+      totalProjectOutlay,
+      totalAgreedBuyPrice,
+      totalPropertyExpenses,
+      dealInflowsBank,
+      loansBorrowedBank,
+      outflowsCash,
       propertyMetrics,
     } = commercialMetrics;
 
@@ -46,98 +64,145 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
         pm.property.status === "sold" || pm.property.status === "closed"
     ).length;
 
+    const bankInflowsGross =
+      dealInflowsBank + capitalInjectedBank + loansBorrowedBank;
+
     return (
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-        {/* Net Bank */}
-        <div className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-3.5 flex flex-col justify-between hover:border-[#383838] transition-standard shadow-sm">
-          <div className="flex items-center justify-between text-[#A1A1AA] text-xs font-semibold uppercase tracking-wider mb-1.5">
-            <span>Net Bank Liquidity</span>
-            <Landmark className="w-4 h-4 text-[#3B82F6]" />
-          </div>
-          <div className="text-xl md:text-2xl font-bold font-mono text-white tracking-tight">
-            {formatINR(netBankLiquidity)}
-          </div>
-          <div className="text-xs text-[#22C55E] font-medium flex items-center gap-1 mt-1.5">
-            <span>Bank Reserve</span>
-          </div>
-        </div>
+        {/* Card 1: Bank Position & Inflow Velocity */}
+        <CyclingKpiCard
+          staggerDelayMs={0}
+          panelA={{
+            title: "Net Bank Liquidity",
+            badge: "CLEARED",
+            badgeColor: "bg-blue-950/60 text-blue-400 border border-blue-800/40",
+            titleColor: "text-blue-400",
+            value: formatINR(netBankLiquidity),
+            subtitle: "Bank Reserve",
+            icon: Landmark,
+            iconColor: "text-[#3B82F6]",
+          }}
+          panelB={{
+            title: "Bank Inflow Volume",
+            badge: "INFLOWS",
+            badgeColor: "bg-emerald-950/60 text-emerald-400 border border-emerald-800/40",
+            titleColor: "text-emerald-400",
+            value: formatINR(bankInflowsGross),
+            subtitle: "Gross Bank Credits Received",
+            icon: ArrowDownLeft,
+            iconColor: "text-[#22C55E]",
+          }}
+        />
 
-        {/* Net Cash */}
-        <div className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-3.5 flex flex-col justify-between hover:border-[#383838] transition-standard shadow-sm">
-          <div className="flex items-center justify-between text-[#A1A1AA] text-xs font-semibold uppercase tracking-wider mb-1.5">
-            <span>Cash in Hand</span>
-            <Banknote className="w-4 h-4 text-[#22C55E]" />
-          </div>
-          <div className="text-xl md:text-2xl font-bold font-mono text-white tracking-tight">
-            {formatINR(netCashLiquidity)}
-          </div>
-          <div className="text-xs text-[#A1A1AA] font-medium flex items-center gap-1 mt-1.5">
-            <span>Liquid Cash</span>
-          </div>
-        </div>
+        {/* Card 2: Liquid Cash & Site Outflow Burn */}
+        <CyclingKpiCard
+          staggerDelayMs={1200}
+          panelA={{
+            title: "Cash in Hand",
+            badge: "IN HAND",
+            badgeColor: "bg-emerald-950/60 text-emerald-400 border border-emerald-800/40",
+            titleColor: "text-emerald-400",
+            value: formatINR(netCashLiquidity),
+            subtitle: "Liquid Vault Cash",
+            icon: Banknote,
+            iconColor: "text-[#22C55E]",
+          }}
+          panelB={{
+            title: "Cash Outflow Burn",
+            badge: "CASH BURN",
+            badgeColor: "bg-amber-950/60 text-amber-400 border border-amber-800/40",
+            titleColor: "text-amber-400",
+            value: formatINR(outflowsCash),
+            subtitle: "Site Labor, Legal & Registration",
+            icon: TrendingDown,
+            iconColor: "text-[#F59E0B]",
+          }}
+        />
 
-        {/* Total Combined Liquidity */}
-        <div className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-3.5 flex flex-col justify-between hover:border-[#383838] transition-standard shadow-sm">
-          <div className="flex items-center justify-between text-[#A1A1AA] text-xs font-semibold uppercase tracking-wider mb-1.5">
-            <span>Total Liquidity</span>
-            <Wallet className="w-4 h-4 text-white" />
-          </div>
-          <div className="text-xl md:text-2xl font-bold font-mono text-white tracking-tight">
-            {formatINR(currentNetLiquidity)}
-          </div>
-          <div className="text-xs text-[#A1A1AA] font-medium mt-1.5">
-            Net Cap: {formatINR(netCapitalInjected)}
-          </div>
-        </div>
+        {/* Card 3: Combined Liquidity vs Invested Capital */}
+        <CyclingKpiCard
+          staggerDelayMs={2400}
+          panelA={{
+            title: "Total Liquidity",
+            badge: "AVAILABLE",
+            badgeColor: "bg-zinc-800 text-zinc-300 border border-zinc-700/50",
+            titleColor: "text-white",
+            value: formatINR(currentNetLiquidity),
+            subtitle: `Bank: ${formatINR(netBankLiquidity)} | Cash: ${formatINR(netCashLiquidity)}`,
+            icon: Wallet,
+            iconColor: "text-white",
+          }}
+          panelB={{
+            title: "Net Retained Capital",
+            badge: "NET EQUITY",
+            badgeColor: "bg-cyan-950/60 text-cyan-400 border border-cyan-800/40",
+            titleColor: "text-cyan-400",
+            value: formatINR(netCapitalInjected),
+            subtitle: `Gross Cap: ${formatINR(capitalInjectedTotal)} - Refunds`,
+            icon: Coins,
+            iconColor: "text-cyan-400",
+          }}
+        />
 
-        {/* Pending Payables to Sellers or Outstanding Debt */}
-        <div className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-3.5 flex flex-col justify-between hover:border-[#383838] transition-standard shadow-sm">
-          <div className="flex items-center justify-between text-[#F59E0B] text-xs font-semibold uppercase tracking-wider mb-1.5">
-            <span>Pending to Sellers</span>
-            <Clock className="w-4 h-4 text-[#F59E0B]" />
-          </div>
-          <div className="text-xl md:text-2xl font-bold font-mono text-[#F59E0B] tracking-tight">
-            {formatINR(totalPendingPayable)}
-          </div>
-          <div className="text-xs text-[#A1A1AA] font-medium mt-1.5 truncate">
-            {outstandingLoansPrincipal > 0
-              ? `+ Debt: ${formatINR(outstandingLoansPrincipal)}`
-              : `${propertyMetrics.length} Land Deals`}
-          </div>
-        </div>
+        {/* Card 4: Seller Liabilities vs Full Outlay */}
+        <CyclingKpiCard
+          staggerDelayMs={3600}
+          panelA={{
+            title: "Pending to Sellers",
+            badge: "SELLER DUE",
+            badgeColor: "bg-amber-950/60 text-amber-400 border border-amber-800/40",
+            titleColor: "text-[#F59E0B]",
+            value: formatINR(totalPendingPayable),
+            valueColor: "text-[#F59E0B]",
+            subtitle: `${propertyMetrics.length} Land Deals Owed`,
+            icon: Clock,
+            iconColor: "text-[#F59E0B]",
+          }}
+          panelB={{
+            title: "Committed Project Outlay",
+            badge: "FULL OUTLAY",
+            badgeColor: "bg-yellow-950/60 text-yellow-400 border border-yellow-800/40",
+            titleColor: "text-yellow-400",
+            value: formatINR(totalProjectOutlay),
+            valueColor: "text-yellow-400",
+            subtitle: `Buy: ${formatINR(totalAgreedBuyPrice)} + Exp: ${formatINR(totalPropertyExpenses)}`,
+            icon: Landmark,
+            iconColor: "text-yellow-400",
+          }}
+        />
 
-        {/* Outstanding Loan Debt / Buyer Receivables */}
-        <div className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-3.5 flex flex-col justify-between hover:border-[#383838] transition-standard shadow-sm">
-          {outstandingLoansPrincipal > 0 ? (
-            <>
-              <div className="flex items-center justify-between text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-1.5">
-                <span>Active Loan Debt</span>
-                <Landmark className="w-4 h-4 text-emerald-400" />
-              </div>
-              <div className="text-xl md:text-2xl font-bold font-mono text-emerald-400 tracking-tight">
-                {formatINR(outstandingLoansPrincipal)}
-              </div>
-              <div className="text-xs text-[#A1A1AA] font-medium mt-1.5 truncate">
-                Receivables: {formatINR(totalPendingReceivable)}
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="flex items-center justify-between text-[#22C55E] text-xs font-semibold uppercase tracking-wider mb-1.5">
-                <span>Buyer Receivables</span>
-                <ArrowDownLeft className="w-4 h-4 text-[#22C55E]" />
-              </div>
-              <div className="text-xl md:text-2xl font-bold font-mono text-[#22C55E] tracking-tight">
-                {formatINR(totalPendingReceivable)}
-              </div>
-              <div className="text-xs text-[#A1A1AA] font-medium mt-1.5">
-                Agreed Selling Pipeline
-              </div>
-            </>
-          )}
-        </div>
+        {/* Card 5: External Debt vs Incoming Buyer Receivables */}
+        <CyclingKpiCard
+          staggerDelayMs={4800}
+          panelA={{
+            title: "Active Loan Debt",
+            badge: "LOAN DEBT",
+            badgeColor: "bg-rose-950/60 text-rose-400 border border-rose-800/40",
+            titleColor: "text-rose-400",
+            value: formatINR(outstandingLoansPrincipal),
+            valueColor:
+              outstandingLoansPrincipal > 0 ? "text-rose-400" : "text-[#A1A1AA]",
+            subtitle:
+              totalFinanceCosts > 0
+                ? `Finance Cost: ${formatINR(totalFinanceCosts)}`
+                : "Principal Outstanding",
+            icon: Landmark,
+            iconColor: "text-rose-400",
+          }}
+          panelB={{
+            title: "Buyer Receivables",
+            badge: "RECEIVABLES",
+            badgeColor: "bg-emerald-950/60 text-emerald-400 border border-emerald-800/40",
+            titleColor: "text-[#22C55E]",
+            value: formatINR(totalPendingReceivable),
+            valueColor: "text-[#22C55E]",
+            subtitle: "Agreed Selling Pipeline",
+            icon: ArrowDownLeft,
+            iconColor: "text-[#22C55E]",
+          }}
+        />
 
-        {/* Auto-Switching Actual vs Projected Profit KPI Card (7s Interval + Touch Swipe) */}
+        {/* Card 6: Auto-Switching Actual vs Projected Profit KPI Card (7s Interval + Touch Swipe) */}
         <ProfitKpiCard
           totalRealizedProfit={totalRealizedProfit}
           totalProjectedProfit={totalProjectedProfit}
@@ -154,68 +219,127 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
     const {
       currentBankBalance,
       currentCashBalance,
+      netPersonalLiquidity,
       totalInvestmentDone,
       inflowsTotal,
+      withdrawalsTotal,
       properties,
     } = personalMetrics;
 
+    const totalAgreedValue = properties.reduce(
+      (sum, p) => sum + (p.property.agreedPurchasePrice || 0),
+      0
+    );
+    const totalPendingCommitment = properties.reduce(
+      (sum, p) => sum + (p.pendingCommitment || 0),
+      0
+    );
+
     return (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {/* Total Invested */}
-        <div className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-3.5 flex flex-col justify-between hover:border-[#383838] transition-standard shadow-sm">
-          <div className="flex items-center justify-between text-[#A1A1AA] text-xs font-semibold uppercase tracking-wider mb-1.5">
-            <span>Total Invested</span>
-            <Wallet className="w-4 h-4 text-white" />
-          </div>
-          <div className="text-2xl md:text-3xl font-bold font-mono text-white tracking-tight">
-            {formatINR(totalInvestmentDone)}
-          </div>
-          <div className="text-xs text-[#A1A1AA] font-medium mt-1.5">
-            Across {properties.length} Personal Properties
-          </div>
-        </div>
+        {/* Card 1: Total Investment Paid vs Committed Value */}
+        <CyclingKpiCard
+          staggerDelayMs={0}
+          panelA={{
+            title: "Total Invested",
+            badge: "PAID",
+            badgeColor: "bg-zinc-800 text-zinc-300 border border-zinc-700/50",
+            titleColor: "text-white",
+            value: formatINR(totalInvestmentDone),
+            subtitle: `Across ${properties.length} Personal Properties`,
+            icon: Wallet,
+            iconColor: "text-white",
+          }}
+          panelB={{
+            title: "Committed Value",
+            badge: "COMMITTED",
+            badgeColor: "bg-blue-950/60 text-blue-400 border border-blue-800/40",
+            titleColor: "text-blue-400",
+            value: formatINR(totalAgreedValue),
+            subtitle: `Pending: ${formatINR(totalPendingCommitment)}`,
+            icon: Building2,
+            iconColor: "text-blue-400",
+          }}
+        />
 
-        {/* Personal Inflows */}
-        <div className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-3.5 flex flex-col justify-between hover:border-[#383838] transition-standard shadow-sm">
-          <div className="flex items-center justify-between text-[#3B82F6] text-xs font-semibold uppercase tracking-wider mb-1.5">
-            <span>Inflows Allocated</span>
-            <Landmark className="w-4 h-4 text-[#3B82F6]" />
-          </div>
-          <div className="text-2xl md:text-3xl font-bold font-mono text-[#3B82F6] tracking-tight">
-            {formatINR(inflowsTotal)}
-          </div>
-          <div className="text-xs text-[#22C55E] font-medium mt-1.5">
-            Personal Savings &amp; Incomes
-          </div>
-        </div>
+        {/* Card 2: Savings Inflows vs Capital Withdrawn */}
+        <CyclingKpiCard
+          staggerDelayMs={1500}
+          panelA={{
+            title: "Inflows Allocated",
+            badge: "SAVINGS",
+            badgeColor: "bg-blue-950/60 text-blue-400 border border-blue-800/40",
+            titleColor: "text-[#3B82F6]",
+            value: formatINR(inflowsTotal),
+            valueColor: "text-[#3B82F6]",
+            subtitle: "Personal Savings & Income",
+            icon: Landmark,
+            iconColor: "text-[#3B82F6]",
+          }}
+          panelB={{
+            title: "Funds Withdrawn",
+            badge: "DRAWINGS",
+            badgeColor: "bg-purple-950/60 text-purple-400 border border-purple-800/40",
+            titleColor: "text-purple-400",
+            value: formatINR(withdrawalsTotal),
+            valueColor: "text-purple-400",
+            subtitle: "Personal Refunds & Drawings",
+            icon: Coins,
+            iconColor: "text-purple-400",
+          }}
+        />
 
-        {/* Current Asset Bank Balance */}
-        <div className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-3.5 flex flex-col justify-between hover:border-[#383838] transition-standard shadow-sm">
-          <div className="flex items-center justify-between text-[#22C55E] text-xs font-semibold uppercase tracking-wider mb-1.5">
-            <span>Bank Balance Available</span>
-            <Banknote className="w-4 h-4 text-[#22C55E]" />
-          </div>
-          <div className="text-2xl md:text-3xl font-bold font-mono text-[#22C55E] tracking-tight">
-            {formatINR(currentBankBalance)}
-          </div>
-          <div className="text-xs text-[#A1A1AA] font-medium mt-1.5">
-            Ready for Next Installment
-          </div>
-        </div>
+        {/* Card 3: Bank Available vs Combined Liquidity */}
+        <CyclingKpiCard
+          staggerDelayMs={3000}
+          panelA={{
+            title: "Bank Available",
+            badge: "BANK BUFFER",
+            badgeColor: "bg-emerald-950/60 text-emerald-400 border border-emerald-800/40",
+            titleColor: "text-[#22C55E]",
+            value: formatINR(currentBankBalance),
+            valueColor: "text-[#22C55E]",
+            subtitle: "Ready for Next Installment",
+            icon: Banknote,
+            iconColor: "text-[#22C55E]",
+          }}
+          panelB={{
+            title: "Total Liquid Buffer",
+            badge: "TOTAL CASH",
+            badgeColor: "bg-zinc-800 text-zinc-300 border border-zinc-700/50",
+            titleColor: "text-white",
+            value: formatINR(netPersonalLiquidity),
+            subtitle: `Cash in Hand: ${formatINR(currentCashBalance)}`,
+            icon: Wallet,
+            iconColor: "text-white",
+          }}
+        />
 
-        {/* Cash in Hand */}
-        <div className="bg-[#0a0a0a] border border-[#262626] rounded-lg p-3.5 flex flex-col justify-between hover:border-[#383838] transition-standard shadow-sm">
-          <div className="flex items-center justify-between text-[#A1A1AA] text-xs font-semibold uppercase tracking-wider mb-1.5">
-            <span>Cash in Hand Balance</span>
-            <Clock className="w-4 h-4 text-[#F59E0B]" />
-          </div>
-          <div className="text-2xl md:text-3xl font-bold font-mono text-white tracking-tight">
-            {formatINR(currentCashBalance)}
-          </div>
-          <div className="text-xs text-[#A1A1AA] font-medium mt-1.5">
-            For Site Expenses &amp; Labor
-          </div>
-        </div>
+        {/* Card 4: Cash in Hand vs Pending Commitments */}
+        <CyclingKpiCard
+          staggerDelayMs={4500}
+          panelA={{
+            title: "Cash in Hand Balance",
+            badge: "VAULT CASH",
+            badgeColor: "bg-amber-950/60 text-amber-400 border border-amber-800/40",
+            titleColor: "text-amber-400",
+            value: formatINR(currentCashBalance),
+            subtitle: "For Site Expenses & Labor",
+            icon: Clock,
+            iconColor: "text-[#F59E0B]",
+          }}
+          panelB={{
+            title: "Pending Payments",
+            badge: "NEXT MILESTONES",
+            badgeColor: "bg-orange-950/60 text-orange-400 border border-orange-800/40",
+            titleColor: "text-orange-400",
+            value: formatINR(totalPendingCommitment),
+            valueColor: "text-orange-400",
+            subtitle: "Builder Construction Milestones",
+            icon: Building2,
+            iconColor: "text-orange-400",
+          }}
+        />
       </div>
     );
   }

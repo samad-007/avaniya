@@ -93,12 +93,23 @@ In real estate asset management, recognizing paper profit on unsold or in-progre
 - **Pending Profit**: For sold assets where the buyer still owes an outstanding balance, Pending Profit tracks uncollected profit:
   $$\text{Pending Profit} = \max(0, \text{Projected Profit} - \text{Realized Profit})$$
 
-#### Auto-Switching Profit KPI Card
-The top KPI strip features an intelligent dual-state Profit card:
-- **Realized vs Pipeline States**: Toggles between Actual (Realized) Profit on sold assets and Total Projected Profit across active unsold pipeline inventory.
-- **7-Second Auto Cycle**: Automatically rotates view every 7 seconds with subtle indicator pill lights.
-- **Interactive Swipe & Touch Gestures**: Mobile users can swipe left or right across the card; desktop users can drag or click the pill buttons.
-- **Hover Pause**: Hovering or touching the card pauses the auto-rotation timer to prevent jarring transitions while reviewing figures.
+#### Auto-Switching Dual-State KPI Cards Strip
+The top KPI strip features intelligent, touch-swipeable dual-state cards across both Commercial and Personal modes:
+- **Commercial Mode Dual Panels (6 Cards)**:
+  1. **Bank Position**: Cleared Bank Reserve (`[ CLEARED ]`) vs Gross Bank Inflow Volume (`[ INFLOWS ]`).
+  2. **Cash Dynamics**: Liquid Vault Cash (`[ IN HAND ]`) vs Cumulative Site Outflow Burn (`[ CASH BURN ]`).
+  3. **Combined Solvency**: Total Available Liquidity (`[ AVAILABLE ]`) vs Net Retained Capital (`[ NET EQUITY ]`).
+  4. **Liabilities**: Outstanding Land Seller Payable (`[ SELLER DUE ]`) vs Committed Full Project Outlay (`[ FULL OUTLAY ]`).
+  5. **Leverage Ratio**: Active External Loan Debt (`[ LOAN DEBT ]`) vs Incoming Buyer Receivables (`[ RECEIVABLES ]`).
+  6. **Profit**: Actual Settled Gains (`[ REALIZED ]`) vs Active Pipeline Potential (`[ PIPELINE ]`).
+- **Personal Mode Dual Panels (4 Cards)**:
+  1. **Total Invested**: Cash Paid to Date (`[ PAID ]`) vs Total Committed Purchase Price (`[ COMMITTED ]`).
+  2. **Savings Inflows**: Personal Inflows Allocated (`[ SAVINGS ]`) vs Capital Withdrawn (`[ DRAWINGS ]`).
+  3. **Bank Readiness**: Available Bank Reserve (`[ BANK BUFFER ]`) vs Total Liquid Buffer (`[ TOTAL CASH ]`).
+  4. **Site Cash & Dues**: Physical Cash in Hand (`[ VAULT CASH ]`) vs Next Milestone Commitments (`[ NEXT MILESTONES ]`).
+- **Staggered 7-Second Auto Rotation**: Cards cycle smoothly on a 7-second interval with progressive 1.2-second start offsets so cards do not rotate simultaneously.
+- **Touch & Gesture Controls**: Swipe left or right on mobile devices (with vertical scroll guard) or click the dual-pill switcher buttons on desktop.
+- **Hover Pause Protection**: Touching or hovering over any card pauses rotation with a 4-second recovery timeout.
 
 ### C. Recording Outflows, Inflows & Transfers
 Click **Record Outflow** or **Add Inflow** from the header:
