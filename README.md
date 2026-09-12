@@ -112,7 +112,7 @@ The top KPI strip features intelligent, touch-swipeable dual-state cards across 
   - **Row 2**: Full-width topic title (`text-xs font-semibold uppercase tracking-wider`) with zero horizontal truncation across desktop and mobile.
   - **Row 3**: Primary bold monospace financial metric (`text-xl md:text-2xl font-bold font-mono`).
   - **Row 4**: Contextual subtitle and reconciliation detail.
-- **Staggered 7-Second Auto Rotation**: Cards cycle smoothly on a 7-second interval with progressive 1.2-second start offsets so cards do not rotate simultaneously.
+- **Synchronized 7-Second Auto Rotation & Seamless Crossfade**: All cards cycle in unified lockstep every 7 seconds via a centralized strip controller. Transitions execute with a hardware-accelerated 200ms crossfade and subtle micro-translation, eliminating abrupt pop-in and preventing desynchronization.
 - **Touch & Gesture Controls**: Swipe left or right on mobile devices (with vertical scroll guard) or click the dual-pill switcher buttons on desktop.
 - **Hover Pause Protection**: Touching or hovering over any card pauses rotation with a 4-second recovery timeout.
 
@@ -124,7 +124,7 @@ Click **Record Outflow** or **Add Inflow** from the header:
 - **Internal Transfers**: Move liquidity between Bank and Cash without distorting P&L profits.
 
 ### D. Editing Properties & Managing Milestones
-- Click the **Pencil icon (✏️)** on any property card or inside the Property Ledger to edit any parameter: name, location, survey number, square feet area, rate per sq.ft, status, or legal verification notes.
+- Click the **Edit button** on any property card or inside the Property Ledger to edit any parameter: name, location, survey number, square feet area, rate per sq.ft, status, or legal verification notes.
 - In Personal mode, manage stage milestones (e.g., *Booking Amount*, *Plinth Completion*, *Slab Casting*, *Plastering*, *Handover*) and check them off as work finishes.
 
 ### E. Loans, Debt Financing & Profit Sharing

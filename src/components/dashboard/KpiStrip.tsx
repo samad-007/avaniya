@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { formatINR } from "@/lib/formatters";
 import {
   CommercialDashboardMetrics,
@@ -30,6 +30,70 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
   commercialMetrics,
   personalMetrics,
 }) => {
+  // Synchronized strip-level state: all cards switch in lockstep
+  const [activePanel, setActivePanel] = useState<"A" | "B">("A");
+  const [isFlipping, setIsFlipping] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+
+  const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const flipTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const triggerSwitch = useCallback((targetPanel?: "A" | "B") => {
+    setIsFlipping(true);
+    if (flipTimeoutRef.current) clearTimeout(flipTimeoutRef.current);
+    flipTimeoutRef.current = setTimeout(() => {
+      setActivePanel((prev) => targetPanel ?? (prev === "A" ? "B" : "A"));
+      setIsFlipping(false);
+    }, 200);
+  }, []);
+
+  // Synchronized 7-second auto-cycle interval across all strip cards
+  useEffect(() => {
+    if (isPaused) return;
+
+    const intervalId = setInterval(() => {
+      triggerSwitch();
+    }, 7000);
+
+    return () => {
+      clearInterval(intervalId);
+      if (flipTimeoutRef.current) clearTimeout(flipTimeoutRef.current);
+    };
+  }, [isPaused, triggerSwitch]);
+
+  const handleHoverStart = useCallback(() => {
+    setIsPaused(true);
+    if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
+  }, []);
+
+  const handleHoverEnd = useCallback(() => {
+    if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
+    pauseTimeoutRef.current = setTimeout(() => {
+      setIsPaused(false);
+    }, 4000);
+  }, []);
+
+  const handleCardClick = useCallback(() => {
+    triggerSwitch();
+    handleHoverEnd();
+  }, [triggerSwitch, handleHoverEnd]);
+
+  const handleSelectPanel = useCallback(
+    (panel: "A" | "B") => {
+      triggerSwitch(panel);
+      handleHoverEnd();
+    },
+    [triggerSwitch, handleHoverEnd]
+  );
+
+  const handleSwipe = useCallback(
+    (direction: "left" | "right") => {
+      triggerSwitch(direction === "left" ? "B" : "A");
+      handleHoverEnd();
+    },
+    [triggerSwitch, handleHoverEnd]
+  );
+
   if (mode === "commercial" && commercialMetrics) {
     const {
       netBankLiquidity,
@@ -68,10 +132,20 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
       dealInflowsBank + capitalInjectedBank + loansBorrowedBank;
 
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div
+        className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3"
+        onMouseEnter={handleHoverStart}
+        onMouseLeave={handleHoverEnd}
+      >
         {/* Card 1: Bank Position & Inflow Velocity */}
         <CyclingKpiCard
-          staggerDelayMs={0}
+          activePanel={activePanel}
+          isFlipping={isFlipping}
+          onClick={handleCardClick}
+          onSelectPanel={handleSelectPanel}
+          onSwipe={handleSwipe}
+          onHoverStart={handleHoverStart}
+          onHoverEnd={handleHoverEnd}
           panelA={{
             title: "Net Bank Liquidity",
             badge: "CLEARED",
@@ -96,7 +170,13 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
 
         {/* Card 2: Liquid Cash & Site Outflow Burn */}
         <CyclingKpiCard
-          staggerDelayMs={1200}
+          activePanel={activePanel}
+          isFlipping={isFlipping}
+          onClick={handleCardClick}
+          onSelectPanel={handleSelectPanel}
+          onSwipe={handleSwipe}
+          onHoverStart={handleHoverStart}
+          onHoverEnd={handleHoverEnd}
           panelA={{
             title: "Cash in Hand",
             badge: "IN HAND",
@@ -121,7 +201,13 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
 
         {/* Card 3: Combined Liquidity vs Invested Capital */}
         <CyclingKpiCard
-          staggerDelayMs={2400}
+          activePanel={activePanel}
+          isFlipping={isFlipping}
+          onClick={handleCardClick}
+          onSelectPanel={handleSelectPanel}
+          onSwipe={handleSwipe}
+          onHoverStart={handleHoverStart}
+          onHoverEnd={handleHoverEnd}
           panelA={{
             title: "Total Liquidity",
             badge: "AVAILABLE",
@@ -146,7 +232,13 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
 
         {/* Card 4: Seller Liabilities vs Full Outlay */}
         <CyclingKpiCard
-          staggerDelayMs={3600}
+          activePanel={activePanel}
+          isFlipping={isFlipping}
+          onClick={handleCardClick}
+          onSelectPanel={handleSelectPanel}
+          onSwipe={handleSwipe}
+          onHoverStart={handleHoverStart}
+          onHoverEnd={handleHoverEnd}
           panelA={{
             title: "Pending to Sellers",
             badge: "SELLER DUE",
@@ -173,7 +265,13 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
 
         {/* Card 5: External Debt vs Incoming Buyer Receivables */}
         <CyclingKpiCard
-          staggerDelayMs={4800}
+          activePanel={activePanel}
+          isFlipping={isFlipping}
+          onClick={handleCardClick}
+          onSelectPanel={handleSelectPanel}
+          onSwipe={handleSwipe}
+          onHoverStart={handleHoverStart}
+          onHoverEnd={handleHoverEnd}
           panelA={{
             title: "Active Loan Debt",
             badge: "LOAN DEBT",
@@ -202,7 +300,7 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
           }}
         />
 
-        {/* Card 6: Auto-Switching Actual vs Projected Profit KPI Card (7s Interval + Touch Swipe) */}
+        {/* Card 6: Auto-Switching Actual vs Projected Profit KPI Card (Synchronized 7s Interval + Touch Swipe) */}
         <ProfitKpiCard
           totalRealizedProfit={totalRealizedProfit}
           totalProjectedProfit={totalProjectedProfit}
@@ -210,6 +308,13 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
           profitWithdrawalsTotal={profitWithdrawalsTotal}
           activeDealsCount={activeDealsCount}
           soldDealsCount={soldDealsCount}
+          activePanel={activePanel}
+          isFlipping={isFlipping}
+          onClick={handleCardClick}
+          onSelectPanel={handleSelectPanel}
+          onSwipe={handleSwipe}
+          onHoverStart={handleHoverStart}
+          onHoverEnd={handleHoverEnd}
         />
       </div>
     );
@@ -236,10 +341,20 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
     );
 
     return (
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div
+        className="grid grid-cols-2 md:grid-cols-4 gap-3"
+        onMouseEnter={handleHoverStart}
+        onMouseLeave={handleHoverEnd}
+      >
         {/* Card 1: Total Investment Paid vs Committed Value */}
         <CyclingKpiCard
-          staggerDelayMs={0}
+          activePanel={activePanel}
+          isFlipping={isFlipping}
+          onClick={handleCardClick}
+          onSelectPanel={handleSelectPanel}
+          onSwipe={handleSwipe}
+          onHoverStart={handleHoverStart}
+          onHoverEnd={handleHoverEnd}
           panelA={{
             title: "Total Invested",
             badge: "PAID",
@@ -264,7 +379,13 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
 
         {/* Card 2: Savings Inflows vs Capital Withdrawn */}
         <CyclingKpiCard
-          staggerDelayMs={1500}
+          activePanel={activePanel}
+          isFlipping={isFlipping}
+          onClick={handleCardClick}
+          onSelectPanel={handleSelectPanel}
+          onSwipe={handleSwipe}
+          onHoverStart={handleHoverStart}
+          onHoverEnd={handleHoverEnd}
           panelA={{
             title: "Inflows Allocated",
             badge: "SAVINGS",
@@ -291,7 +412,13 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
 
         {/* Card 3: Bank Available vs Combined Liquidity */}
         <CyclingKpiCard
-          staggerDelayMs={3000}
+          activePanel={activePanel}
+          isFlipping={isFlipping}
+          onClick={handleCardClick}
+          onSelectPanel={handleSelectPanel}
+          onSwipe={handleSwipe}
+          onHoverStart={handleHoverStart}
+          onHoverEnd={handleHoverEnd}
           panelA={{
             title: "Bank Available",
             badge: "BANK BUFFER",
@@ -317,7 +444,13 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
 
         {/* Card 4: Cash in Hand vs Pending Commitments */}
         <CyclingKpiCard
-          staggerDelayMs={4500}
+          activePanel={activePanel}
+          isFlipping={isFlipping}
+          onClick={handleCardClick}
+          onSelectPanel={handleSelectPanel}
+          onSwipe={handleSwipe}
+          onHoverStart={handleHoverStart}
+          onHoverEnd={handleHoverEnd}
           panelA={{
             title: "Cash in Hand Balance",
             badge: "VAULT CASH",
