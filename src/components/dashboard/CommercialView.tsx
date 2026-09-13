@@ -963,7 +963,27 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                         </div>
                       </td>
                       <td className="py-3 px-3.5 font-semibold text-white">
-                        {t.category}
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span>{t.category}</span>
+                          {t.borneBy === "seller" && (
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-950/50 text-amber-300 border border-amber-800/60 font-bold uppercase tracking-wider">
+                              Seller
+                            </span>
+                          )}
+                          {t.borneBy === "buyer" && (
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-950/50 text-blue-300 border border-blue-800/60 font-bold uppercase tracking-wider">
+                              Buyer
+                            </span>
+                          )}
+                          {t.borneBy === "split" && (
+                            <span
+                              className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-950/50 text-purple-300 border border-purple-800/60 font-bold uppercase tracking-wider"
+                              title={`Self: ₹${(t.amountSelf || 0).toLocaleString("en-IN")} | Seller: ₹${(t.amountSeller || 0).toLocaleString("en-IN")} | Buyer: ₹${(t.amountBuyer || 0).toLocaleString("en-IN")}`}
+                            >
+                              Split
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="py-3 px-3.5">
                         <span
