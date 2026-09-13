@@ -313,6 +313,11 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                   <span className="font-mono text-[#F59E0B] font-bold text-sm mt-0.5 block">
                     {formatINR(propertyMetrics.pendingOutflow)}
                   </span>
+                  {propertyMetrics.sellerPaidExpenses > 0 && (
+                    <span className="text-[10px] text-amber-500/90 block mt-0.5 font-medium">
+                      (-{formatINR(propertyMetrics.sellerPaidExpenses)} paid on behalf)
+                    </span>
+                  )}
                 </div>
                 <div>
                   <span className="text-[#22C55E] text-xs font-semibold block">
@@ -321,6 +326,11 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                   <span className="font-mono text-[#22C55E] font-bold text-sm mt-0.5 block">
                     {formatINR(propertyMetrics.pendingInflow)}
                   </span>
+                  {propertyMetrics.buyerPaidExpenses > 0 && (
+                    <span className="text-[10px] text-blue-400/90 block mt-0.5 font-medium">
+                      (+{formatINR(propertyMetrics.buyerPaidExpenses)} charges billed)
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -604,6 +614,24 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                             {t.subPlotNumber && (
                               <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/40 text-emerald-400 border border-emerald-800/40">
                                 Plot #{t.subPlotNumber}
+                              </span>
+                            )}
+                            {t.borneBy === "seller" && (
+                              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-950/50 text-amber-300 border border-amber-800/60 font-bold uppercase tracking-wider">
+                                Seller Borne
+                              </span>
+                            )}
+                            {t.borneBy === "buyer" && (
+                              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-950/50 text-blue-300 border border-blue-800/60 font-bold uppercase tracking-wider">
+                                Buyer Borne
+                              </span>
+                            )}
+                            {t.borneBy === "split" && (
+                              <span
+                                className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-950/50 text-purple-300 border border-purple-800/60 font-bold uppercase tracking-wider"
+                                title={`Self: ₹${(t.amountSelf || 0).toLocaleString("en-IN")} | Seller: ₹${(t.amountSeller || 0).toLocaleString("en-IN")} | Buyer: ₹${(t.amountBuyer || 0).toLocaleString("en-IN")}`}
+                              >
+                                Split
                               </span>
                             )}
                           </div>
