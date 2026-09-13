@@ -84,8 +84,8 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Desktop Inline Mode Switcher */}
-          <div className="hidden lg:flex items-center bg-[#111111] p-1 rounded-lg border border-[#262626]">
+          {/* Desktop Inline Mode Switcher (Visible on xl and above) */}
+          <div className="hidden xl:flex items-center bg-[#111111] p-1 rounded-lg border border-[#262626] shrink-0">
             <button
               onClick={() => onModeChange("commercial")}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-150 ${
@@ -110,45 +110,13 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           </div>
 
-          {/* Top Right Corner Profile & Quick Egress */}
-          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-            {/* Super Admin Dataset Switcher (Desktop) */}
-            {isSuperAdmin && onSwitchDataset && (
-              <div className="hidden xl:flex items-center gap-1.5 bg-[#111111] px-2.5 py-1.5 rounded-lg border border-emerald-800/40 text-xs">
-                <FolderLock className="w-3.5 h-3.5 text-emerald-400" />
-                <select
-                  value={currentDatasetId || "ds_yousuf_portfolio"}
-                  onChange={(e) => onSwitchDataset(e.target.value)}
-                  className="bg-transparent text-emerald-400 font-mono text-xs font-semibold outline-none cursor-pointer"
-                  title="Super Admin Workspace Switcher"
-                >
-                  <option value="ds_yousuf_portfolio" className="bg-[#111111] text-white">
-                    Mohammed Yousuf
-                  </option>
-                  <option value="all" className="bg-[#111111] text-white">
-                    [All Datasets]
-                  </option>
-                </select>
-              </div>
-            )}
-
-            {/* Super Admin Panel Button */}
-            {isSuperAdmin && onOpenSuperAdminModal && (
-              <button
-                onClick={onOpenSuperAdminModal}
-                className="btn-action-primary p-2 sm:px-2.5 sm:py-1.5 rounded-lg text-xs flex items-center gap-1"
-                title="Super Admin Panel"
-              >
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span className="hidden md:inline">Admin</span>
-              </button>
-            )}
-
+          {/* Top Right: Actions & User Profile */}
+          <div className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0 ml-auto">
             {/* Desktop Action Buttons Group */}
-            <div className="hidden md:flex items-center gap-1.5">
+            <div className="hidden md:flex items-center gap-1 sm:gap-1.5">
               <button
                 onClick={() => onOpenEntryModal("outflow")}
-                className="btn-action-primary flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs"
+                className="btn-action-primary flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs"
                 title="Log Outflow or Land Expense"
               >
                 <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -157,7 +125,7 @@ export const Header: React.FC<HeaderProps> = ({
 
               <button
                 onClick={() => onOpenEntryModal("inflow")}
-                className="btn-action-primary flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs"
+                className="btn-action-primary flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs"
                 title="Log Buyer Receipt or Capital Inflow"
               >
                 <ArrowUpRight className="w-3.5 h-3.5 text-[#22C55E]" />
@@ -166,7 +134,7 @@ export const Header: React.FC<HeaderProps> = ({
 
               <button
                 onClick={() => onOpenEntryModal("withdrawal")}
-                className="btn-action-primary flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs border border-amber-800/40 text-amber-300"
+                className="btn-action-primary flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs border border-amber-800/40 text-amber-300"
                 title="Log Profit Withdrawal or Capital Refund"
               >
                 <span>Withdraw</span>
@@ -175,7 +143,7 @@ export const Header: React.FC<HeaderProps> = ({
               {onOpenNewLoanModal && (
                 <button
                   onClick={onOpenNewLoanModal}
-                  className="btn-action-primary flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs border border-emerald-800/40 text-emerald-400"
+                  className="btn-action-primary flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs border border-emerald-800/40 text-emerald-400"
                   title="Create or Track Loan Facility"
                 >
                   <span>+ Loan</span>
@@ -184,7 +152,7 @@ export const Header: React.FC<HeaderProps> = ({
 
               <button
                 onClick={onOpenNewPropertyModal}
-                className="btn-action-primary flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs"
+                className="btn-action-primary flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs"
                 title="Create New Real Estate Asset"
               >
                 <span>+ Property</span>
@@ -192,7 +160,7 @@ export const Header: React.FC<HeaderProps> = ({
 
               <button
                 onClick={onOpenExportModal}
-                className="btn-action-primary flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs"
+                className="btn-action-primary flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-lg text-xs"
                 title="Export Excel / PDF / CSV"
               >
                 <Download className="w-3.5 h-3.5" />
@@ -208,23 +176,30 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             </div>
 
-            {/* User Auth Pill & Logout (Positioned cleanly on Top Right) */}
+            {/* User Auth Pill & Logout (Always flex-shrink-0, Pinned on Top Right Corner) */}
             {user ? (
-              <div className="flex items-center gap-1 sm:gap-1.5 pl-1 sm:pl-2 border-l border-[#262626]">
+              <div className="flex items-center gap-1.5 pl-2 border-l border-[#262626] flex-shrink-0">
                 <div
-                  className="flex items-center gap-1.5 bg-[#111111] px-2 sm:px-2.5 py-1.5 rounded-lg border border-[#262626] text-xs text-[#E4E4E7] max-w-[130px] sm:max-w-[160px]"
+                  className="flex items-center gap-1.5 bg-[#111111] px-2.5 py-1.5 rounded-lg border border-[#262626] text-xs text-[#E4E4E7] max-w-[140px] sm:max-w-[180px] flex-shrink-0"
                   title={`Signed in as ${user.email} (${user.role})`}
                 >
                   <div
                     className={`w-2 h-2 rounded-full flex-shrink-0 ${
                       isSuperAdmin ? "bg-amber-400" : "bg-[#22C55E]"
                     }`}
-                  ></div>
-                  <span className="font-semibold truncate text-[11px] sm:text-xs">{user.name}</span>
+                  />
+                  <span className="font-semibold truncate text-[11px] sm:text-xs">
+                    {user.name}
+                  </span>
+                  {isSuperAdmin && (
+                    <span className="text-[9px] font-mono font-bold text-amber-400 bg-amber-950/70 border border-amber-800/40 px-1 py-0.2 rounded hidden sm:inline flex-shrink-0">
+                      ADMIN
+                    </span>
+                  )}
                 </div>
                 <button
                   onClick={onLogout}
-                  className="p-1.5 sm:p-2 rounded-lg bg-[#111111] text-[#A1A1AA] border border-[#262626] hover:text-rose-400 hover:border-rose-900/50 transition-all duration-150 flex-shrink-0"
+                  className="p-1.5 sm:p-2 rounded-lg bg-[#111111] text-[#A1A1AA] border border-[#262626] hover:text-rose-400 hover:border-rose-900/50 hover:bg-rose-950/20 transition-all duration-150 flex-shrink-0"
                   title="Sign Out"
                 >
                   <LogOut className="w-3.5 h-3.5" />
@@ -233,7 +208,7 @@ export const Header: React.FC<HeaderProps> = ({
             ) : (
               <button
                 onClick={onOpenAuthModal}
-                className="btn-action-primary flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs"
+                className="btn-action-primary flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs flex-shrink-0"
               >
                 <UserIcon className="w-3.5 h-3.5" />
                 <span>Sign In</span>
@@ -242,8 +217,69 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Mobile Sub-Row: Full-Width Mode Switcher */}
-        <div className="flex lg:hidden items-center bg-[#111111] p-1 rounded-lg border border-[#262626] w-full">
+        {/* Dedicated Super Admin Command Strip */}
+        {isSuperAdmin && (
+          <div className="flex items-center justify-between bg-[#08100a] border border-emerald-900/50 rounded-lg px-3 py-1.5 text-xs text-emerald-300 w-full gap-2 transition-all">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-wrap">
+              {/* Super Admin Identity Badge */}
+              <div className="flex items-center gap-1.5 font-mono text-[10px] sm:text-xs font-bold text-emerald-400 uppercase tracking-wider bg-emerald-950/80 border border-emerald-800/60 px-2 py-0.5 rounded shrink-0">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Super Admin</span>
+              </div>
+
+              {/* Workspace Dataset Selector */}
+              {onSwitchDataset && (
+                <div className="flex items-center gap-1.5 bg-[#111111] px-2.5 py-1 rounded-md border border-emerald-800/40 text-xs shrink-0">
+                  <FolderLock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span className="text-[11px] text-[#A1A1AA] hidden sm:inline">Active Workspace:</span>
+                  <select
+                    value={currentDatasetId || "ds_yousuf_portfolio"}
+                    onChange={(e) => onSwitchDataset(e.target.value)}
+                    className="bg-transparent text-emerald-300 font-mono text-xs font-semibold outline-none cursor-pointer"
+                    title="Switch Active Tenant / Dataset"
+                  >
+                    <option value="ds_yousuf_portfolio" className="bg-[#111111] text-white">
+                      Mohammed Yousuf Portfolio
+                    </option>
+                    <option value="ds_demo_sandbox" className="bg-[#111111] text-white">
+                      Sandbox Demo Dataset
+                    </option>
+                    <option value="all" className="bg-[#111111] text-white">
+                      [All Datasets Consolidated]
+                    </option>
+                  </select>
+                </div>
+              )}
+
+              {/* Live Status Description */}
+              <div className="hidden lg:flex items-center gap-1.5 text-[11px] font-mono text-[#71717A] truncate">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                <span className="truncate">
+                  {currentDatasetId === "all"
+                    ? "Cross-Tenant Consolidated Audit Mode"
+                    : currentDatasetId === "ds_demo_sandbox"
+                    ? "Isolated Sandbox Testing Environment"
+                    : "Production Deal Ledger (Active Tenant)"}
+                </span>
+              </div>
+            </div>
+
+            {/* Super Admin Management Console Action */}
+            {onOpenSuperAdminModal && (
+              <button
+                onClick={onOpenSuperAdminModal}
+                className="px-2.5 py-1 rounded-md bg-emerald-950/80 text-emerald-300 border border-emerald-700/60 hover:bg-emerald-900 hover:border-emerald-500 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm shrink-0"
+                title="Open Super Admin Management Console (Users, Datasets, DB Audit)"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Admin Console</span>
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Sub-Row: Mode Switcher (Tablet & Mobile: < xl) */}
+        <div className="flex xl:hidden items-center bg-[#111111] p-1 rounded-lg border border-[#262626] w-full">
           <button
             onClick={() => onModeChange("commercial")}
             className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[11px] sm:text-xs font-semibold transition-all duration-150 ${

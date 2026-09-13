@@ -384,6 +384,7 @@ Whenever adding categories, assign one of the predefined `financialRole` types:
 - **Legibility Standard**: Do NOT use text sizes smaller than `text-xs` (12px). Body and form inputs must default to comfortable `text-sm` (14px).
 - **Tabular Numerals**: Always wrap financial amounts in `font-mono` (`font-family: var(--font-jetbrains-mono)`).
 - **Mobile Subwindow & Modal Viewport Containment**: All dialog backdrops and modal cards enforce `overflow-y-auto overflow-x-hidden`, `max-w-full`, and `min-w-0` on form parents, flex children, and table wrappers, ensuring strictly vertical scrolling and zero horizontal drift on mobile screens.
+- **Dedicated Super Admin Command Strip & Protected Egress**: Specialized administrative controls (Workspace/Dataset selector, Admin Console trigger, status telemetry) are decoupled into a dedicated full-width sub-strip, preventing horizontal crowding on the primary navigation row. The user profile badge and logout button remain permanently pinned in the top-right corner with `flex-shrink-0` and dedicated border separation across all viewports and roles.
 
 ---
 
