@@ -355,11 +355,12 @@ All business logic MUST mirror the formulas verified in [`tests/formulaEngine.te
 5. **Total Finance Costs Paid**:
    $$\text{Total Finance Costs} = \sum \text{Loan Interest Paid} + \sum \text{Loan Profit Share Paid}$$
 6. **Total Project Outlay**:
-   $$\text{Total Outlay} = \text{Agreed Purchase Price} + \text{Property Expenses}$$
+   $$\text{Total Outlay} = \text{Agreed Purchase Price} + \text{Property Expenses (Borne by Self)}$$
 7. **Pending Payable to Seller**:
-   $$\text{Pending Outflow} = \max(0, \text{Agreed Purchase Price} - \text{Principal Paid So Far})$$
+   $$\text{Pending Outflow} = \max(0, \text{Agreed Purchase Price} - \text{Principal Paid So Far} - \text{Expenses Paid for Seller})$$
 8. **Pending Buyer Receivable**:
-   $$\text{Pending Inflow} = \max(0, \text{Agreed Selling Price} - \text{Sale Inflows Received})$$
+   $$\text{Adjusted Buyer Obligation} = \text{Agreed Selling Price} + \text{Expenses Billed to Buyer}$$
+   $$\text{Pending Inflow} = \max(0, \text{Adjusted Buyer Obligation} - \text{Sale Inflows Received})$$
 9. **Realized Profit (Cost Recovery Model)**:
    $$\text{Realized Profit} = \begin{cases} \max(0, \text{Total Sale Receipts Collected} - \text{Total Project Outlay}) & \text{if status} \in \{\text{sold}, \text{closed}\} \\ 0 & \text{otherwise} \end{cases}$$
 10. **Pending Uncollected Profit on Sold Deals**:
