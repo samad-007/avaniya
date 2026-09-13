@@ -29,6 +29,10 @@ export interface ITransaction extends Document {
     | "Cash to Bank"
     | "Bank to Cash";
   amount: number;
+  borneBy?: "self" | "seller" | "buyer" | "split";
+  amountSelf?: number;
+  amountSeller?: number;
+  amountBuyer?: number;
   subPlotNumber?: string;
   attachmentUrl?: string;
   recipientOrSource?: string;
@@ -82,6 +86,15 @@ const TransactionSchema = new Schema<ITransaction>(
       ],
     },
     amount: { type: Number, required: true },
+    borneBy: {
+      type: String,
+      enum: ["self", "seller", "buyer", "split"],
+      default: "self",
+      index: true,
+    },
+    amountSelf: { type: Number, default: 0 },
+    amountSeller: { type: Number, default: 0 },
+    amountBuyer: { type: Number, default: 0 },
     subPlotNumber: { type: String },
     attachmentUrl: { type: String },
     recipientOrSource: { type: String },

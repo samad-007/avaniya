@@ -12,6 +12,7 @@ import {
   Trash2,
   AlertCircle,
   X,
+  LogOut,
 } from "lucide-react";
 import { generateSecurePassword } from "@/lib/passwordGenerator";
 
@@ -38,6 +39,8 @@ interface SuperAdminDashboardProps {
   onClose: () => void;
   currentDatasetId: string;
   onSwitchDataset: (datasetId: string) => void;
+  user?: { name: string; email: string; role: string; datasetId?: string } | null;
+  onLogout?: () => void;
 }
 
 export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
@@ -45,6 +48,8 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
   onClose,
   currentDatasetId,
   onSwitchDataset,
+  user,
+  onLogout,
 }) => {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [datasets, setDatasets] = useState<DatasetOption[]>([]);
@@ -254,18 +259,46 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             <button
               onClick={handleOpenCreateModal}
-              className="btn-action-primary flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs sm:text-sm"
+              className="btn-action-primary flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold"
             >
               <Plus className="w-4 h-4 stroke-[2.5]" />
               <span>Provision User</span>
             </button>
 
+            {/* Consistent User Profile & Logout */}
+            {user && (
+              <div className="flex items-center gap-1.5 pl-2 border-l border-[#262626]">
+                <div
+                  className="flex items-center gap-1.5 bg-[#141414] px-2.5 py-1.5 rounded-lg border border-emerald-800/40 text-xs text-[#E4E4E7]"
+                  title={`Signed in as ${user.email} (${user.role})`}
+                >
+                  <div className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
+                  <span className="font-semibold text-xs whitespace-nowrap">
+                    {user.name}
+                  </span>
+                  <span className="text-[9px] font-mono font-bold text-amber-400 bg-amber-950/70 border border-amber-800/40 px-1 py-0.2 rounded hidden sm:inline flex-shrink-0">
+                    ADMIN
+                  </span>
+                </div>
+                {onLogout && (
+                  <button
+                    onClick={onLogout}
+                    className="p-2 rounded-lg bg-[#141414] text-[#A1A1AA] border border-[#262626] hover:text-rose-400 hover:border-rose-900/50 hover:bg-rose-950/20 transition-all duration-150 flex-shrink-0"
+                    title="Sign Out"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            )}
+
             <button
               onClick={onClose}
               className="p-2 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] transition-all duration-150"
+              title="Close Admin Panel"
             >
               <X className="w-5 h-5" />
             </button>

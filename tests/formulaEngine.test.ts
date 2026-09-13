@@ -8,6 +8,7 @@ import {
   INITIAL_TRANSACTIONS,
   INITIAL_CATEGORIES,
   SeedProperty,
+  SeedTransaction,
 } from "../src/lib/seedData";
 import { generateCSV, generateExcelWorkbook, generateExecutivePDF } from "../src/lib/exportEngine";
 import { hashPassword, verifyPassword, signSessionToken, verifySessionToken } from "../src/lib/auth";
@@ -551,4 +552,156 @@ describe("Financial Formula Engine & Export Tests", () => {
     expect(metrics.upcomingDeadlinesCount).toBe(0);
     expect(metrics.overdueDeadlinesCount).toBe(0);
   });
+
+  it("correctly deducts expenses borne by seller from pending seller consideration", () => {
+    const testProp: SeedProperty = {
+      id: "prop-seller-test",
+      type: "commercial",
+      propertyCode: "LND-SELLER-1",
+      name: "Seller Deduction Land",
+      acquisitionDate: "2026-01-01",
+      agreedPurchasePrice: 5000000,
+      agreedSellingPrice: 7000000,
+      status: "in_progress",
+    };
+
+    const testTxs: SeedTransaction[] = [
+      {
+        id: "tx-buy-1",
+        scope: "commercial",
+        transactionType: "outflow",
+        propertyCode: "LND-SELLER-1",
+        date: "2026-01-05",
+        category: "Token Advance / Purchase",
+        mode: "Bank",
+        amount: 1000000,
+      },
+      {
+        id: "tx-seller-exp-1",
+        scope: "commercial",
+        transactionType: "outflow",
+        propertyCode: "LND-SELLER-1",
+        date: "2026-01-10",
+        category: "Legal & Court Clearance",
+        mode: "Bank",
+        amount: 150000,
+        borneBy: "seller",
+        amountSeller: 150000,
+        amountSelf: 0,
+        amountBuyer: 0,
+      },
+    ];
+
+    const metrics = calculateCommercialMetrics(
+      [testProp],
+      testTxs,
+      INITIAL_CATEGORIES
+    );
+
+    const pm = metrics.propertyMetrics[0];
+    expect(pm.purchasePaidTotal).toBe(1000000);
+    expect(pm.propertyExpenses).toBe(0);
+    expect(pm.sellerPaidExpenses).toBe(150000);
+    expect(pm.pendingOutflow).toBe(3850000);
+    expect(pm.totalProjectOutlay).toBe(5000000);
+  });
+
+  it("correctly adds expenses borne by buyer to pending buyer receivables", () => {
+    const testProp: SeedProperty = {
+      id: "prop-buyer-test",
+      type: "commercial",
+      propertyCode: "LND-BUYER-1",
+      name: "Buyer Receivable Land",
+      acquisitionDate: "2026-01-01",
+      agreedPurchasePrice: 2000000,
+      agreedSellingPrice: 3000000,
+      status: "in_progress",
+    };
+
+    const testTxs: SeedTransaction[] = [
+      {
+        id: "tx-rec-1",
+        scope: "commercial",
+        transactionType: "deal_inflow",
+        propertyCode: "LND-BUYER-1",
+        date: "2026-01-05",
+        category: "Sale Advance",
+        mode: "Bank",
+        amount: 500000,
+      },
+      {
+        id: "tx-buyer-exp-1",
+        scope: "commercial",
+        transactionType: "outflow",
+        propertyCode: "LND-BUYER-1",
+        date: "2026-01-10",
+        category: "Stamp Duty & Registration",
+        mode: "Bank",
+        amount: 250000,
+        borneBy: "buyer",
+        amountBuyer: 250000,
+        amountSelf: 0,
+        amountSeller: 0,
+      },
+    ];
+
+    const metrics = calculateCommercialMetrics(
+      [testProp],
+      testTxs,
+      INITIAL_CATEGORIES
+    );
+
+    const pm = metrics.propertyMetrics[0];
+    expect(pm.propertyExpenses).toBe(0);
+    expect(pm.buyerPaidExpenses).toBe(250000);
+    expect(pm.adjustedBuyerObligation).toBe(3250000);
+    expect(pm.totalReceiptsCollected).toBe(500000);
+    expect(pm.pendingInflow).toBe(2750000);
+  });
+
+  it("accurately handles 3-way split expenses across self, seller, and buyer", () => {
+    const testProp: SeedProperty = {
+      id: "prop-split-test",
+      type: "commercial",
+      propertyCode: "LND-SPLIT-1",
+      name: "Split Expense Land",
+      acquisitionDate: "2026-01-01",
+      agreedPurchasePrice: 4000000,
+      agreedSellingPrice: 6000000,
+      status: "in_progress",
+    };
+
+    const testTxs: SeedTransaction[] = [
+      {
+        id: "tx-split-1",
+        scope: "commercial",
+        transactionType: "outflow",
+        propertyCode: "LND-SPLIT-1",
+        date: "2026-01-12",
+        category: "Joint Survey & Verification",
+        mode: "Bank",
+        amount: 60000,
+        borneBy: "split",
+        amountSelf: 20000,
+        amountSeller: 20000,
+        amountBuyer: 20000,
+      },
+    ];
+
+    const metrics = calculateCommercialMetrics(
+      [testProp],
+      testTxs,
+      INITIAL_CATEGORIES
+    );
+
+    const pm = metrics.propertyMetrics[0];
+    expect(pm.propertyExpenses).toBe(20000);
+    expect(pm.sellerPaidExpenses).toBe(20000);
+    expect(pm.buyerPaidExpenses).toBe(20000);
+    expect(pm.pendingOutflow).toBe(3980000);
+    expect(pm.adjustedBuyerObligation).toBe(6020000);
+    expect(pm.pendingInflow).toBe(6020000);
+    expect(pm.totalProjectOutlay).toBe(4020000);
+  });
 });
+

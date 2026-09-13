@@ -37,6 +37,21 @@ export async function PATCH(
       updates.amount = Math.round(parsedAmount);
     }
 
+    if (updates.borneBy !== undefined) {
+      if (!["self", "seller", "buyer", "split"].includes(updates.borneBy)) {
+        updates.borneBy = "self";
+      }
+    }
+    if (updates.amountSelf !== undefined) {
+      updates.amountSelf = Math.round(parseFloat(updates.amountSelf) || 0);
+    }
+    if (updates.amountSeller !== undefined) {
+      updates.amountSeller = Math.round(parseFloat(updates.amountSeller) || 0);
+    }
+    if (updates.amountBuyer !== undefined) {
+      updates.amountBuyer = Math.round(parseFloat(updates.amountBuyer) || 0);
+    }
+
     const updated = await updateTransaction(id, updates, datasetId);
     if (!updated) {
       return NextResponse.json(

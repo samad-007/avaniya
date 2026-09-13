@@ -47,6 +47,25 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
         mode: transaction.mode || "Bank",
         transferType: transaction.transferType,
         amount: transaction.amount || 0,
+        borneBy: transaction.borneBy || "self",
+        amountSelf:
+          transaction.amountSelf !== undefined
+            ? transaction.amountSelf
+            : transaction.borneBy === "self" || !transaction.borneBy
+            ? transaction.amount || 0
+            : 0,
+        amountSeller:
+          transaction.amountSeller !== undefined
+            ? transaction.amountSeller
+            : transaction.borneBy === "seller"
+            ? transaction.amount || 0
+            : 0,
+        amountBuyer:
+          transaction.amountBuyer !== undefined
+            ? transaction.amountBuyer
+            : transaction.borneBy === "buyer"
+            ? transaction.amount || 0
+            : 0,
         recipientOrSource: transaction.recipientOrSource || "",
         remarks: transaction.remarks || "",
       });
@@ -109,12 +128,52 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
       return;
     }
 
+    if (formData.transactionType === "outflow" && formData.borneBy === "split") {
+      const self = formData.amountSelf || 0;
+      const seller = formData.amountSeller || 0;
+      const buyer = formData.amountBuyer || 0;
+      if (self + seller + buyer !== formData.amount) {
+        setErrorMsg(
+          `Split amounts (Self: ₹${self}, Seller: ₹${seller}, Buyer: ₹${buyer}) must equal total amount (₹${formData.amount})`
+        );
+        return;
+      }
+    }
+
     setErrorMsg("");
     setIsSaving(true);
 
     try {
       const transIdOrCode = transaction.id || transaction.transCode || "";
-      await onSave(transIdOrCode, formData);
+      const payload: Partial<SeedTransaction> = {
+        ...formData,
+        borneBy: formData.transactionType === "outflow" ? formData.borneBy || "self" : "self",
+        amountSelf:
+          formData.transactionType === "outflow"
+            ? formData.borneBy === "split"
+              ? formData.amountSelf || 0
+              : formData.borneBy === "self"
+              ? formData.amount || 0
+              : 0
+            : 0,
+        amountSeller:
+          formData.transactionType === "outflow"
+            ? formData.borneBy === "split"
+              ? formData.amountSeller || 0
+              : formData.borneBy === "seller"
+              ? formData.amount || 0
+              : 0
+            : 0,
+        amountBuyer:
+          formData.transactionType === "outflow"
+            ? formData.borneBy === "split"
+              ? formData.amountBuyer || 0
+              : formData.borneBy === "buyer"
+              ? formData.amount || 0
+              : 0
+            : 0,
+      };
+      await onSave(transIdOrCode, payload);
       onClose();
     } catch (err: unknown) {
       setErrorMsg(
@@ -462,6 +521,273 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
             )}
           </div>
 
+          {/* Expense Allocation / Borne By (Only for Outflows) */}
+          {formData.transactionType === "outflow" && (
+            <div className="flex flex-col gap-2 bg-[#0c0c0c] p-3 rounded-lg border border-[#222222]">
+              <div className="flex items-center justify-between flex-wrap gap-1">
+                <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
+                  Cost Borne By / Allocation
+                </label>
+                <span className="text-[11px] text-[#71717A] font-mono">
+                  {formData.borneBy === "self"
+                    ? "Developer project cost"
+                    : formData.borneBy === "seller"
+                    ? "Deducted from seller dues"
+                    : formData.borneBy === "buyer"
+                    ? "Added to buyer receivables"
+                    : "Multi-party apportioned"}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-[#141414] p-1 rounded-lg border border-[#262626]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const amt = formData.amount || 0;
+                    setFormData({
+                      ...formData,
+                      borneBy: "self",
+                      amountSelf: amt,
+                      amountSeller: 0,
+                      amountBuyer: 0,
+                    });
+                  }}
+                  className={`py-1.5 px-2 rounded-md text-xs font-medium transition-all duration-150 ${
+                    (formData.borneBy || "self") === "self"
+                      ? "bg-[#262626] text-white font-bold shadow-sm"
+                      : "text-[#A1A1AA] hover:text-white"
+                  }`}
+                >
+                  Self (Project)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const amt = formData.amount || 0;
+                    setFormData({
+                      ...formData,
+                      borneBy: "seller",
+                      amountSeller: amt,
+                      amountSelf: 0,
+                      amountBuyer: 0,
+                    });
+                  }}
+                  className={`py-1.5 px-2 rounded-md text-xs font-medium transition-all duration-150 ${
+                    formData.borneBy === "seller"
+                      ? "bg-amber-950/60 border border-amber-600/50 text-amber-300 font-bold shadow-sm"
+                      : "text-[#A1A1AA] hover:text-white"
+                  }`}
+                >
+                  For Seller
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const amt = formData.amount || 0;
+                    setFormData({
+                      ...formData,
+                      borneBy: "buyer",
+                      amountBuyer: amt,
+                      amountSelf: 0,
+                      amountSeller: 0,
+                    });
+                  }}
+                  className={`py-1.5 px-2 rounded-md text-xs font-medium transition-all duration-150 ${
+                    formData.borneBy === "buyer"
+                      ? "bg-blue-950/60 border border-blue-600/50 text-blue-300 font-bold shadow-sm"
+                      : "text-[#A1A1AA] hover:text-white"
+                  }`}
+                >
+                  For Buyer
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const amt = formData.amount || 0;
+                    const curSelf = formData.amountSelf || 0;
+                    const curSeller = formData.amountSeller || 0;
+                    const curBuyer = formData.amountBuyer || 0;
+                    setFormData({
+                      ...formData,
+                      borneBy: "split",
+                      amountSelf: curSelf + curSeller + curBuyer === amt ? curSelf : amt,
+                      amountSeller: curSelf + curSeller + curBuyer === amt ? curSeller : 0,
+                      amountBuyer: curSelf + curSeller + curBuyer === amt ? curBuyer : 0,
+                    });
+                  }}
+                  className={`py-1.5 px-2 rounded-md text-xs font-medium transition-all duration-150 ${
+                    formData.borneBy === "split"
+                      ? "bg-purple-950/60 border border-purple-600/50 text-purple-300 font-bold shadow-sm"
+                      : "text-[#A1A1AA] hover:text-white"
+                  }`}
+                >
+                  Custom Split
+                </button>
+              </div>
+
+              {/* Context Explanation */}
+              <div className="text-[11px] text-[#888888] leading-relaxed">
+                {(formData.borneBy || "self") === "self" && (
+                  <span>
+                    Regular project expenditure. Increases project outlay and directly reduces deal net profit.
+                  </span>
+                )}
+                {formData.borneBy === "seller" && (
+                  <span className="text-amber-300/90">
+                    Paid on behalf of seller. Deducted from pending consideration dues to seller.
+                  </span>
+                )}
+                {formData.borneBy === "buyer" && (
+                  <span className="text-blue-300/90">
+                    Paid on behalf of buyer. Added to outstanding customer receivable.
+                  </span>
+                )}
+                {formData.borneBy === "split" && (
+                  <span className="text-purple-300/90">
+                    Disbursed from bank/cash, divided between developer outlay, seller deduction, and buyer billing.
+                  </span>
+                )}
+              </div>
+
+              {/* Split Inputs & Presets (Only when borneBy === "split") */}
+              {formData.borneBy === "split" && (
+                <div className="flex flex-col gap-2.5 pt-2 border-t border-[#1e1e1e]">
+                  {/* Presets */}
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="text-[11px] text-[#71717A] uppercase font-semibold mr-1">Presets:</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const amt = formData.amount || 0;
+                        const half = Math.round(amt * 0.5);
+                        setFormData({
+                          ...formData,
+                          amountSelf: half,
+                          amountSeller: amt - half,
+                          amountBuyer: 0,
+                        });
+                      }}
+                      className="px-2 py-0.5 rounded bg-[#181818] border border-[#2c2c2c] text-[11px] text-[#D4D4D8] hover:text-white hover:border-[#555]"
+                    >
+                      50/50 Self &amp; Seller
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const amt = formData.amount || 0;
+                        const half = Math.round(amt * 0.5);
+                        setFormData({
+                          ...formData,
+                          amountBuyer: half,
+                          amountSeller: amt - half,
+                          amountSelf: 0,
+                        });
+                      }}
+                      className="px-2 py-0.5 rounded bg-[#181818] border border-[#2c2c2c] text-[11px] text-[#D4D4D8] hover:text-white hover:border-[#555]"
+                    >
+                      50/50 Buyer &amp; Seller
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const amt = formData.amount || 0;
+                        const third = Math.floor(amt / 3);
+                        setFormData({
+                          ...formData,
+                          amountSelf: third,
+                          amountSeller: third,
+                          amountBuyer: amt - (third * 2),
+                        });
+                      }}
+                      className="px-2 py-0.5 rounded bg-[#181818] border border-[#2c2c2c] text-[11px] text-[#D4D4D8] hover:text-white hover:border-[#555]"
+                    >
+                      Equal 3-Way
+                    </button>
+                  </div>
+
+                  {/* 3 Input Fields */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[11px] font-semibold text-white">Self Share (₹)</label>
+                      <input
+                        type="number"
+                        value={formData.amountSelf || ""}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            amountSelf: parseFloat(e.target.value) || 0,
+                          })
+                        }
+                        placeholder="0"
+                        className="bg-[#141414] border border-[#282828] rounded-md px-2.5 py-1.5 text-xs text-white font-mono focus:border-purple-500 outline-none"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[11px] font-semibold text-amber-400">Seller Share (₹)</label>
+                      <input
+                        type="number"
+                        value={formData.amountSeller || ""}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            amountSeller: parseFloat(e.target.value) || 0,
+                          })
+                        }
+                        placeholder="0"
+                        className="bg-[#141414] border border-[#282828] rounded-md px-2.5 py-1.5 text-xs text-amber-300 font-mono focus:border-amber-500 outline-none"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[11px] font-semibold text-blue-400">Buyer Share (₹)</label>
+                      <input
+                        type="number"
+                        value={formData.amountBuyer || ""}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            amountBuyer: parseFloat(e.target.value) || 0,
+                          })
+                        }
+                        placeholder="0"
+                        className="bg-[#141414] border border-[#282828] rounded-md px-2.5 py-1.5 text-xs text-blue-300 font-mono focus:border-blue-500 outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Allocation Status */}
+                  <div className="flex items-center justify-between text-xs pt-1">
+                    <span className="text-[#A1A1AA]">
+                      Allocated:{" "}
+                      <span className="font-mono font-bold text-white">
+                        ₹{(((formData.amountSelf || 0) + (formData.amountSeller || 0) + (formData.amountBuyer || 0))).toLocaleString("en-IN")}
+                      </span>{" "}
+                      / ₹{(formData.amount || 0).toLocaleString("en-IN")}
+                    </span>
+                    {(formData.amount || 0) -
+                      ((formData.amountSelf || 0) +
+                        (formData.amountSeller || 0) +
+                        (formData.amountBuyer || 0)) ===
+                    0 ? (
+                      <span className="text-[#22C55E] font-medium flex items-center gap-1">
+                        Fully Allocated (100%)
+                      </span>
+                    ) : (
+                      <span className="text-amber-400 font-medium">
+                        {(formData.amount || 0) -
+                          ((formData.amountSelf || 0) +
+                            (formData.amountSeller || 0) +
+                            (formData.amountBuyer || 0)) >
+                        0
+                          ? `₹${((formData.amount || 0) - ((formData.amountSelf || 0) + (formData.amountSeller || 0) + (formData.amountBuyer || 0))).toLocaleString("en-IN")} unallocated`
+                          : `Over-allocated by ₹${Math.abs((formData.amount || 0) - ((formData.amountSelf || 0) + (formData.amountSeller || 0) + (formData.amountBuyer || 0))).toLocaleString("en-IN")}`}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Row 5: Remarks / Notes */}
           <div className="flex flex-col gap-1.5 min-w-0">
             <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
@@ -566,7 +892,15 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
               </button>
               <button
                 type="submit"
-                disabled={isSaving}
+                disabled={
+                  isSaving ||
+                  (formData.transactionType === "outflow" &&
+                    formData.borneBy === "split" &&
+                    (formData.amountSelf || 0) +
+                      (formData.amountSeller || 0) +
+                      (formData.amountBuyer || 0) !==
+                      (formData.amount || 0))
+                }
                 className="btn-action-primary px-5 py-2 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />

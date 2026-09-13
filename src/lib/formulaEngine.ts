@@ -18,6 +18,10 @@ export interface PropertyFinancialMetrics {
   totalReceiptsCollected: number;
   pendingOutflow: number; // Remaining payable to seller
   pendingInflow: number; // Remaining receivable from buyer
+  sellerPaidExpenses: number; // Expenses paid on behalf of seller (deducted from seller dues)
+  buyerPaidExpenses: number; // Expenses paid on behalf of buyer (added to buyer receivables)
+  selfPaidExpenses: number; // Developer portion of property expenses
+  adjustedBuyerObligation: number; // Agreed Selling Price + buyerPaidExpenses
   projectedProfit: number; // Selling/Target Price - Total Project Outlay
   realizedProfit: number; // Total Receipts Collected - Total Outflows Paid
   pendingProfit: number; // Remaining profit to be received from buyer
@@ -106,6 +110,8 @@ export interface CommercialDashboardMetrics {
   totalAgreedSalePrice: number;
   totalPendingPayable: number;
   totalPendingReceivable: number;
+  totalSellerPaidExpenses?: number;
+  totalBuyerPaidExpenses?: number;
   totalRealizedProfit: number;
   totalProjectedProfit: number;
   totalPendingProfit: number;
@@ -335,9 +341,54 @@ export function calculateCommercialMetrics(
 
     const purchasePaidTotal = purchasePaidCash + purchasePaidBank;
 
-    const propertyExpenses = pOutflows
-      .filter((t) => !isPurchasePrincipal(t.category))
-      .reduce((sum, t) => sum + t.amount, 0);
+    const nonPrincipalOutflows = pOutflows.filter(
+      (t) => !isPurchasePrincipal(t.category)
+    );
+
+    // Helper to resolve tripartite expense allocation shares
+    const getExpenseShares = (t: SeedTransaction) => {
+      const amt = t.amount || 0;
+      if (t.borneBy === "seller") {
+        const seller = t.amountSeller !== undefined ? t.amountSeller : amt;
+        const self = t.amountSelf ?? 0;
+        const buyer = t.amountBuyer ?? 0;
+        return { self, seller, buyer };
+      }
+      if (t.borneBy === "buyer") {
+        const buyer = t.amountBuyer !== undefined ? t.amountBuyer : amt;
+        const self = t.amountSelf ?? 0;
+        const seller = t.amountSeller ?? 0;
+        return { self, seller, buyer };
+      }
+      if (t.borneBy === "split") {
+        const self = t.amountSelf ?? 0;
+        const seller = t.amountSeller ?? 0;
+        const buyer = t.amountBuyer ?? 0;
+        return { self, seller, buyer };
+      }
+      // default: self
+      const self = t.amountSelf !== undefined ? t.amountSelf : amt;
+      const seller = t.amountSeller ?? 0;
+      const buyer = t.amountBuyer ?? 0;
+      return { self, seller, buyer };
+    };
+
+    // Only self portion counts as developer project expense
+    const propertyExpenses = nonPrincipalOutflows.reduce((sum, t) => {
+      return sum + getExpenseShares(t).self;
+    }, 0);
+
+    const selfPaidExpenses = propertyExpenses;
+
+    // Cumulative expenses paid on behalf of seller across this property
+    const sellerPaidExpenses = nonPrincipalOutflows.reduce((sum, t) => {
+      return sum + getExpenseShares(t).seller;
+    }, 0);
+
+    // Cumulative expenses paid on behalf of buyer across this property
+    const buyerPaidExpenses = nonPrincipalOutflows.reduce((sum, t) => {
+      return sum + getExpenseShares(t).buyer;
+    }, 0);
 
     const totalProjectOutlay = p.agreedPurchasePrice + propertyExpenses;
     const totalOutflowsPaid = purchasePaidTotal + propertyExpenses;
@@ -353,14 +404,20 @@ export function calculateCommercialMetrics(
     const totalReceiptsCollected =
       receiptsReceivedCash + receiptsReceivedBank;
 
+    // Pending outflow to seller: Agreed price minus direct purchase paid minus expenses paid on seller behalf
     const pendingOutflow =
       p.agreedPurchasePrice > 0
-        ? Math.max(0, p.agreedPurchasePrice - purchasePaidTotal)
+        ? Math.max(0, p.agreedPurchasePrice - purchasePaidTotal - sellerPaidExpenses)
         : 0;
 
+    // Buyer dues: Agreed selling price plus expenses billed to buyer
+    const baseSellingPrice = p.agreedSellingPrice || 0;
+    const adjustedBuyerObligation =
+      baseSellingPrice > 0 ? baseSellingPrice + buyerPaidExpenses : 0;
+
     const pendingInflow =
-      (p.agreedSellingPrice || 0) > 0
-        ? Math.max(0, (p.agreedSellingPrice || 0) - totalReceiptsCollected)
+      adjustedBuyerObligation > 0
+        ? Math.max(0, adjustedBuyerObligation - totalReceiptsCollected)
         : 0;
 
     const projectedProfit =
@@ -373,10 +430,10 @@ export function calculateCommercialMetrics(
     const isSoldOrClosed = p.status === "sold" || p.status === "closed";
 
     // Cost Recovery Realized Profit on Sold Assets:
-    // Recognized strictly after cumulative receipts exceed total project cost basis.
-    // In-progress or open assets recognize 0 realized profit.
+    // When buyer reimburses buyerPaidExpenses, developer recovers totalProjectOutlay + buyerPaidExpenses
+    const effectiveOutlayToRecover = totalProjectOutlay + buyerPaidExpenses;
     const realizedProfit = isSoldOrClosed
-      ? Math.max(0, totalReceiptsCollected - totalProjectOutlay)
+      ? Math.max(0, totalReceiptsCollected - effectiveOutlayToRecover)
       : 0;
 
     // Remaining profit pending collection from buyer
@@ -429,6 +486,10 @@ export function calculateCommercialMetrics(
       purchasePaidBank,
       purchasePaidTotal,
       propertyExpenses,
+      sellerPaidExpenses,
+      buyerPaidExpenses,
+      selfPaidExpenses,
+      adjustedBuyerObligation,
       totalProjectOutlay,
       totalOutflowsPaid,
       receiptsReceivedCash,
@@ -655,6 +716,12 @@ export function calculateCommercialMetrics(
     totalAgreedSalePrice: Math.round(totalAgreedSalePrice),
     totalPendingPayable: Math.round(totalPendingPayable),
     totalPendingReceivable: Math.round(totalPendingReceivable),
+    totalSellerPaidExpenses: Math.round(
+      propertyMetrics.reduce((sum, pm) => sum + pm.sellerPaidExpenses, 0)
+    ),
+    totalBuyerPaidExpenses: Math.round(
+      propertyMetrics.reduce((sum, pm) => sum + pm.buyerPaidExpenses, 0)
+    ),
     totalRealizedProfit: Math.round(totalRealizedProfit),
     totalProjectedProfit: Math.round(totalProjectedProfit),
     totalPendingProfit: Math.round(totalPendingProfit),

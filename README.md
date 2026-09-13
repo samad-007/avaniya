@@ -28,6 +28,8 @@
    - [Progressive Web App (PWA) Mobile Setup](#m-progressive-web-app-pwa-mobile-setup)
    - [Multi-Format Exports (Excel, PDF, CSV)](#n-multi-format-exports-excel-pdf-csv)
    - [Session Security, Inactivity Timeout & Sign Out](#o-session-security-inactivity-timeout--sign-out)
+   - [Tripartite Expense Allocation (Self / Seller / Buyer Splits)](#p-tripartite-expense-allocation-self--seller--buyer-splits)
+   - [2-Tier Responsive Header & Master Egress Architecture](#q-2-tier-responsive-header--master-egress-architecture)
 3. [Developer & DevOps Engineering Guide](#3-developer--devops-engineering-guide)
    - [Architecture & Tech Stack](#a-architecture--tech-stack)
    - [Project Directory Structure](#b-project-directory-structure)
@@ -182,6 +184,19 @@ Click **Export** in the top bar to generate offline files:
 ### O. Session Security, Inactivity Timeout & Sign Out
 - **Auto-Logout on Idle**: If the tab remains inactive for 30 minutes, you will be logged out automatically.
 - **Swipe / Back Button Protection**: Swiping back on mobile or pressing the browser back button prompts a logout confirmation modal to prevent accidental session termination.
+
+### P. Tripartite Expense Allocation (Self / Seller / Buyer Splits)
+In real-world Indian land transactions, ancillary development or statutory expenses (e.g. boundary demarcation, survey fees, EC charges, legal clearances, stamp duty) are frequently advanced by the developer but contractually borne by the seller or the buyer:
+- **Borne by Self (Developer Default)**: The entire expense is treated as a property project expense, increasing the Total Project Outlay.
+- **Borne by Seller**: The paid expense is deducted from the seller remaining purchase dues (`pendingOutflow`). It does not inflate developer project outlay or distort profit margins.
+- **Borne by Buyer**: The paid expense is added to the buyer outstanding payment obligations (`adjustedBuyerObligation` and `pendingInflow`).
+- **Custom Tripartite Split**: Expenses can be divided across all three parties with live amount validation ensuring the split parts equal the transaction total.
+
+### Q. 2-Tier Responsive Header & Master Egress Architecture
+To prevent navigation bar clipping and ensure critical user session controls are never obscured:
+- **Tier 1 (Master Identity, Workspace Mode & Session Egress)**: Retains the Avaniya brand identity, desktop mode switcher (Commercial Land vs Personal Asset), and permanently anchors the authenticated User Profile pill and Sign Out button in the top right. Total row width is contained under 800px, leaving ample room on standard desktop screens (1280px/1366px) and eliminating horizontal overflow.
+- **Tier 2 (Desktop Operations Toolbar)**: Consolidates action buttons (`+ Outflow`, `+ Inflow`, `Withdraw`, `+ Loan`, `+ Property`, `Export`, `Settings`) alongside tenant workspace selectors and Super Admin console triggers.
+- **Super Admin Egress Parity**: The Super Admin Management Console features the exact same authenticated user profile badge and dedicated sign out action in its top header, guaranteeing direct egress from any view.
 
 ---
 

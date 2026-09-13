@@ -70,7 +70,28 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
     | "Cash to Bank"
     | "Bank to Cash"
   >("Bank Withdrawal to Cash");
+  const [borneBy, setBorneBy] = useState<"self" | "seller" | "buyer" | "split">("self");
+  const [amountSelf, setAmountSelf] = useState<number>(500000);
+  const [amountSeller, setAmountSeller] = useState<number>(0);
+  const [amountBuyer, setAmountBuyer] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Automatically keep allocation amounts in sync when mode is self, seller, or buyer
+  useEffect(() => {
+    if (borneBy === "self") {
+      setAmountSelf(amount || 0);
+      setAmountSeller(0);
+      setAmountBuyer(0);
+    } else if (borneBy === "seller") {
+      setAmountSeller(amount || 0);
+      setAmountSelf(0);
+      setAmountBuyer(0);
+    } else if (borneBy === "buyer") {
+      setAmountBuyer(amount || 0);
+      setAmountSelf(0);
+      setAmountSeller(0);
+    }
+  }, [amount, borneBy]);
 
   const selectedProperty = useMemo(() => {
     return properties.find(
@@ -516,6 +537,31 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
         mode,
         transferType: activeType === "transfer" ? transferType : undefined,
         amount,
+        borneBy: activeType === "outflow" ? borneBy : "self",
+        amountSelf:
+          activeType === "outflow"
+            ? borneBy === "split"
+              ? amountSelf
+              : borneBy === "self"
+              ? amount
+              : 0
+            : 0,
+        amountSeller:
+          activeType === "outflow"
+            ? borneBy === "split"
+              ? amountSeller
+              : borneBy === "seller"
+              ? amount
+              : 0
+            : 0,
+        amountBuyer:
+          activeType === "outflow"
+            ? borneBy === "split"
+              ? amountBuyer
+              : borneBy === "buyer"
+              ? amount
+              : 0
+            : 0,
         subPlotNumber:
           activeType === "withdrawal" ||
           activeType === "transfer" ||
@@ -1007,6 +1053,217 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
             </div>
           )}
 
+          {/* Expense Allocation / Borne By (Only for Outflows) */}
+          {activeType === "outflow" && (
+            <div className="flex flex-col gap-2 bg-[#0c0c0c] p-3 rounded-lg border border-[#222222]">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
+                  Cost Borne By / Allocation
+                </label>
+                <span className="text-[11px] text-[#71717A] font-mono">
+                  {borneBy === "self"
+                    ? "Developer project cost"
+                    : borneBy === "seller"
+                    ? "Deducted from seller dues"
+                    : borneBy === "buyer"
+                    ? "Added to buyer receivables"
+                    : "Multi-party apportioned"}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-[#141414] p-1 rounded-lg border border-[#262626]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setBorneBy("self");
+                    setAmountSelf(amount);
+                    setAmountSeller(0);
+                    setAmountBuyer(0);
+                  }}
+                  className={`py-1.5 px-2 rounded-md text-xs font-medium transition-all duration-150 ${
+                    borneBy === "self"
+                      ? "bg-[#262626] text-white font-bold shadow-sm"
+                      : "text-[#A1A1AA] hover:text-white"
+                  }`}
+                >
+                  Self (Project)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setBorneBy("seller");
+                    setAmountSeller(amount);
+                    setAmountSelf(0);
+                    setAmountBuyer(0);
+                  }}
+                  className={`py-1.5 px-2 rounded-md text-xs font-medium transition-all duration-150 ${
+                    borneBy === "seller"
+                      ? "bg-amber-950/60 border border-amber-600/50 text-amber-300 font-bold shadow-sm"
+                      : "text-[#A1A1AA] hover:text-white"
+                  }`}
+                >
+                  For Seller
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setBorneBy("buyer");
+                    setAmountBuyer(amount);
+                    setAmountSelf(0);
+                    setAmountSeller(0);
+                  }}
+                  className={`py-1.5 px-2 rounded-md text-xs font-medium transition-all duration-150 ${
+                    borneBy === "buyer"
+                      ? "bg-blue-950/60 border border-blue-600/50 text-blue-300 font-bold shadow-sm"
+                      : "text-[#A1A1AA] hover:text-white"
+                  }`}
+                >
+                  For Buyer
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setBorneBy("split");
+                    if (amountSelf + amountSeller + amountBuyer !== amount) {
+                      setAmountSelf(amount);
+                      setAmountSeller(0);
+                      setAmountBuyer(0);
+                    }
+                  }}
+                  className={`py-1.5 px-2 rounded-md text-xs font-medium transition-all duration-150 ${
+                    borneBy === "split"
+                      ? "bg-purple-950/60 border border-purple-600/50 text-purple-300 font-bold shadow-sm"
+                      : "text-[#A1A1AA] hover:text-white"
+                  }`}
+                >
+                  Custom Split
+                </button>
+              </div>
+
+              {/* Context Explanation */}
+              <div className="text-[11px] text-[#888888] leading-relaxed">
+                {borneBy === "self" && (
+                  <span>
+                    Regular project expenditure. Increases project outlay and directly reduces deal net profit.
+                  </span>
+                )}
+                {borneBy === "seller" && (
+                  <span className="text-amber-300/90">
+                    Paid on behalf of seller (e.g. taluk surveyor, court litigation, Section 194-IA TDS). Deducted from pending consideration dues to seller.
+                  </span>
+                )}
+                {borneBy === "buyer" && (
+                  <span className="text-blue-300/90">
+                    Paid on behalf of buyer (e.g. stamp duty, sub-registrar registration, Patta transfer). Added to outstanding customer receivable.
+                  </span>
+                )}
+                {borneBy === "split" && (
+                  <span className="text-purple-300/90">
+                    Disburse once from bank/cash, divided between developer outlay, seller deduction, and buyer billing.
+                  </span>
+                )}
+              </div>
+
+              {/* Split Inputs & Presets (Only when borneBy === "split") */}
+              {borneBy === "split" && (
+                <div className="flex flex-col gap-2.5 pt-2 border-t border-[#1e1e1e]">
+                  {/* Preset Buttons */}
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="text-[11px] text-[#71717A] uppercase font-semibold mr-1">Presets:</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const half = Math.round(amount * 0.5);
+                        setAmountSelf(half);
+                        setAmountSeller(amount - half);
+                        setAmountBuyer(0);
+                      }}
+                      className="px-2 py-0.5 rounded bg-[#181818] border border-[#2c2c2c] text-[11px] text-[#D4D4D8] hover:text-white hover:border-[#555]"
+                    >
+                      50/50 Self &amp; Seller
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const half = Math.round(amount * 0.5);
+                        setAmountBuyer(half);
+                        setAmountSeller(amount - half);
+                        setAmountSelf(0);
+                      }}
+                      className="px-2 py-0.5 rounded bg-[#181818] border border-[#2c2c2c] text-[11px] text-[#D4D4D8] hover:text-white hover:border-[#555]"
+                    >
+                      50/50 Buyer &amp; Seller
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const third = Math.floor(amount / 3);
+                        setAmountSelf(third);
+                        setAmountSeller(third);
+                        setAmountBuyer(amount - (third * 2));
+                      }}
+                      className="px-2 py-0.5 rounded bg-[#181818] border border-[#2c2c2c] text-[11px] text-[#D4D4D8] hover:text-white hover:border-[#555]"
+                    >
+                      Equal 3-Way
+                    </button>
+                  </div>
+
+                  {/* 3 Input Fields */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[11px] font-semibold text-white">Self Share (₹)</label>
+                      <input
+                        type="number"
+                        value={amountSelf || ""}
+                        onChange={(e) => setAmountSelf(parseFloat(e.target.value) || 0)}
+                        placeholder="0"
+                        className="bg-[#141414] border border-[#282828] rounded-md px-2.5 py-1.5 text-xs text-white font-mono focus:border-purple-500 outline-none"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[11px] font-semibold text-amber-400">Seller Share (₹)</label>
+                      <input
+                        type="number"
+                        value={amountSeller || ""}
+                        onChange={(e) => setAmountSeller(parseFloat(e.target.value) || 0)}
+                        placeholder="0"
+                        className="bg-[#141414] border border-[#282828] rounded-md px-2.5 py-1.5 text-xs text-amber-300 font-mono focus:border-amber-500 outline-none"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[11px] font-semibold text-blue-400">Buyer Share (₹)</label>
+                      <input
+                        type="number"
+                        value={amountBuyer || ""}
+                        onChange={(e) => setAmountBuyer(parseFloat(e.target.value) || 0)}
+                        placeholder="0"
+                        className="bg-[#141414] border border-[#282828] rounded-md px-2.5 py-1.5 text-xs text-blue-300 font-mono focus:border-blue-500 outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Allocation Balance Status */}
+                  <div className="flex items-center justify-between text-xs pt-1">
+                    <span className="text-[#A1A1AA]">
+                      Allocated: <span className="font-mono font-bold text-white">₹{((amountSelf || 0) + (amountSeller || 0) + (amountBuyer || 0)).toLocaleString("en-IN")}</span> / ₹{amount.toLocaleString("en-IN")}
+                    </span>
+                    {amount - ((amountSelf || 0) + (amountSeller || 0) + (amountBuyer || 0)) === 0 ? (
+                      <span className="text-[#22C55E] font-medium flex items-center gap-1">
+                        Fully Allocated (100%)
+                      </span>
+                    ) : (
+                      <span className="text-amber-400 font-medium">
+                        {amount - ((amountSelf || 0) + (amountSeller || 0) + (amountBuyer || 0)) > 0
+                          ? `₹${(amount - ((amountSelf || 0) + (amountSeller || 0) + (amountBuyer || 0))).toLocaleString("en-IN")} unallocated`
+                          : `Over-allocated by ₹${Math.abs(amount - ((amountSelf || 0) + (amountSeller || 0) + (amountBuyer || 0))).toLocaleString("en-IN")}`}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Date & Recipient Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5">
             <div className="flex flex-col gap-1.5 min-w-0">
@@ -1078,7 +1335,12 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           <div className="flex items-center gap-2.5 pt-2.5 border-t border-[#262626] flex-wrap sm:flex-nowrap">
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={
+                isSubmitting ||
+                (activeType === "outflow" &&
+                  borneBy === "split" &&
+                  (amountSelf || 0) + (amountSeller || 0) + (amountBuyer || 0) !== amount)
+              }
               className="btn-action-primary flex-1 py-2.5 rounded-lg text-xs sm:text-sm disabled:opacity-50 font-semibold"
             >
               {isSubmitting ? "Saving Transaction..." : "Save Transaction"}

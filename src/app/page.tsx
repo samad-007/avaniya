@@ -742,6 +742,11 @@ export default function DashboardPage() {
         onClose={() => setIsSuperAdminModalOpen(false)}
         currentDatasetId={currentDatasetId}
         onSwitchDataset={handleSwitchDataset}
+        user={user}
+        onLogout={() => {
+          setIsSuperAdminModalOpen(false);
+          setIsLogoutModalOpen(true);
+        }}
       />
 
       {/* Re-Auth Modal (When opened from Header) */}

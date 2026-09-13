@@ -106,6 +106,10 @@ export interface SeedTransaction {
     | "Cash to Bank"
     | "Bank to Cash";
   amount: number;
+  borneBy?: "self" | "seller" | "buyer" | "split";
+  amountSelf?: number;
+  amountSeller?: number;
+  amountBuyer?: number;
   recipientOrSource?: string;
   remarks?: string;
 }

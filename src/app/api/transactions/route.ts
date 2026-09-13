@@ -64,6 +64,41 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const roundedAmount = Math.round(amount);
+
+    let borneBy: "self" | "seller" | "buyer" | "split" = "self";
+    if (body.borneBy && ["self", "seller", "buyer", "split"].includes(body.borneBy)) {
+      borneBy = body.borneBy;
+    }
+
+    let amountSelf = 0;
+    let amountSeller = 0;
+    let amountBuyer = 0;
+
+    if (body.transactionType === "outflow") {
+      if (borneBy === "seller") {
+        amountSeller = roundedAmount;
+      } else if (borneBy === "buyer") {
+        amountBuyer = roundedAmount;
+      } else if (borneBy === "split") {
+        amountSelf = Math.round(parseFloat(body.amountSelf) || 0);
+        amountSeller = Math.round(parseFloat(body.amountSeller) || 0);
+        amountBuyer = Math.round(parseFloat(body.amountBuyer) || 0);
+
+        if (amountSelf + amountSeller + amountBuyer !== roundedAmount) {
+          return NextResponse.json(
+            {
+              success: false,
+              error: `Split amounts (Self: ₹${amountSelf}, Seller: ₹${amountSeller}, Buyer: ₹${amountBuyer}) must sum up exactly to total amount (₹${roundedAmount})`,
+            },
+            { status: 400 }
+          );
+        }
+      } else {
+        amountSelf = roundedAmount;
+      }
+    }
+
     const newTx = await addTransaction(
       {
         scope: body.scope === "personal" ? "personal" : "commercial",
@@ -78,7 +113,11 @@ export async function POST(req: NextRequest) {
         category: String(body.category).trim(),
         mode: body.mode === "Cash" ? "Cash" : "Bank",
         transferType: body.transferType,
-        amount: Math.round(amount),
+        amount: roundedAmount,
+        borneBy,
+        amountSelf,
+        amountSeller,
+        amountBuyer,
         recipientOrSource: body.recipientOrSource ? String(body.recipientOrSource).trim() : "",
         remarks: body.remarks ? String(body.remarks).trim() : "",
       },
