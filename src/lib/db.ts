@@ -55,46 +55,50 @@ export function getTargetDbName(): string {
 
 /**
  * Connect to MongoDB Atlas with pooled serverless connection pointing to the production database.
+ * Thread-safe promise caching ensures concurrent calls share the same connection attempt.
  */
 export async function connectDB(overrideDbName?: string): Promise<typeof mongoose> {
   const MONGODB_URI = getSanitizedMongoUri();
   const dbName = overrideDbName || getTargetDbName();
 
   if (!MONGODB_URI) {
-    console.warn("MONGODB_URI is not defined in environment variables.");
+    const errorMsg = "MONGODB_URI is not defined in environment variables.";
+    console.warn(errorMsg);
+    throw new Error(errorMsg);
   }
 
+  // If already connected, reuse the active connection
   if (cached!.conn && mongoose.connection.readyState === 1) {
     return cached!.conn;
   }
 
-  // Reset stale cached connection and promise when disconnected (e.g. idle socket drop)
-  if (mongoose.connection.readyState !== 1) {
+  // Only reset cached promise if the connection is dead (disconnected) AND no connection is currently pending
+  if (mongoose.connection.readyState === 0 && !cached!.promise) {
     cached!.conn = null;
-    cached!.promise = null;
   }
 
-  if (!cached!.promise && MONGODB_URI) {
+  // Initiate connection if no promise is in flight
+  if (!cached!.promise) {
     const opts = {
-      bufferCommands: false,
+      bufferCommands: true, // Allow Mongoose to buffer model operations while connecting
       maxPoolSize: 10,
-      minPoolSize: 0,
-      serverSelectionTimeoutMS: 5000,
+      minPoolSize: 1,
+      serverSelectionTimeoutMS: 10000,
       socketTimeoutMS: 45000,
-      connectTimeoutMS: 5000,
+      connectTimeoutMS: 10000,
       dbName: dbName, // Explicitly route to target database on Atlas
     };
 
     cached!.promise = mongoose.connect(MONGODB_URI, opts).then((m) => {
+      cached!.conn = m;
       return m;
     });
   }
 
   try {
-    if (cached!.promise) {
-      cached!.conn = await cached!.promise;
-    }
+    cached!.conn = await cached!.promise;
   } catch (e) {
+    // Reset cache on failure so subsequent attempts can retry cleanly
     cached!.conn = null;
     cached!.promise = null;
     throw e;

@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "tsc --noEmit",
-    "test": "npx -y vitest run tests/formulaEngine.test.ts",
+    "test": "npx -y vitest run",
     "migrate": "npx -y tsx scripts/migrateToMongo.ts",
     "init:test-db": "npx -y tsx scripts/initTestDb.ts"
   },

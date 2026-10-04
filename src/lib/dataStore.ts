@@ -42,17 +42,14 @@ let memLoans: (SeedLoan & { datasetId?: string })[] = [
 let memAccountBalances = [...INITIAL_ACCOUNT_BALANCES];
 
 /**
- * Check if MongoDB connection is active
+ * Ensure MongoDB connection is active when MONGODB_URI is present.
+ * Throws if MongoDB is configured but fails to connect, preventing silent fallback to stale seed data.
  */
-async function isDBConnected(): Promise<boolean> {
+async function ensureDB(): Promise<boolean> {
   const uri = getSanitizedMongoUri();
   if (!uri) return false;
-  try {
-    const conn = await connectDB();
-    return !!conn && conn.connection.readyState === 1;
-  } catch {
-    return false;
-  }
+  const conn = await connectDB();
+  return !!conn && conn.connection.readyState === 1;
 }
 
 /**
@@ -69,7 +66,7 @@ export async function getProperties(
       ? DEMO_FILLER_PROPERTIES.filter((p) => p.type === scope)
       : DEMO_FILLER_PROPERTIES;
   }
-  const dbOk = await isDBConnected();
+  const dbOk = await ensureDB();
   if (dbOk) {
     const query: Record<string, unknown> = {};
     if (!isSuperAdminAll) {
@@ -78,7 +75,7 @@ export async function getProperties(
     if (scope) query.type = scope;
 
     const docs = await Property.find(query).lean<{ _id: unknown } & IProperty[]>();
-    if (docs && docs.length > 0) {
+    if (docs) {
       return (docs as unknown as ({ _id: { toString: () => string } } & IProperty)[]).map((d) => ({
         id: d._id.toString(),
         type: d.type,
@@ -110,7 +107,7 @@ export async function getProperties(
     return [];
   }
 
-  // Memory fallback
+  // Memory fallback only active in offline environments without MONGODB_URI
   let list = isSuperAdminAll
     ? memProperties
     : memProperties.filter((p) => p.datasetId === datasetId || !datasetId);
@@ -142,24 +139,36 @@ export async function addProperty(
   datasetId: string = "ds_yousuf_portfolio",
   userId: string = "user_default"
 ): Promise<SeedProperty> {
-  const newProp: SeedProperty & { datasetId: string } = {
-    ...data,
-    id: `prop-${Date.now()}`,
-    datasetId,
-    propertyCode:
-      data.propertyCode ||
-      (data.type === "commercial"
-        ? `LND-${String(memProperties.length + 1).padStart(3, "0")}`
-        : `APT-${String(memProperties.length + 1).padStart(3, "0")}`),
-  };
-
-  const dbOk = await isDBConnected();
+  const dbOk = await ensureDB();
   if (dbOk) {
     try {
-      const { id, ...dbPayload } = newProp;
-      const doc = await Property.create({ ...dbPayload, userId, datasetId });
-      newProp.id = doc._id.toString();
-      memProperties.push(newProp);
+      let propertyCode = data.propertyCode;
+      if (!propertyCode) {
+        const count = await Property.countDocuments({
+          $or: [{ datasetId }, { userId: datasetId }],
+          type: data.type,
+        });
+        const prefix = data.type === "commercial" ? "LND" : "APT";
+        propertyCode = `${prefix}-${String(count + 1).padStart(3, "0")}`;
+        const existing = await Property.findOne({ propertyCode });
+        if (existing) {
+          propertyCode = `${prefix}-${Date.now().toString().slice(-4)}`;
+        }
+      }
+
+      const dbPayload = {
+        ...data,
+        propertyCode,
+        userId,
+        datasetId,
+      };
+      const doc = await Property.create(dbPayload);
+      const newProp: SeedProperty = {
+        ...data,
+        id: doc._id.toString(),
+        propertyCode,
+      };
+      memProperties.push({ ...newProp, datasetId });
       return newProp;
     } catch (e) {
       console.error("MongoDB Property write failed:", e);
@@ -171,7 +180,17 @@ export async function addProperty(
     }
   }
 
-  if (datasetId === "ds_demo_sandbox") {
+  if (datasetId === "ds_demo_sandbox" || !getSanitizedMongoUri()) {
+    const newProp: SeedProperty & { datasetId: string } = {
+      ...data,
+      id: `prop-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      datasetId,
+      propertyCode:
+        data.propertyCode ||
+        (data.type === "commercial"
+          ? `LND-${String(memProperties.length + 1).padStart(3, "0")}`
+          : `APT-${String(memProperties.length + 1).padStart(3, "0")}`),
+    };
     memProperties.push(newProp);
     return newProp;
   }
@@ -189,7 +208,7 @@ export async function updateProperty(
   updates: Partial<SeedProperty>,
   datasetId: string = "ds_yousuf_portfolio"
 ): Promise<SeedProperty | null> {
-  const dbOk = await isDBConnected();
+  const dbOk = await ensureDB();
   if (dbOk) {
     try {
       const query: Record<string, unknown> = {
@@ -258,7 +277,7 @@ export async function updateProperty(
     }
   }
 
-  if (datasetId === "ds_demo_sandbox") {
+  if (datasetId === "ds_demo_sandbox" || !getSanitizedMongoUri()) {
     const idx = memProperties.findIndex(
       (p) =>
         p.propertyCode.toLowerCase() === propertyCodeOrId.toLowerCase() ||
@@ -297,7 +316,7 @@ export async function getTransactions(
     );
   }
 
-  const dbOk = await isDBConnected();
+  const dbOk = await ensureDB();
   if (dbOk) {
     const query: Record<string, unknown> = {};
     if (!isSuperAdminAll) {
@@ -308,7 +327,7 @@ export async function getTransactions(
     if (filter?.type) query.transactionType = filter.type;
 
     const docs = await Transaction.find(query).sort({ date: -1 }).lean();
-    if (docs && docs.length > 0) {
+    if (docs) {
       return (docs as unknown as ({ _id: { toString: () => string } } & ITransaction)[]).map((d) => ({
         id: d._id.toString(),
         scope: d.scope,
@@ -335,6 +354,7 @@ export async function getTransactions(
     return [];
   }
 
+  // Memory fallback only active in offline environments without MONGODB_URI
   let list = isSuperAdminAll
     ? [...memTransactions]
     : memTransactions.filter((t) => t.datasetId === datasetId || !datasetId);
@@ -367,22 +387,34 @@ export async function addTransaction(
       ? "INF"
       : "TRF";
 
-  const newTx: SeedTransaction & { datasetId: string } = {
-    ...data,
-    id: `tx-${Date.now()}`,
-    datasetId,
-    transCode:
-      data.transCode ||
-      `${prefix}-${String(memTransactions.length + 1).padStart(3, "0")}`,
-  };
-
-  const dbOk = await isDBConnected();
+  const dbOk = await ensureDB();
   if (dbOk) {
     try {
-      const { id, ...dbPayload } = newTx;
-      const doc = await Transaction.create({ ...dbPayload, userId, datasetId });
-      newTx.id = doc._id.toString();
-      memTransactions.push(newTx);
+      let transCode = data.transCode;
+      if (!transCode) {
+        const count = await Transaction.countDocuments({
+          $or: [{ datasetId }, { userId: datasetId }],
+        });
+        transCode = `${prefix}-${String(count + 1).padStart(3, "0")}`;
+        const existing = await Transaction.findOne({ transCode });
+        if (existing) {
+          transCode = `${prefix}-${Date.now().toString().slice(-4)}`;
+        }
+      }
+
+      const dbPayload = {
+        ...data,
+        transCode,
+        userId,
+        datasetId,
+      };
+      const doc = await Transaction.create(dbPayload);
+      const newTx: SeedTransaction = {
+        ...data,
+        id: doc._id.toString(),
+        transCode,
+      };
+      memTransactions.push({ ...newTx, datasetId });
       return newTx;
     } catch (e) {
       console.error("MongoDB Transaction write failed:", e);
@@ -394,7 +426,15 @@ export async function addTransaction(
     }
   }
 
-  if (datasetId === "ds_demo_sandbox") {
+  if (datasetId === "ds_demo_sandbox" || !getSanitizedMongoUri()) {
+    const newTx: SeedTransaction & { datasetId: string } = {
+      ...data,
+      id: `tx-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      datasetId,
+      transCode:
+        data.transCode ||
+        `${prefix}-${String(memTransactions.length + 1).padStart(3, "0")}`,
+    };
     memTransactions.push(newTx);
     return newTx;
   }
@@ -412,7 +452,7 @@ export async function updateTransaction(
   updates: Partial<SeedTransaction>,
   datasetId: string = "ds_yousuf_portfolio"
 ): Promise<SeedTransaction | null> {
-  const dbOk = await isDBConnected();
+  const dbOk = await ensureDB();
   if (dbOk) {
     try {
       const query: Record<string, unknown> = {
@@ -476,7 +516,7 @@ export async function updateTransaction(
     }
   }
 
-  if (datasetId === "ds_demo_sandbox") {
+  if (datasetId === "ds_demo_sandbox" || !getSanitizedMongoUri()) {
     const idx = memTransactions.findIndex(
       (t) =>
         (t.transCode && t.transCode.toLowerCase() === transIdOrCode.toLowerCase()) ||
@@ -501,7 +541,7 @@ export async function deleteTransaction(
   transIdOrCode: string,
   datasetId: string = "ds_yousuf_portfolio"
 ): Promise<boolean> {
-  const dbOk = await isDBConnected();
+  const dbOk = await ensureDB();
   if (dbOk) {
     try {
       const query: Record<string, unknown> = {
@@ -537,7 +577,7 @@ export async function deleteTransaction(
     }
   }
 
-  if (datasetId === "ds_demo_sandbox") {
+  if (datasetId === "ds_demo_sandbox" || !getSanitizedMongoUri()) {
     const idx = memTransactions.findIndex(
       (t) =>
         (t.transCode && t.transCode.toLowerCase() === transIdOrCode.toLowerCase()) ||
@@ -563,7 +603,7 @@ export async function getCategories(
   scope?: "commercial" | "personal",
   isSuperAdminAll: boolean = false
 ): Promise<SeedCategory[]> {
-  const dbOk = await isDBConnected();
+  const dbOk = await ensureDB();
   if (dbOk) {
     const query: Record<string, unknown> = isSuperAdminAll
       ? {}
@@ -593,7 +633,7 @@ export async function addCategory(
   datasetId: string = "ds_yousuf_portfolio",
   userId: string = "user_default"
 ): Promise<SeedCategory> {
-  const dbOk = await isDBConnected();
+  const dbOk = await ensureDB();
   if (dbOk) {
     try {
       await Category.create({ ...category, userId, datasetId });
@@ -621,7 +661,7 @@ export async function getLoans(
       : DEMO_FILLER_LOANS;
   }
 
-  const dbOk = await isDBConnected();
+  const dbOk = await ensureDB();
   if (dbOk) {
     const query: Record<string, unknown> = {};
     if (!isSuperAdminAll) {
@@ -630,7 +670,7 @@ export async function getLoans(
     if (scope) query.scope = scope;
 
     const docs = await Loan.find(query).sort({ startDate: -1 }).lean<{ _id: unknown } & ILoan[]>();
-    if (docs && docs.length > 0) {
+    if (docs) {
       return (docs as unknown as ({ _id: { toString: () => string } } & ILoan)[]).map((d) => ({
         id: d._id.toString(),
         scope: d.scope,
@@ -656,6 +696,7 @@ export async function getLoans(
     return [];
   }
 
+  // Memory fallback only active in offline environments without MONGODB_URI
   let list = isSuperAdminAll
     ? memLoans
     : memLoans.filter((l) => l.datasetId === datasetId || !datasetId);
@@ -687,22 +728,34 @@ export async function addLoan(
   datasetId: string = "ds_yousuf_portfolio",
   userId: string = "user_default"
 ): Promise<SeedLoan> {
-  const newLoan: SeedLoan & { datasetId: string } = {
-    ...data,
-    id: `loan-${Date.now()}`,
-    datasetId,
-    loanCode:
-      data.loanCode ||
-      `LOAN-${String(memLoans.length + 1).padStart(3, "0")}`,
-  };
-
-  const dbOk = await isDBConnected();
+  const dbOk = await ensureDB();
   if (dbOk) {
     try {
-      const { id, ...dbPayload } = newLoan;
-      const doc = await Loan.create({ ...dbPayload, userId, datasetId });
-      newLoan.id = doc._id.toString();
-      memLoans.push(newLoan);
+      let loanCode = data.loanCode;
+      if (!loanCode) {
+        const count = await Loan.countDocuments({
+          $or: [{ datasetId }, { userId: datasetId }],
+        });
+        loanCode = `LOAN-${String(count + 1).padStart(3, "0")}`;
+        const existing = await Loan.findOne({ loanCode });
+        if (existing) {
+          loanCode = `LOAN-${Date.now().toString().slice(-4)}`;
+        }
+      }
+
+      const dbPayload = {
+        ...data,
+        loanCode,
+        userId,
+        datasetId,
+      };
+      const doc = await Loan.create(dbPayload);
+      const newLoan: SeedLoan = {
+        ...data,
+        id: doc._id.toString(),
+        loanCode,
+      };
+      memLoans.push({ ...newLoan, datasetId });
       return newLoan;
     } catch (e) {
       console.error("Loan DB write failed:", e);
@@ -714,7 +767,15 @@ export async function addLoan(
     }
   }
 
-  if (datasetId === "ds_demo_sandbox") {
+  if (datasetId === "ds_demo_sandbox" || !getSanitizedMongoUri()) {
+    const newLoan: SeedLoan & { datasetId: string } = {
+      ...data,
+      id: `loan-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      datasetId,
+      loanCode:
+        data.loanCode ||
+        `LOAN-${String(memLoans.length + 1).padStart(3, "0")}`,
+    };
     memLoans.push(newLoan);
     return newLoan;
   }
@@ -730,7 +791,7 @@ export async function updateLoan(
   updates: Partial<SeedLoan>,
   datasetId: string = "ds_yousuf_portfolio"
 ): Promise<SeedLoan | null> {
-  const dbOk = await isDBConnected();
+  const dbOk = await ensureDB();
   if (dbOk) {
     try {
       const query: Record<string, unknown> = {
@@ -793,7 +854,7 @@ export async function updateLoan(
     }
   }
 
-  if (datasetId === "ds_demo_sandbox") {
+  if (datasetId === "ds_demo_sandbox" || !getSanitizedMongoUri()) {
     const idx = memLoans.findIndex(
       (l) =>
         l.loanCode.toLowerCase() === loanIdOrCode.toLowerCase() ||
@@ -816,7 +877,7 @@ export async function deleteLoan(
   loanIdOrCode: string,
   datasetId: string = "ds_yousuf_portfolio"
 ): Promise<boolean> {
-  const dbOk = await isDBConnected();
+  const dbOk = await ensureDB();
   if (dbOk) {
     try {
       const query: Record<string, unknown> = {
@@ -852,7 +913,7 @@ export async function deleteLoan(
     }
   }
 
-  if (datasetId === "ds_demo_sandbox") {
+  if (datasetId === "ds_demo_sandbox" || !getSanitizedMongoUri()) {
     const idx = memLoans.findIndex(
       (l) =>
         l.loanCode.toLowerCase() === loanIdOrCode.toLowerCase() ||

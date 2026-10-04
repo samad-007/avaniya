@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { updateLoan, deleteLoan } from "@/lib/dataStore";
 import { getSessionFromRequest } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }

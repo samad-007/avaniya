@@ -12,6 +12,8 @@ import {
 } from "@/lib/formulaEngine";
 import { INITIAL_CATEGORIES } from "@/lib/seedData";
 
+export const dynamic = "force-dynamic";
+
 /**
  * Consolidated Bootstrap API Endpoint:
  * Returns properties, transactions, dynamic categories, loans, and pre-calculated metrics in 1 single HTTP call.
@@ -48,18 +50,27 @@ export async function GET(req: NextRequest) {
     );
     const personalMetrics = calculatePersonalMetrics(properties, transactions);
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        datasetId,
-        properties,
-        transactions,
-        categories: activeCategories,
-        loans,
-        commercialMetrics,
-        personalMetrics,
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          datasetId,
+          properties,
+          transactions,
+          categories: activeCategories,
+          loans,
+          commercialMetrics,
+          personalMetrics,
+        },
       },
-    });
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      }
+    );
   } catch (error: unknown) {
     const errorMsg =
       error instanceof Error
@@ -67,7 +78,12 @@ export async function GET(req: NextRequest) {
         : "Failed to bootstrap portfolio data";
     return NextResponse.json(
       { success: false, error: errorMsg },
-      { status: 500 }
+      {
+        status: 500,
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        },
+      }
     );
   }
 }

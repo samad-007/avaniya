@@ -154,11 +154,14 @@ export default function DashboardPage() {
     setPersonalMetrics(pers);
   }, [properties, transactions, categories, loans]);
 
-  // Load dataset-specific data in a single consolidated HTTP call (cuts initial load latency by ~65%)
-  const loadDatasetData = useCallback(async (targetDataset: string) => {
+  // Load dataset-specific data in a single consolidated HTTP call with retry resilience
+  const loadDatasetData = useCallback(async (targetDataset: string, retries = 2): Promise<void> => {
     try {
       const q = targetDataset ? `?datasetId=${encodeURIComponent(targetDataset)}` : "";
-      const res = await fetch(`/api/bootstrap${q}`);
+      const res = await fetch(`/api/bootstrap${q}`, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" },
+      });
 
       if (res.ok) {
         const json = await res.json();
@@ -178,9 +181,17 @@ export default function DashboardPage() {
             setPersonalMetrics(json.data.personalMetrics);
           }
         }
+      } else if (retries > 0) {
+        // Automatic retry with exponential backoff on transient network / DB reconnect
+        await new Promise((resolve) => setTimeout(resolve, 800));
+        return await loadDatasetData(targetDataset, retries - 1);
       }
     } catch (e) {
-      console.warn("API bootstrap fallback to local data", e);
+      if (retries > 0) {
+        await new Promise((resolve) => setTimeout(resolve, 800));
+        return await loadDatasetData(targetDataset, retries - 1);
+      }
+      console.warn("API bootstrap failed after retries:", e);
     }
   }, []);
 
@@ -192,7 +203,10 @@ export default function DashboardPage() {
   useEffect(() => {
     async function restoreSession() {
       try {
-        const res = await fetch("/api/auth/me");
+        const res = await fetch("/api/auth/me", {
+          cache: "no-store",
+          headers: { "Cache-Control": "no-cache" },
+        });
         if (res.ok) {
           const json = await res.json();
           if (json.success && json.data) {

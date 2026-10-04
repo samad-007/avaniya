@@ -402,6 +402,11 @@ Whenever adding categories, assign one of the predefined `financialRole` types:
 - **Mobile Subwindow & Modal Viewport Containment**: All dialog backdrops and modal cards enforce `overflow-y-auto overflow-x-hidden`, `max-w-full`, and `min-w-0` on form parents, flex children, and table wrappers, ensuring strictly vertical scrolling and zero horizontal drift on mobile screens.
 - **Dedicated Super Admin Command Strip & Protected Egress**: Specialized administrative controls (Workspace/Dataset selector, Admin Console trigger, status telemetry) are decoupled into a dedicated full-width sub-strip, preventing horizontal crowding on the primary navigation row. The user profile badge and logout button remain permanently pinned in the top-right corner with `flex-shrink-0` and dedicated border separation across all viewports and roles.
 
+### E. Data Flow Resilience & Concurrency Guard
+- **Preserve Mongoose Connection Promise**: `connectDB()` in `src/lib/db.ts` must maintain `cached.promise` across all concurrent serverless invocations. Never reset `cached.promise` when Mongoose is in `readyState === 2` (`connecting`).
+- **Zero Silent Fallback**: When `MONGODB_URI` is configured, data access methods in `src/lib/dataStore.ts` must never silently drop down to in-memory seed data on transient connection drops. A transient error must throw or retry, ensuring MongoDB remains the sole source of truth.
+- **Dynamic Headers on Data Routes**: All API route handlers returning business records must set `export const dynamic = "force-dynamic"` and include `Cache-Control: no-store, no-cache, must-revalidate` headers. Client `fetch` calls must specify `cache: "no-store"` to prevent stale browser reads.
+
 ---
 
 ## 📄 License & Confidentiality

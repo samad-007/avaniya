@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getTransactions, addTransaction } from "@/lib/dataStore";
 import { getSessionFromRequest } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   const session = await getSessionFromRequest(req);
   const { searchParams } = new URL(req.url);
@@ -24,13 +26,27 @@ export async function GET(req: NextRequest) {
       { scope, propertyCode, type },
       isAll
     );
-    return NextResponse.json({ success: true, data: transactions });
+    return NextResponse.json(
+      { success: true, data: transactions },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      }
+    );
   } catch (error: unknown) {
     const errorMsg =
       error instanceof Error ? error.message : "Failed to fetch transactions";
     return NextResponse.json(
       { success: false, error: errorMsg },
-      { status: 500 }
+      {
+        status: 500,
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        },
+      }
     );
   }
 }

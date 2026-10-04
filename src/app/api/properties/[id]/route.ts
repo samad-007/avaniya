@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPropertyByCode, updateProperty, getTransactions } from "@/lib/dataStore";
 import { getSessionFromRequest } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(
   req: NextRequest,
   context: { params: Promise<{ id: string }> }
@@ -21,7 +23,16 @@ export async function GET(
     }
 
     const txs = await getTransactions(datasetId, { propertyCode: property.propertyCode });
-    return NextResponse.json({ success: true, data: { property, transactions: txs } });
+    return NextResponse.json(
+      { success: true, data: { property, transactions: txs } },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      }
+    );
   } catch (error: unknown) {
     const errorMsg =
       error instanceof Error ? error.message : "Failed to fetch property details";
