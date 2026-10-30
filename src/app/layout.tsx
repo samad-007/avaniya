@@ -1,20 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-
-const plexSans = IBM_Plex_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-plex-sans",
-  display: "swap",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-jetbrains-mono",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: {
@@ -50,8 +35,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark bg-black">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body
-        className={`${plexSans.variable} ${jetbrainsMono.variable} font-sans bg-black text-white antialiased min-h-screen flex flex-col`}
+        className="font-sans bg-black text-white antialiased min-h-screen flex flex-col"
       >
         {children}
       </body>
