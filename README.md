@@ -403,9 +403,11 @@ Whenever adding categories, assign one of the predefined `financialRole` types:
 - **Dedicated Super Admin Command Strip & Protected Egress**: Specialized administrative controls (Workspace/Dataset selector, Admin Console trigger, status telemetry) are decoupled into a dedicated full-width sub-strip, preventing horizontal crowding on the primary navigation row. The user profile badge and logout button remain permanently pinned in the top-right corner with `flex-shrink-0` and dedicated border separation across all viewports and roles.
 
 ### E. Data Flow Resilience & Concurrency Guard
-- **Preserve Mongoose Connection Promise**: `connectDB()` in `src/lib/db.ts` must maintain `cached.promise` across all concurrent serverless invocations. Never reset `cached.promise` when Mongoose is in `readyState === 2` (`connecting`).
-- **Zero Silent Fallback**: When `MONGODB_URI` is configured, data access methods in `src/lib/dataStore.ts` must never silently drop down to in-memory seed data on transient connection drops. A transient error must throw or retry, ensuring MongoDB remains the sole source of truth.
-- **Dynamic Headers on Data Routes**: All API route handlers returning business records must set `export const dynamic = "force-dynamic"` and include `Cache-Control: no-store, no-cache, must-revalidate` headers. Client `fetch` calls must specify `cache: "no-store"` to prevent stale browser reads.
+- **Preserve Mongoose Connection Promise**: `connectDB()` in `src/lib/db.ts` maintains `cached.promise` across all concurrent serverless invocations. Concurrent callers share the in-flight promise and never duplicate connection handshakes. Once resolved, `cached.promise` clears cleanly so subsequent connection drops re-trigger connection establishment instead of returning stale state.
+- **Mobile Sleep-Wake & Idle Socket Auto-Reconnect**: When mobile devices sleep or Atlas terminates idle sockets, `activeReadyState` dropping to 0 automatically invalidates the cache and initiates a fresh connection. Mongoose `disconnected` and `close` event listeners automatically purge dead connection handles.
+- **Serverless Pool Optimization**: Connect options enforce `minPoolSize: 0` and `maxIdleTimeMS: 30000` to prevent frozen container sockets from failing when resumed on serverless platforms.
+- **Zero Silent Fallback & DB Operation Retries**: Data mutations and reads wrap in `withDBRetry` and `ensureDB` with exponential backoff. Transient network disconnects (`MongoNetworkError`, socket closed) automatically reconnect and retry before failing, preventing false "MongoDB is disconnected" popups on mobile.
+- **Dynamic Headers & Mobile Fetch Resilience**: All API route handlers returning business records set `export const dynamic = "force-dynamic"` and include `Cache-Control: no-store, no-cache, must-revalidate` headers. Client-side mutation handlers employ `fetchWithMobileRetry` to absorb transient radio switch latency.
 
 ---
 

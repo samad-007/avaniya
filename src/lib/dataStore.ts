@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { connectDB, getSanitizedMongoUri } from "./db";
+import { connectDB, getSanitizedMongoUri, resetConnectionCache } from "./db";
 import { Property, IProperty } from "../models/Property";
 import { Transaction, ITransaction } from "../models/Transaction";
 import { Category, ICategory } from "../models/Category";
@@ -43,13 +43,79 @@ let memAccountBalances = [...INITIAL_ACCOUNT_BALANCES];
 
 /**
  * Ensure MongoDB connection is active when MONGODB_URI is present.
- * Throws if MongoDB is configured but fails to connect, preventing silent fallback to stale seed data.
+ * Auto-retries on transient connection delay or socket recovery with exponential backoff.
  */
-async function ensureDB(): Promise<boolean> {
+export async function ensureDB(retries = 2): Promise<boolean> {
   const uri = getSanitizedMongoUri();
   if (!uri) return false;
-  const conn = await connectDB();
-  return !!conn && conn.connection.readyState === 1;
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const conn = await connectDB();
+      if (conn && conn.connection.readyState === 1) {
+        return true;
+      }
+      if (conn && conn.connection.readyState === 2) {
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        if ((conn.connection.readyState as number) === 1) {
+          return true;
+        }
+      }
+    } catch (err) {
+      if (attempt === retries) {
+        console.error("ensureDB failed after retries:", err);
+        throw err;
+      }
+      await new Promise((resolve) =>
+        setTimeout(resolve, 300 * Math.pow(2, attempt))
+      );
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Executes a database operation with automatic retry on transient connection drops.
+ */
+async function withDBRetry<T>(
+  operation: () => Promise<T>,
+  maxRetries = 1
+): Promise<T> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const dbOk = await ensureDB();
+      if (!dbOk) {
+        throw new Error("MongoDB database is not connected.");
+      }
+      return await operation();
+    } catch (err: unknown) {
+      lastError = err;
+      const isNetworkErr =
+        err instanceof Error &&
+        (err.name === "MongoNetworkError" ||
+          err.name === "MongoServerSelectionError" ||
+          err.message.toLowerCase().includes("connection closed") ||
+          err.message.toLowerCase().includes("topology was destroyed") ||
+          err.message.toLowerCase().includes("econnreset") ||
+          err.message.toLowerCase().includes("not connected") ||
+          err.message.toLowerCase().includes("socket timeout") ||
+          err.message.toLowerCase().includes("timed out"));
+
+      if (attempt < maxRetries && isNetworkErr) {
+        console.warn(
+          `Transient DB operation failure (attempt ${attempt + 1}), resetting cache and retrying...`,
+          err
+        );
+        resetConnectionCache();
+        await new Promise((resolve) => setTimeout(resolve, 350));
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw lastError;
 }
 
 /**
@@ -139,9 +205,9 @@ export async function addProperty(
   datasetId: string = "ds_yousuf_portfolio",
   userId: string = "user_default"
 ): Promise<SeedProperty> {
-  const dbOk = await ensureDB();
-  if (dbOk) {
-    try {
+  const uri = getSanitizedMongoUri();
+  if (uri && datasetId !== "ds_demo_sandbox") {
+    return await withDBRetry(async () => {
       let propertyCode = data.propertyCode;
       if (!propertyCode) {
         const count = await Property.countDocuments({
@@ -170,17 +236,10 @@ export async function addProperty(
       };
       memProperties.push({ ...newProp, datasetId });
       return newProp;
-    } catch (e) {
-      console.error("MongoDB Property write failed:", e);
-      throw new Error(
-        `Failed to save property to MongoDB: ${
-          e instanceof Error ? e.message : "Database write failed"
-        }`
-      );
-    }
+    });
   }
 
-  if (datasetId === "ds_demo_sandbox" || !getSanitizedMongoUri()) {
+  if (datasetId === "ds_demo_sandbox" || !uri) {
     const newProp: SeedProperty & { datasetId: string } = {
       ...data,
       id: `prop-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
@@ -208,9 +267,9 @@ export async function updateProperty(
   updates: Partial<SeedProperty>,
   datasetId: string = "ds_yousuf_portfolio"
 ): Promise<SeedProperty | null> {
-  const dbOk = await ensureDB();
-  if (dbOk) {
-    try {
+  const uri = getSanitizedMongoUri();
+  if (uri && datasetId !== "ds_demo_sandbox") {
+    return await withDBRetry(async () => {
       const query: Record<string, unknown> = {
         $or: [
           { propertyCode: propertyCodeOrId },
@@ -267,17 +326,10 @@ export async function updateProperty(
         return mapped;
       }
       return null;
-    } catch (e) {
-      console.error("MongoDB Property update failed:", e);
-      throw new Error(
-        `Failed to update property in MongoDB: ${
-          e instanceof Error ? e.message : "Database update failed"
-        }`
-      );
-    }
+    });
   }
 
-  if (datasetId === "ds_demo_sandbox" || !getSanitizedMongoUri()) {
+  if (datasetId === "ds_demo_sandbox" || !uri) {
     const idx = memProperties.findIndex(
       (p) =>
         p.propertyCode.toLowerCase() === propertyCodeOrId.toLowerCase() ||
@@ -387,9 +439,9 @@ export async function addTransaction(
       ? "INF"
       : "TRF";
 
-  const dbOk = await ensureDB();
-  if (dbOk) {
-    try {
+  const uri = getSanitizedMongoUri();
+  if (uri && datasetId !== "ds_demo_sandbox") {
+    return await withDBRetry(async () => {
       let transCode = data.transCode;
       if (!transCode) {
         const count = await Transaction.countDocuments({
@@ -416,17 +468,10 @@ export async function addTransaction(
       };
       memTransactions.push({ ...newTx, datasetId });
       return newTx;
-    } catch (e) {
-      console.error("MongoDB Transaction write failed:", e);
-      throw new Error(
-        `Failed to save transaction to MongoDB: ${
-          e instanceof Error ? e.message : "Database write failed"
-        }`
-      );
-    }
+    });
   }
 
-  if (datasetId === "ds_demo_sandbox" || !getSanitizedMongoUri()) {
+  if (datasetId === "ds_demo_sandbox" || !uri) {
     const newTx: SeedTransaction & { datasetId: string } = {
       ...data,
       id: `tx-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
@@ -452,9 +497,9 @@ export async function updateTransaction(
   updates: Partial<SeedTransaction>,
   datasetId: string = "ds_yousuf_portfolio"
 ): Promise<SeedTransaction | null> {
-  const dbOk = await ensureDB();
-  if (dbOk) {
-    try {
+  const uri = getSanitizedMongoUri();
+  if (uri && datasetId !== "ds_demo_sandbox") {
+    return await withDBRetry(async () => {
       const query: Record<string, unknown> = {
         $or: [
           { transCode: transIdOrCode },
@@ -506,17 +551,10 @@ export async function updateTransaction(
         return mapped;
       }
       return null;
-    } catch (e) {
-      console.error("MongoDB Transaction update failed:", e);
-      throw new Error(
-        `Failed to update transaction in MongoDB: ${
-          e instanceof Error ? e.message : "Database update failed"
-        }`
-      );
-    }
+    });
   }
 
-  if (datasetId === "ds_demo_sandbox" || !getSanitizedMongoUri()) {
+  if (datasetId === "ds_demo_sandbox" || !uri) {
     const idx = memTransactions.findIndex(
       (t) =>
         (t.transCode && t.transCode.toLowerCase() === transIdOrCode.toLowerCase()) ||
@@ -541,9 +579,9 @@ export async function deleteTransaction(
   transIdOrCode: string,
   datasetId: string = "ds_yousuf_portfolio"
 ): Promise<boolean> {
-  const dbOk = await ensureDB();
-  if (dbOk) {
-    try {
+  const uri = getSanitizedMongoUri();
+  if (uri && datasetId !== "ds_demo_sandbox") {
+    return await withDBRetry(async () => {
       const query: Record<string, unknown> = {
         $or: [
           { transCode: transIdOrCode },
@@ -567,17 +605,10 @@ export async function deleteTransaction(
         return true;
       }
       return false;
-    } catch (e) {
-      console.error("MongoDB Transaction delete failed:", e);
-      throw new Error(
-        `Failed to delete transaction from MongoDB: ${
-          e instanceof Error ? e.message : "Database delete failed"
-        }`
-      );
-    }
+    });
   }
 
-  if (datasetId === "ds_demo_sandbox" || !getSanitizedMongoUri()) {
+  if (datasetId === "ds_demo_sandbox" || !uri) {
     const idx = memTransactions.findIndex(
       (t) =>
         (t.transCode && t.transCode.toLowerCase() === transIdOrCode.toLowerCase()) ||
@@ -633,10 +664,12 @@ export async function addCategory(
   datasetId: string = "ds_yousuf_portfolio",
   userId: string = "user_default"
 ): Promise<SeedCategory> {
-  const dbOk = await ensureDB();
-  if (dbOk) {
+  const uri = getSanitizedMongoUri();
+  if (uri && datasetId !== "ds_demo_sandbox") {
     try {
-      await Category.create({ ...category, userId, datasetId });
+      await withDBRetry(async () => {
+        await Category.create({ ...category, userId, datasetId });
+      });
     } catch (e) {
       console.warn("Category DB write failed, updating in-memory store", e);
     }
@@ -728,9 +761,9 @@ export async function addLoan(
   datasetId: string = "ds_yousuf_portfolio",
   userId: string = "user_default"
 ): Promise<SeedLoan> {
-  const dbOk = await ensureDB();
-  if (dbOk) {
-    try {
+  const uri = getSanitizedMongoUri();
+  if (uri && datasetId !== "ds_demo_sandbox") {
+    return await withDBRetry(async () => {
       let loanCode = data.loanCode;
       if (!loanCode) {
         const count = await Loan.countDocuments({
@@ -757,17 +790,10 @@ export async function addLoan(
       };
       memLoans.push({ ...newLoan, datasetId });
       return newLoan;
-    } catch (e) {
-      console.error("Loan DB write failed:", e);
-      throw new Error(
-        `Failed to save loan to MongoDB: ${
-          e instanceof Error ? e.message : "Database write failed"
-        }`
-      );
-    }
+    });
   }
 
-  if (datasetId === "ds_demo_sandbox" || !getSanitizedMongoUri()) {
+  if (datasetId === "ds_demo_sandbox" || !uri) {
     const newLoan: SeedLoan & { datasetId: string } = {
       ...data,
       id: `loan-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
@@ -791,9 +817,9 @@ export async function updateLoan(
   updates: Partial<SeedLoan>,
   datasetId: string = "ds_yousuf_portfolio"
 ): Promise<SeedLoan | null> {
-  const dbOk = await ensureDB();
-  if (dbOk) {
-    try {
+  const uri = getSanitizedMongoUri();
+  if (uri && datasetId !== "ds_demo_sandbox") {
+    return await withDBRetry(async () => {
       const query: Record<string, unknown> = {
         $or: [
           { loanCode: loanIdOrCode },
@@ -844,17 +870,10 @@ export async function updateLoan(
         return mapped;
       }
       return null;
-    } catch (e) {
-      console.error("MongoDB Loan update failed:", e);
-      throw new Error(
-        `Failed to update loan in MongoDB: ${
-          e instanceof Error ? e.message : "Database update failed"
-        }`
-      );
-    }
+    });
   }
 
-  if (datasetId === "ds_demo_sandbox" || !getSanitizedMongoUri()) {
+  if (datasetId === "ds_demo_sandbox" || !uri) {
     const idx = memLoans.findIndex(
       (l) =>
         l.loanCode.toLowerCase() === loanIdOrCode.toLowerCase() ||
@@ -877,9 +896,9 @@ export async function deleteLoan(
   loanIdOrCode: string,
   datasetId: string = "ds_yousuf_portfolio"
 ): Promise<boolean> {
-  const dbOk = await ensureDB();
-  if (dbOk) {
-    try {
+  const uri = getSanitizedMongoUri();
+  if (uri && datasetId !== "ds_demo_sandbox") {
+    return await withDBRetry(async () => {
       const query: Record<string, unknown> = {
         $or: [
           { loanCode: loanIdOrCode },
@@ -903,17 +922,10 @@ export async function deleteLoan(
         return true;
       }
       return false;
-    } catch (e) {
-      console.error("MongoDB Loan delete failed:", e);
-      throw new Error(
-        `Failed to delete loan from MongoDB: ${
-          e instanceof Error ? e.message : "Database delete failed"
-        }`
-      );
-    }
+    });
   }
 
-  if (datasetId === "ds_demo_sandbox" || !getSanitizedMongoUri()) {
+  if (datasetId === "ds_demo_sandbox" || !uri) {
     const idx = memLoans.findIndex(
       (l) =>
         l.loanCode.toLowerCase() === loanIdOrCode.toLowerCase() ||

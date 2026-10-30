@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 interface MongooseGlobalCache {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
+  listenersAttached?: boolean;
 }
 
 declare global {
@@ -16,7 +17,22 @@ declare global {
 let cached = global.mongooseCache;
 
 if (!cached) {
-  cached = global.mongooseCache = { conn: null, promise: null };
+  cached = global.mongooseCache = {
+    conn: null,
+    promise: null,
+    listenersAttached: false,
+  };
+}
+
+/**
+ * Resets the connection cache completely.
+ * Exported so dataStore and test runners can force a fresh reconnect when needed.
+ */
+export function resetConnectionCache(): void {
+  if (cached) {
+    cached.conn = null;
+    cached.promise = null;
+  }
 }
 
 /**
@@ -67,42 +83,72 @@ export async function connectDB(overrideDbName?: string): Promise<typeof mongoos
     throw new Error(errorMsg);
   }
 
-  // If already connected, reuse the active connection
-  if (cached!.conn && mongoose.connection.readyState === 1) {
+  const activeReadyState =
+    (cached!.conn as typeof mongoose | null)?.connection?.readyState ??
+    mongoose.connection.readyState;
+
+  // 1. If actively connected, reuse connection immediately
+  if (cached!.conn && activeReadyState === 1) {
     return cached!.conn;
   }
 
-  // Only reset cached promise if the connection is dead (disconnected) AND no connection is currently pending
-  if (mongoose.connection.readyState === 0 && !cached!.promise) {
-    cached!.conn = null;
+  // 2. If a connection is in-flight, await the shared promise
+  if (cached!.promise) {
+    return await cached!.promise;
   }
 
-  // Initiate connection if no promise is in flight
-  if (!cached!.promise) {
-    const opts = {
-      bufferCommands: true, // Allow Mongoose to buffer model operations while connecting
-      maxPoolSize: 10,
-      minPoolSize: 1,
-      serverSelectionTimeoutMS: 10000,
-      socketTimeoutMS: 45000,
-      connectTimeoutMS: 10000,
-      dbName: dbName, // Explicitly route to target database on Atlas
-    };
+  // 3. Stale or disconnected: clear connection handle before reconnecting
+  cached!.conn = null;
 
-    cached!.promise = mongoose.connect(MONGODB_URI, opts).then((m) => {
-      cached!.conn = m;
-      return m;
+  if (activeReadyState === 3) {
+    try {
+      await mongoose.connection.close();
+    } catch {
+      // Disconnecting transition; safe to proceed
+    }
+  }
+
+  // Attach lifecycle event listeners once to catch future drops and invalidate cache
+  if (!cached!.listenersAttached && mongoose.connection) {
+    mongoose.connection.on("disconnected", () => {
+      console.warn("MongoDB connection disconnected: cache reset for auto-reconnect");
+      if (cached) {
+        cached.conn = null;
+        cached.promise = null;
+      }
     });
+    mongoose.connection.on("close", () => {
+      if (cached) {
+        cached.conn = null;
+        cached.promise = null;
+      }
+    });
+    cached!.listenersAttached = true;
   }
 
-  try {
-    cached!.conn = await cached!.promise;
-  } catch (e) {
-    // Reset cache on failure so subsequent attempts can retry cleanly
-    cached!.conn = null;
-    cached!.promise = null;
-    throw e;
-  }
+  const opts = {
+    bufferCommands: true, // Allow Mongoose to buffer model operations while connecting
+    maxPoolSize: 10,
+    minPoolSize: 0, // Serverless best practice: prevents frozen socket timeouts on mobile sleep
+    maxIdleTimeMS: 30000, // Discard sockets idle >30s before container pause drops them
+    serverSelectionTimeoutMS: 10000,
+    socketTimeoutMS: 45000,
+    connectTimeoutMS: 10000,
+    dbName: dbName, // Explicitly route to target database on Atlas
+  };
 
-  return cached!.conn as typeof mongoose;
+  cached!.promise = mongoose
+    .connect(MONGODB_URI, opts)
+    .then((m) => {
+      cached!.conn = m;
+      cached!.promise = null; // Clear promise once resolved so future disconnects reconnect cleanly
+      return m;
+    })
+    .catch((e) => {
+      cached!.conn = null;
+      cached!.promise = null;
+      throw e;
+    });
+
+  return await cached!.promise;
 }

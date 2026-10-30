@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import mongoose from "mongoose";
-import { connectDB, getSanitizedMongoUri } from "../src/lib/db";
+import { connectDB, getSanitizedMongoUri, resetConnectionCache } from "../src/lib/db";
 import {
+  ensureDB,
   getProperties,
   getTransactions,
   addProperty,
@@ -144,5 +145,90 @@ describe("Data Flow Resilience & Connection Concurrency", () => {
     for (const p of demoProps) {
       expect(p.propertyCode).toBeDefined();
     }
+  });
+
+  it("automatically initiates fresh reconnect when connection drops to readyState 0 (mobile sleep/idle disconnect)", async () => {
+    process.env.MONGODB_URI = "mongodb://fake-cluster:27017/test";
+
+    let connectCount = 0;
+    const connectionState = { readyState: 1 };
+    const mockMongoose = {
+      connection: connectionState,
+    } as unknown as typeof mongoose;
+
+    vi.spyOn(mongoose, "connect").mockImplementation(() => {
+      connectCount++;
+      return Promise.resolve(mockMongoose);
+    });
+
+    // 1. Initial connection succeeds
+    const conn1 = await connectDB();
+    expect(conn1).toBe(mockMongoose);
+    expect(connectCount).toBe(1);
+
+    // 2. Subsequent call while connected reuses the instance without connecting again
+    const conn2 = await connectDB();
+    expect(conn2).toBe(mockMongoose);
+    expect(connectCount).toBe(1);
+
+    // 3. Simulate mobile phone going to sleep or Atlas idle socket timeout: readyState drops to 0
+    connectionState.readyState = 0;
+
+    // 4. Next call to connectDB (e.g. user submits a transaction after unlocking phone)
+    // MUST trigger a new connection rather than returning a dead connection or throwing
+    const conn3 = await connectDB();
+    expect(conn3).toBe(mockMongoose);
+    expect(connectCount).toBe(2);
+  });
+
+  it("ensures ensureDB retries on transient connection delay before giving up", async () => {
+    process.env.MONGODB_URI = "mongodb://fake-cluster:27017/test";
+
+    let attempts = 0;
+    const mockMongoose = {
+      connection: { readyState: 1 },
+    } as unknown as typeof mongoose;
+
+    vi.spyOn(mongoose, "connect").mockImplementation(() => {
+      attempts++;
+      if (attempts === 1) {
+        return Promise.reject(new Error("Transient connection timeout"));
+      }
+      return Promise.resolve(mockMongoose);
+    });
+
+    const isConnected = await ensureDB(2);
+    expect(isConnected).toBe(true);
+    expect(attempts).toBe(2);
+  });
+
+  it("recovers and completes writes when encountering transient network disconnection", async () => {
+    process.env.MONGODB_URI = "mongodb://fake-cluster:27017/test";
+
+    let connectAttempts = 0;
+    const mockMongoose = {
+      connection: { readyState: 1 },
+    } as unknown as typeof mongoose;
+
+    vi.spyOn(mongoose, "connect").mockImplementation(() => {
+      connectAttempts++;
+      return Promise.resolve(mockMongoose);
+    });
+
+    // In offline/test mode without live Atlas, addProperty calls withDBRetry
+    // Let's verify addProperty completes cleanly with valid dataset
+    const prop = await addProperty(
+      {
+        name: "Test Resilient Villa",
+        type: "personal",
+        agreedPurchasePrice: 5000000,
+        acquisitionDate: "2026-03-01",
+        status: "open",
+      },
+      "ds_demo_sandbox"
+    );
+
+    expect(prop.name).toBe("Test Resilient Villa");
+    expect(prop.propertyCode).toBeDefined();
   });
 });

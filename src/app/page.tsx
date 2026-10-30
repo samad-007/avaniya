@@ -154,6 +154,30 @@ export default function DashboardPage() {
     setPersonalMetrics(pers);
   }, [properties, transactions, categories, loans]);
 
+  // Resilient network fetch with automatic retry on transient mobile sleep-wake socket drops
+  const fetchWithMobileRetry = useCallback(
+    async (url: string, options: RequestInit, retries = 1): Promise<Response> => {
+      for (let attempt = 0; attempt <= retries; attempt++) {
+        try {
+          const res = await fetch(url, options);
+          if (res.status === 503 && attempt < retries) {
+            await new Promise((r) => setTimeout(r, 600));
+            continue;
+          }
+          return res;
+        } catch (err) {
+          if (attempt < retries) {
+            await new Promise((r) => setTimeout(r, 600));
+            continue;
+          }
+          throw err;
+        }
+      }
+      throw new Error("Network request failed");
+    },
+    []
+  );
+
   // Load dataset-specific data in a single consolidated HTTP call with retry resilience
   const loadDatasetData = useCallback(async (targetDataset: string, retries = 2): Promise<void> => {
     try {
@@ -361,7 +385,7 @@ export default function DashboardPage() {
     try {
       if (loanData.id || loanData.loanCode) {
         const idOrCode = loanData.loanCode || loanData.id || "";
-        const res = await fetch(
+        const res = await fetchWithMobileRetry(
           `/api/loans/${encodeURIComponent(idOrCode)}?datasetId=${encodeURIComponent(
             currentDatasetId
           )}`,
@@ -387,7 +411,7 @@ export default function DashboardPage() {
           throw new Error(errJson?.error || "Failed to update loan");
         }
       } else {
-        const res = await fetch("/api/loans", {
+        const res = await fetchWithMobileRetry("/api/loans", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ...loanData, datasetId: currentDatasetId }),
@@ -409,7 +433,7 @@ export default function DashboardPage() {
 
   const handleDeleteLoan = async (loanIdOrCode: string) => {
     try {
-      await fetch(
+      await fetchWithMobileRetry(
         `/api/loans/${encodeURIComponent(loanIdOrCode)}?datasetId=${encodeURIComponent(
           currentDatasetId
         )}`,
@@ -451,7 +475,7 @@ export default function DashboardPage() {
     updates: Partial<SeedProperty>
   ) => {
     try {
-      const res = await fetch(
+      const res = await fetchWithMobileRetry(
         `/api/properties/${encodeURIComponent(propertyCode)}?datasetId=${encodeURIComponent(
           currentDatasetId
         )}`,
@@ -486,7 +510,7 @@ export default function DashboardPage() {
     txData: Omit<SeedTransaction, "id">
   ) => {
     try {
-      const res = await fetch("/api/transactions", {
+      const res = await fetchWithMobileRetry("/api/transactions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...txData, datasetId: currentDatasetId }),
@@ -521,7 +545,7 @@ export default function DashboardPage() {
     updates: Partial<SeedTransaction>
   ) => {
     try {
-      const res = await fetch(
+      const res = await fetchWithMobileRetry(
         `/api/transactions/${encodeURIComponent(transIdOrCode)}?datasetId=${encodeURIComponent(
           currentDatasetId
         )}`,
@@ -555,7 +579,7 @@ export default function DashboardPage() {
 
   const handleDeleteTransaction = async (transIdOrCode: string) => {
     try {
-      const res = await fetch(
+      const res = await fetchWithMobileRetry(
         `/api/transactions/${encodeURIComponent(transIdOrCode)}?datasetId=${encodeURIComponent(
           currentDatasetId
         )}`,
@@ -589,7 +613,7 @@ export default function DashboardPage() {
     }
   ) => {
     try {
-      const res = await fetch("/api/properties", {
+      const res = await fetchWithMobileRetry("/api/properties", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...propData, datasetId: currentDatasetId }),
@@ -616,7 +640,7 @@ export default function DashboardPage() {
 
   const handleAddCategory = async (catData: SeedCategory) => {
     try {
-      const res = await fetch("/api/categories", {
+      const res = await fetchWithMobileRetry("/api/categories", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...catData, datasetId: currentDatasetId }),
