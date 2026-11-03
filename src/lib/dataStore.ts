@@ -818,21 +818,35 @@ export async function updateLoan(
   datasetId: string = "ds_yousuf_portfolio"
 ): Promise<SeedLoan | null> {
   const uri = getSanitizedMongoUri();
+  const trimmedKey = (loanIdOrCode || "").trim();
   if (uri && datasetId !== "ds_demo_sandbox") {
     return await withDBRetry(async () => {
+      const orConditions: Record<string, unknown>[] = [
+        {
+          loanCode: {
+            $regex: `^${trimmedKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`,
+            $options: "i",
+          },
+        },
+      ];
+      if (mongoose.isValidObjectId(trimmedKey)) {
+        orConditions.push({ _id: trimmedKey });
+      }
+
       const query: Record<string, unknown> = {
-        $or: [
-          { loanCode: loanIdOrCode },
-          { _id: mongoose.isValidObjectId(loanIdOrCode) ? loanIdOrCode : null },
-        ],
+        $or: orConditions,
       };
       if (datasetId && datasetId !== "all") {
         query.$and = [{ $or: [{ datasetId }, { userId: datasetId }] }];
       }
 
+      // Strip id / _id to avoid attempting to modify immutable / non-schema primary keys
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { id: _ignoredId, _id: _ignoredMongoId, ...cleanUpdates } = updates as any;
+
       const updated = await Loan.findOneAndUpdate(
         query,
-        { $set: updates },
+        { $set: cleanUpdates },
         { new: true }
       ).lean<ILoan & { _id: unknown }>();
 
@@ -861,11 +875,12 @@ export async function updateLoan(
 
         const idx = memLoans.findIndex(
           (l) =>
-            l.loanCode.toLowerCase() === loanIdOrCode.toLowerCase() ||
-            l.id === loanIdOrCode
+            l.loanCode.toLowerCase() === trimmedKey.toLowerCase() ||
+            l.id === trimmedKey ||
+            l.id === mapped.id
         );
         if (idx !== -1) {
-          memLoans[idx] = { ...memLoans[idx], ...updates, id: mapped.id };
+          memLoans[idx] = { ...memLoans[idx], ...cleanUpdates, id: mapped.id };
         }
         return mapped;
       }
@@ -876,11 +891,13 @@ export async function updateLoan(
   if (datasetId === "ds_demo_sandbox" || !uri) {
     const idx = memLoans.findIndex(
       (l) =>
-        l.loanCode.toLowerCase() === loanIdOrCode.toLowerCase() ||
-        l.id === loanIdOrCode
+        l.loanCode.toLowerCase() === trimmedKey.toLowerCase() ||
+        l.id === trimmedKey
     );
     if (idx !== -1) {
-      memLoans[idx] = { ...memLoans[idx], ...updates };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { id: _ignoredId, ...cleanUpdates } = updates as any;
+      memLoans[idx] = { ...memLoans[idx], ...cleanUpdates };
       return memLoans[idx];
     }
     return null;
@@ -897,13 +914,23 @@ export async function deleteLoan(
   datasetId: string = "ds_yousuf_portfolio"
 ): Promise<boolean> {
   const uri = getSanitizedMongoUri();
+  const trimmedKey = (loanIdOrCode || "").trim();
   if (uri && datasetId !== "ds_demo_sandbox") {
     return await withDBRetry(async () => {
+      const orConditions: Record<string, unknown>[] = [
+        {
+          loanCode: {
+            $regex: `^${trimmedKey.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`,
+            $options: "i",
+          },
+        },
+      ];
+      if (mongoose.isValidObjectId(trimmedKey)) {
+        orConditions.push({ _id: trimmedKey });
+      }
+
       const query: Record<string, unknown> = {
-        $or: [
-          { loanCode: loanIdOrCode },
-          { _id: mongoose.isValidObjectId(loanIdOrCode) ? loanIdOrCode : null },
-        ],
+        $or: orConditions,
       };
       if (datasetId && datasetId !== "all") {
         query.$and = [{ $or: [{ datasetId }, { userId: datasetId }] }];
@@ -911,10 +938,12 @@ export async function deleteLoan(
 
       const res = await Loan.findOneAndDelete(query);
       if (res) {
+        const resId = res._id ? (res._id as { toString(): string }).toString() : "";
         const idx = memLoans.findIndex(
           (l) =>
-            l.loanCode.toLowerCase() === loanIdOrCode.toLowerCase() ||
-            l.id === loanIdOrCode
+            l.loanCode.toLowerCase() === trimmedKey.toLowerCase() ||
+            l.id === trimmedKey ||
+            (resId && l.id === resId)
         );
         if (idx !== -1) {
           memLoans.splice(idx, 1);
@@ -928,8 +957,8 @@ export async function deleteLoan(
   if (datasetId === "ds_demo_sandbox" || !uri) {
     const idx = memLoans.findIndex(
       (l) =>
-        l.loanCode.toLowerCase() === loanIdOrCode.toLowerCase() ||
-        l.id === loanIdOrCode
+        l.loanCode.toLowerCase() === trimmedKey.toLowerCase() ||
+        l.id === trimmedKey
     );
     if (idx !== -1) {
       memLoans.splice(idx, 1);

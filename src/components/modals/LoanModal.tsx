@@ -143,7 +143,7 @@ export const LoanModal: React.FC<LoanModalProps> = ({
     if (!loan || !onDelete) return;
     setIsDeleting(true);
     try {
-      await onDelete(loan.loanCode || loan.id);
+      await onDelete(loan.id || loan.loanCode);
       onClose();
     } catch (err) {
       console.error("Failed to delete loan", err);

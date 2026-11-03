@@ -383,10 +383,18 @@ export default function DashboardPage() {
     }
   ) => {
     try {
-      if (loanData.id || loanData.loanCode) {
-        const idOrCode = loanData.loanCode || loanData.id || "";
+      // Discriminate between create and update based on editing loan state or existing loan ID
+      const isUpdate = Boolean(editingLoan || loanData.id);
+
+      if (isUpdate) {
+        const targetIdOrCode =
+          editingLoan?.id ||
+          editingLoan?.loanCode ||
+          loanData.id ||
+          loanData.loanCode ||
+          "";
         const res = await fetchWithMobileRetry(
-          `/api/loans/${encodeURIComponent(idOrCode)}?datasetId=${encodeURIComponent(
+          `/api/loans/${encodeURIComponent(targetIdOrCode)}?datasetId=${encodeURIComponent(
             currentDatasetId
           )}`,
           {
@@ -399,8 +407,10 @@ export default function DashboardPage() {
           const json = await res.json();
           setLoans((prev) =>
             prev.map((l) =>
-              (l.loanCode && l.loanCode.toLowerCase() === idOrCode.toLowerCase()) ||
-              l.id === idOrCode
+              (targetIdOrCode && l.id === targetIdOrCode) ||
+              (l.loanCode &&
+                targetIdOrCode &&
+                l.loanCode.toLowerCase() === targetIdOrCode.toLowerCase())
                 ? { ...l, ...json.data }
                 : l
             )
