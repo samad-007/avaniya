@@ -47,9 +47,9 @@ const config: Config = {
         },
       },
       fontFamily: {
-        display: ["var(--font-display)", "var(--font-sans)", "sans-serif"],
-        sans: ["var(--font-sans)", "sans-serif"],
-        mono: ["var(--font-jetbrains-mono)", "monospace"],
+        display: ["var(--font-display)", '"Google Sans Flex"', "sans-serif"],
+        sans: ["var(--font-sans)", '"Google Sans Flex"', "sans-serif"],
+        mono: ["var(--font-jetbrains-mono)", '"Google Sans Flex"', "sans-serif"],
       },
       borderRadius: {
         "m3-sm": "12px",
