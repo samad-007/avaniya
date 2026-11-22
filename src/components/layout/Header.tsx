@@ -18,6 +18,7 @@ import {
   FolderLock,
   HandCoins,
   Wallet,
+  ArrowRightLeft,
 } from "lucide-react";
 import { useTheme } from "@/components/theme/ThemeProvider";
 
@@ -25,7 +26,7 @@ interface HeaderProps {
   currentMode: "commercial" | "personal";
   onModeChange: (mode: "commercial" | "personal") => void;
   onOpenEntryModal: (
-    type: "outflow" | "inflow" | "transfer" | "withdrawal" | "loan"
+    type: "outflow" | "inflow" | "transfer" | "withdrawal" | "loan" | "shift_profit"
   ) => void;
   onOpenNewPropertyModal: () => void;
   onOpenNewLoanModal?: () => void;
@@ -59,13 +60,13 @@ export const Header: React.FC<HeaderProps> = ({
   const { mode, toggleMode, palette } = useTheme();
 
   return (
-    <header className="sticky top-0 z-40 bg-md-surface-lowest/90 dark:bg-md-surface-low/90 backdrop-blur-xl px-3 sm:px-5 py-3 w-full max-w-[100vw] overflow-x-hidden shadow-m3-1 transition-standard">
-      <div className="max-w-[1440px] mx-auto flex flex-col gap-3">
+    <header className="sticky top-0 z-40 bg-md-surface-lowest/90 dark:bg-md-surface-low/90 backdrop-blur-xl px-3 sm:px-5 py-2.5 sm:py-3 w-full max-w-[100vw] overflow-x-clip shadow-m3-1 transition-standard">
+      <div className="max-w-[1440px] mx-auto flex flex-col gap-2.5 sm:gap-3 min-w-0">
         {/* Row 1: Brand, M3 Connected Mode Switcher, Theme & User Controls */}
-        <div className="flex items-center justify-between gap-3 w-full">
+        <div className="flex items-center justify-between gap-2 sm:gap-3 w-full min-w-0">
           {/* Brand & Logo */}
-          <div className="flex items-center gap-2.5 sm:gap-3 flex-shrink-0 min-w-0">
-            <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-[14px] overflow-hidden bg-md-primary-container flex items-center justify-center flex-shrink-0 shadow-sm">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 md:flex-initial">
+            <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-[12px] sm:rounded-[14px] overflow-hidden bg-md-primary-container flex items-center justify-center flex-shrink-0 shadow-sm">
               <Image
                 src="/logo.jpg"
                 alt="Avaniya"
@@ -76,14 +77,14 @@ export const Header: React.FC<HeaderProps> = ({
               />
             </div>
             <div className="min-w-0">
-              <div className="font-display text-base sm:text-lg font-extrabold text-md-on-surface tracking-tight flex items-center gap-2">
+              <div className="font-display text-sm sm:text-lg font-extrabold text-md-on-surface tracking-tight flex items-center gap-1.5 sm:gap-2 min-w-0">
                 <span className="truncate">Avaniya</span>
                 {currentDatasetId === "ds_demo_sandbox" ? (
-                  <span className="text-[10px] sm:text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-md-warning-container text-md-on-warning-container whitespace-nowrap flex-shrink-0">
-                    Demo Mode
+                  <span className="hidden sm:inline-flex text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-full bg-md-warning-container text-md-on-warning-container whitespace-nowrap flex-shrink-0">
+                    Demo
                   </span>
                 ) : (
-                  <span className="text-[10px] sm:text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-md-primary-container text-md-on-primary-container whitespace-nowrap flex-shrink-0">
+                  <span className="hidden sm:inline-flex text-[10px] sm:text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-md-primary-container text-md-on-primary-container whitespace-nowrap flex-shrink-0">
                     Portfolio
                   </span>
                 )}
@@ -113,7 +114,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Top Right: Quick Light/Dark Toggle, Settings/Themes & User Profile */}
-          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 ml-auto">
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
             {/* Quick Light/Dark Mode Toggle */}
             <button
               type="button"
@@ -138,28 +139,29 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 type="button"
                 onClick={onOpenThemeSettingsModal}
-                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-md-secondary-container text-md-on-secondary-container hover:brightness-95 dark:hover:brightness-110 transition-all text-xs font-semibold flex-shrink-0"
+                className="flex items-center gap-1.5 p-2 sm:px-3 sm:py-1.5 rounded-full bg-md-secondary-container text-md-on-secondary-container hover:brightness-95 dark:hover:brightness-110 transition-all text-xs font-semibold flex-shrink-0"
                 title={`Theme & Settings (${palette.name})`}
+                aria-label="Appearance and theme settings"
               >
-                <Palette className="w-3.5 h-3.5" />
+                <Palette className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
                 <span className="hidden lg:inline">Themes</span>
               </button>
             )}
 
             {user ? (
-              <div className="flex items-center gap-1.5 flex-shrink-0">
+              <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
                 <div
-                  className="flex items-center gap-2 bg-md-surface-container px-3 py-1.5 rounded-full text-xs text-md-on-surface flex-shrink-0"
-                  title={`Signed in as ${user.email}`}
+                  className="flex items-center gap-1.5 bg-md-surface-container px-2.5 sm:px-3 py-1.5 rounded-full text-xs text-md-on-surface max-w-[92px] sm:max-w-[200px] min-w-0"
+                  title={`Signed in as ${user.name} (${user.email})`}
                 >
                   <div
                     className={`w-2 h-2 rounded-full flex-shrink-0 ${ isSuperAdmin ? "bg-md-warning" : "bg-md-primary" }`}
                   />
-                  <span className="font-semibold text-xs whitespace-nowrap">
+                  <span className="font-semibold text-xs truncate">
                     {user.name}
                   </span>
                   {isSuperAdmin && (
-                    <span className="text-[10px] font-bold bg-md-tertiary-container text-md-on-tertiary-container px-1.5 py-0.5 rounded-full flex-shrink-0">
+                    <span className="hidden sm:inline-flex text-[10px] font-bold bg-md-tertiary-container text-md-on-tertiary-container px-1.5 py-0.5 rounded-full flex-shrink-0">
                       ADMIN
                     </span>
                   )}
@@ -176,7 +178,7 @@ export const Header: React.FC<HeaderProps> = ({
             ) : (
               <button
                 onClick={onOpenAuthModal}
-                className="m3-btn-filled flex items-center gap-1.5 px-4 py-2 text-xs flex-shrink-0"
+                className="m3-btn-filled flex items-center gap-1.5 px-3.5 sm:px-4 py-2 text-xs flex-shrink-0"
               >
                 <UserIcon className="w-3.5 h-3.5" />
                 <span>Sign In</span>
@@ -214,6 +216,17 @@ export const Header: React.FC<HeaderProps> = ({
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Add Property</span>
             </button>
+
+            {currentMode === "commercial" && (
+              <button
+                onClick={() => onOpenEntryModal("shift_profit")}
+                className="m3-btn-tonal flex items-center gap-1.5 px-3.5 py-2 text-xs"
+                title="Shift profits from Business (Bank/Cash) to Personal (Bank/Cash)"
+              >
+                <ArrowRightLeft className="w-3.5 h-3.5" />
+                <span>Shift Profit</span>
+              </button>
+            )}
 
             <button
               onClick={() => onOpenEntryModal("withdrawal")}
@@ -390,6 +403,16 @@ export const Header: React.FC<HeaderProps> = ({
             <Plus className="w-3.5 h-3.5" />
             <span>Property</span>
           </button>
+
+          {currentMode === "commercial" && (
+            <button
+              onClick={() => onOpenEntryModal("shift_profit")}
+              className="m3-btn-tonal flex items-center justify-center gap-1 py-2 px-3 text-xs whitespace-nowrap flex-shrink-0"
+            >
+              <ArrowRightLeft className="w-3.5 h-3.5" />
+              <span>Shift Profit</span>
+            </button>
+          )}
 
           <button
             onClick={() => onOpenEntryModal("withdrawal")}

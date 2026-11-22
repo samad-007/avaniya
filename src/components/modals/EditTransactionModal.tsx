@@ -9,6 +9,7 @@ import {
   AlertTriangle,
   Link2,
   ExternalLink,
+  Percent,
 } from "lucide-react";
 import {
   SeedTransaction,
@@ -16,6 +17,7 @@ import {
   SeedCategory,
   SeedLoan,
 } from "@/lib/seedData";
+import { PropertyFinancialMetrics } from "@/lib/formulaEngine";
 import { formatINRCompact } from "@/lib/formatters";
 
 interface EditTransactionModalProps {
@@ -25,6 +27,7 @@ interface EditTransactionModalProps {
   properties: SeedProperty[];
   loans?: SeedLoan[];
   categories: SeedCategory[];
+  propertyMetrics?: PropertyFinancialMetrics[];
   onSave: (
     transIdOrCode: string,
     updates: Partial<SeedTransaction>
@@ -39,10 +42,12 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
   properties,
   loans = [],
   categories,
+  propertyMetrics,
   onSave,
   onDelete,
 }) => {
   const [formData, setFormData] = useState<Partial<SeedTransaction>>({});
+  const [pctBasis, setPctBasis] = useState<"base" | "total">("base");
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -100,6 +105,46 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
       ) || null
     );
   }, [properties, formData.propertyCode]);
+
+  const editPropBases = useMemo(() => {
+    if (!selectedProp) return null;
+    const metric = propertyMetrics?.find(
+      (m) =>
+        m.property.propertyCode.toLowerCase() ===
+        selectedProp.propertyCode.toLowerCase()
+    );
+    const isSale = formData.transactionType === "deal_inflow";
+    const buyBase = selectedProp.agreedPurchasePrice || 0;
+    const saleBase =
+      selectedProp.agreedSellingPrice || selectedProp.targetSalePrice || buyBase;
+    const baseAmount = isSale ? saleBase : buyBase;
+    const baseLabel = isSale
+      ? selectedProp.agreedSellingPrice
+        ? "Agreed Sale"
+        : selectedProp.targetSalePrice
+        ? "Target Sale"
+        : "Base Price"
+      : "Base Price";
+    const totalAmount = metric?.totalProjectOutlay || buyBase;
+    if (baseAmount <= 0 && totalAmount <= 0) return null;
+    return {
+      baseAmount: baseAmount > 0 ? baseAmount : totalAmount,
+      baseLabel,
+      totalAmount: totalAmount > 0 ? totalAmount : baseAmount,
+      hasDistinctTotal: totalAmount > 0 && totalAmount !== baseAmount,
+    };
+  }, [selectedProp, propertyMetrics, formData.transactionType]);
+
+  const activeEditRefAmount = editPropBases
+    ? pctBasis === "total"
+      ? editPropBases.totalAmount
+      : editPropBases.baseAmount
+    : 0;
+
+  const currentEditPct =
+    activeEditRefAmount > 0 && (formData.amount || 0) > 0
+      ? parseFloat((((formData.amount || 0) / activeEditRefAmount) * 100).toFixed(2)).toString()
+      : "";
 
   const filteredCategories = useMemo(() => {
     if (!categories) return [];
@@ -376,6 +421,92 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
               </span>
             </div>
           </div>
+
+          {/* Two-Way Property Percentage <-> Amount Calculator */}
+          {editPropBases && (
+            <div className="flex flex-col gap-2 bg-md-secondary-container/45 p-3 rounded-[18px]">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-md-on-surface">
+                  <Percent className="w-3.5 h-3.5 text-md-primary" />
+                  <span>% of {selectedProp?.propertyCode}</span>
+                </div>
+                <div className="flex items-center gap-1 bg-md-surface-container p-0.5 rounded-full">
+                  <button
+                    type="button"
+                    onClick={() => setPctBasis("base")}
+                    className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold transition-all ${
+                      pctBasis === "base"
+                        ? "bg-md-primary text-md-on-primary shadow-sm"
+                        : "text-md-on-surface-variant hover:text-md-on-surface"
+                    }`}
+                  >
+                    {editPropBases.baseLabel}:{" "}
+                    {formatINRCompact(editPropBases.baseAmount)}
+                  </button>
+                  {editPropBases.hasDistinctTotal && (
+                    <button
+                      type="button"
+                      onClick={() => setPctBasis("total")}
+                      className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold transition-all ${
+                        pctBasis === "total"
+                          ? "bg-md-primary text-md-on-primary shadow-sm"
+                          : "text-md-on-surface-variant hover:text-md-on-surface"
+                      }`}
+                    >
+                      Total Cost: {formatINRCompact(editPropBases.totalAmount)}
+                    </button>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="relative w-28 flex-shrink-0">
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={currentEditPct}
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value);
+                      if (!isNaN(val) && val >= 0 && activeEditRefAmount > 0) {
+                        setFormData({
+                          ...formData,
+                          amount: Math.round((val / 100) * activeEditRefAmount),
+                        });
+                      } else if (e.target.value === "") {
+                        setFormData({ ...formData, amount: 0 });
+                      }
+                    }}
+                    placeholder="0"
+                    className="w-full bg-md-surface-lowest dark:bg-md-surface-high rounded-full pl-3 pr-7 py-1.5 text-sm font-mono font-bold text-md-on-surface outline-none focus:ring-2 focus:ring-md-primary"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-md-on-surface-variant">
+                    %
+                  </span>
+                </div>
+                <div className="flex items-center gap-1 overflow-x-auto scrollbar-none">
+                  {[5, 10, 20, 25, 50, 100].map((pct) => (
+                    <button
+                      key={pct}
+                      type="button"
+                      onClick={() =>
+                        setFormData({
+                          ...formData,
+                          amount: Math.round((pct / 100) * activeEditRefAmount),
+                        })
+                      }
+                      className={`px-2.5 py-1 rounded-full text-[11px] font-mono font-semibold transition-all flex-shrink-0 ${
+                        currentEditPct === String(pct)
+                          ? "bg-md-primary text-md-on-primary shadow-sm"
+                          : "bg-md-surface-lowest dark:bg-md-surface-high text-md-on-surface"
+                      }`}
+                    >
+                      {pct}%
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Row 3: Property / Loan & Category */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

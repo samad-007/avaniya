@@ -69,7 +69,7 @@ export default function DashboardPage() {
   // Modals state
   const [isEntryModalOpen, setIsEntryModalOpen] = useState(false);
   const [entryModalType, setEntryModalType] = useState<
-    "outflow" | "inflow" | "transfer" | "withdrawal" | "loan"
+    "outflow" | "inflow" | "transfer" | "withdrawal" | "loan" | "shift_profit"
   >("outflow");
   const [entryDefaultPropertyCode, setEntryDefaultPropertyCode] =
     useState<string>("");
@@ -362,7 +362,7 @@ export default function DashboardPage() {
   };
 
   const handleOpenEntryModal = (
-    type: "outflow" | "inflow" | "transfer" | "withdrawal" | "loan",
+    type: "outflow" | "inflow" | "transfer" | "withdrawal" | "loan" | "shift_profit",
     propertyCode?: string,
     loanCode?: string
   ) => {
@@ -865,6 +865,7 @@ export default function DashboardPage() {
         categories={categories}
         propertyMetrics={commercialMetrics?.propertyMetrics}
         loanMetrics={commercialMetrics?.loanMetrics}
+        commercialMetrics={commercialMetrics}
         onSave={handleSaveTransaction}
         onOpenCategoryModal={() => {
           setIsEntryModalOpen(false);
@@ -916,6 +917,7 @@ export default function DashboardPage() {
         properties={properties}
         loans={loans}
         categories={categories}
+        propertyMetrics={commercialMetrics?.propertyMetrics}
         onSave={handleUpdateTransaction}
         onDelete={handleDeleteTransaction}
       />

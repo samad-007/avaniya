@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { amountToVerbalSummary } from "@/lib/formatters";
+import { amountToVerbalSummary, formatINRCompact } from "@/lib/formatters";
 import {
   SeedProperty,
   SeedCategory,
@@ -11,13 +11,33 @@ import {
 import {
   PropertyFinancialMetrics,
   LoanFinancialMetrics,
+  CommercialDashboardMetrics,
 } from "@/lib/formulaEngine";
-import { X, Banknote, Landmark, Plus, Edit3, Zap, Link2 } from "lucide-react";
+import {
+  X,
+  Banknote,
+  Landmark,
+  Plus,
+  Edit3,
+  Zap,
+  Link2,
+  ArrowRight,
+  Percent,
+  Building2,
+  Home,
+} from "lucide-react";
+import { M3LoadingIndicator } from "@/components/ui/M3ExpressivePrimitives";
 
 interface QuickEntryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  entryType: "outflow" | "inflow" | "transfer" | "withdrawal" | "loan";
+  entryType:
+    | "outflow"
+    | "inflow"
+    | "transfer"
+    | "withdrawal"
+    | "loan"
+    | "shift_profit";
   currentScope: "commercial" | "personal";
   defaultPropertyCode?: string;
   defaultLoanCode?: string;
@@ -26,6 +46,7 @@ interface QuickEntryModalProps {
   categories: SeedCategory[];
   propertyMetrics?: PropertyFinancialMetrics[];
   loanMetrics?: LoanFinancialMetrics[];
+  commercialMetrics?: CommercialDashboardMetrics | null;
   onSave: (transactionData: Omit<SeedTransaction, "id">) => Promise<void>;
   onOpenCategoryModal: () => void;
 }
@@ -42,12 +63,16 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
   categories,
   propertyMetrics,
   loanMetrics,
+  commercialMetrics,
   onSave,
   onOpenCategoryModal,
 }) => {
   const [activeType, setActiveType] = useState<
-    "outflow" | "inflow" | "transfer" | "withdrawal" | "loan"
+    "outflow" | "inflow" | "transfer" | "withdrawal" | "loan" | "shift_profit"
   >(initialEntryType);
+  const [shiftDestMode, setShiftDestMode] = useState<"Bank" | "Cash">("Bank");
+  const [pctBasis, setPctBasis] = useState<"base" | "total">("base");
+  const [pctInput, setPctInput] = useState<string>("");
   const [withdrawalSubtype, setWithdrawalSubtype] = useState<
     "profit_withdrawal" | "capital_withdrawal"
   >("profit_withdrawal");
@@ -119,6 +144,64 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
       (lm) => lm.loan.loanCode.toLowerCase() === loanCode.toLowerCase()
     );
   }, [loanMetrics, loanCode]);
+
+  // Property Base / Total Reference Amounts for Two-Way % <-> ₹ Calculator
+  const propertyReferenceBases = useMemo(() => {
+    if (!selectedProperty) return null;
+    const isCommercialInflow =
+      activeType === "inflow" && selectedProperty.type === "commercial";
+    const buyBase = selectedProperty.agreedPurchasePrice || 0;
+    const saleBase =
+      selectedProperty.agreedSellingPrice ||
+      selectedProperty.targetSalePrice ||
+      buyBase;
+    const baseAmount = isCommercialInflow ? saleBase : buyBase;
+    const baseLabel = isCommercialInflow
+      ? selectedProperty.agreedSellingPrice
+        ? "Agreed Sale"
+        : selectedProperty.targetSalePrice
+        ? "Target Sale"
+        : "Base Price"
+      : "Base Price";
+    const totalAmount = activePropMetric?.totalProjectOutlay || buyBase;
+    if (baseAmount <= 0 && totalAmount <= 0) return null;
+    return {
+      baseAmount: baseAmount > 0 ? baseAmount : totalAmount,
+      baseLabel,
+      totalAmount: totalAmount > 0 ? totalAmount : baseAmount,
+      hasDistinctTotal: totalAmount > 0 && totalAmount !== baseAmount,
+    };
+  }, [selectedProperty, activePropMetric, activeType]);
+
+  const activeReferenceAmount = useMemo(() => {
+    if (!propertyReferenceBases) return 0;
+    return pctBasis === "total"
+      ? propertyReferenceBases.totalAmount
+      : propertyReferenceBases.baseAmount;
+  }, [propertyReferenceBases, pctBasis]);
+
+  // Sync % display when amount or reference base changes
+  useEffect(() => {
+    if (activeReferenceAmount > 0 && amount > 0) {
+      const computed = (amount / activeReferenceAmount) * 100;
+      const formatted = Number.isInteger(computed)
+        ? String(computed)
+        : parseFloat(computed.toFixed(2)).toString();
+      setPctInput(formatted);
+    } else if (!amount) {
+      setPctInput("");
+    }
+  }, [amount, activeReferenceAmount]);
+
+  const handlePctChange = (raw: string) => {
+    setPctInput(raw);
+    const parsed = parseFloat(raw);
+    if (!isNaN(parsed) && parsed >= 0 && activeReferenceAmount > 0) {
+      setAmount(Math.round((parsed / 100) * activeReferenceAmount));
+    } else if (raw === "") {
+      setAmount(0);
+    }
+  };
 
   const suggestedFill = useMemo(() => {
     if (activeType === "outflow") {
@@ -535,6 +618,46 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
 
     setIsSubmitting(true);
     try {
+      if (activeType === "shift_profit") {
+        const shiftNote =
+          remarks.trim() ||
+          `Profit shifted from Business (${mode}) to Personal (${shiftDestMode})`;
+        await onSave({
+          scope: "commercial",
+          transactionType: "profit_withdrawal",
+          category: "Business Profit Shift to Personal",
+          mode,
+          amount,
+          borneBy: "self",
+          amountSelf: 0,
+          amountSeller: 0,
+          amountBuyer: 0,
+          attachmentUrl: attachmentUrl.trim() || undefined,
+          recipientOrSource:
+            recipient.trim() || `Personal Portfolio (${shiftDestMode})`,
+          remarks: shiftNote,
+          date,
+        });
+        await onSave({
+          scope: "personal",
+          transactionType: "capital_inflow",
+          category: "Profit Shifted from Business",
+          mode: shiftDestMode,
+          amount,
+          borneBy: "self",
+          amountSelf: 0,
+          amountSeller: 0,
+          amountBuyer: 0,
+          attachmentUrl: attachmentUrl.trim() || undefined,
+          recipientOrSource:
+            recipient.trim() || `Business Portfolio (${mode})`,
+          remarks: shiftNote,
+          date,
+        });
+        onClose();
+        return;
+      }
+
       await onSave({
         scope: currentScope,
         transactionType: finalTxType,
@@ -608,22 +731,28 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
         className="bg-md-surface-lowest dark:bg-md-surface-container rounded-[24px] max-w-lg w-full min-w-0 max-h-[92vh] overflow-y-auto overflow-x-hidden p-5 sm:p-6 shadow-m3-3 my-auto flex flex-col gap-4 sm:gap-5 animate-modal"
       >
         {/* Header */}
-        <div className="flex items-start justify-between pb-3.5 gap-2">
+        <div className="flex items-start justify-between pb-2 gap-2">
           <div className="min-w-0 flex-1">
-            <div className="text-base sm:text-lg font-bold text-md-on-surface tracking-tight flex items-center gap-2 flex-wrap">
+            <div className="font-display text-base sm:text-lg font-bold text-md-on-surface tracking-tight flex items-center gap-2 flex-wrap">
               <span>
                 {activeType === "outflow"
                   ? "Record a Payment"
                   : activeType === "inflow"
                   ? "Record Money Received"
+                  : activeType === "shift_profit"
+                  ? "Shift Profit to Personal"
                   : activeType === "withdrawal"
                   ? "Record a Withdrawal"
                   : activeType === "loan"
                   ? "Record Loan Activity"
                   : "Move Money (Bank ↔ Cash)"}
               </span>
-              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-md-surface-container text-md-on-surface-variant">
-                {currentScope === "commercial" ? "Business" : "Personal"}
+              <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-md-secondary-container text-md-on-secondary-container">
+                {activeType === "shift_profit"
+                  ? "Business → Personal"
+                  : currentScope === "commercial"
+                  ? "Business"
+                  : "Personal"}
               </span>
             </div>
             <p className="text-xs text-md-on-surface-variant mt-0.5">
@@ -631,6 +760,8 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                 ? "Money you paid for a property, registration, or expense."
                 : activeType === "inflow"
                 ? "Money received from a buyer, partner, or personal savings."
+                : activeType === "shift_profit"
+                ? "Move profits from Business (Bank or Cash) directly into Personal (Bank or Cash)."
                 : activeType === "withdrawal"
                 ? "Profit taken out or capital returned to a partner."
                 : activeType === "loan"
@@ -640,38 +771,135 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container transition-colors flex-shrink-0"
+            className="p-2 rounded-full text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high transition-colors flex-shrink-0"
             aria-label="Close"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Entry Type Selector Tabs */}
-        <div className="grid grid-cols-5 gap-1 bg-md-surface-container p-1 rounded-[18px] min-w-0">
+        {/* Entry Type Selector Tabs (Mobile-Friendly Scrollable M3 Pills) */}
+        <div className="flex items-center gap-1 bg-md-surface-container p-1.5 rounded-full overflow-x-auto scrollbar-none min-w-0">
           {(
             [
-              { id: "outflow", label: "Payment", activeClass: "text-md-error" },
-              { id: "inflow", label: "Receipt", activeClass: "text-md-positive" },
-              { id: "withdrawal", label: "Withdraw", activeClass: "text-md-warning" },
-              { id: "loan", label: "Loan", activeClass: "text-teal-700" },
-              { id: "transfer", label: "Transfer", activeClass: "text-md-tertiary" },
+              { id: "outflow", label: "Payment" },
+              { id: "inflow", label: "Receipt" },
+              { id: "shift_profit", label: "Shift Profit" },
+              { id: "withdrawal", label: "Withdraw" },
+              { id: "loan", label: "Loan" },
+              { id: "transfer", label: "Transfer" },
             ] as const
           ).map((tab) => (
             <button
               key={tab.id}
               type="button"
               onClick={() => setActiveType(tab.id)}
-              className={`py-1.5 px-1 rounded-lg text-[11px] sm:text-xs font-semibold transition-all truncate min-w-0 ${
+              className={`py-1.5 px-3 rounded-full text-xs font-semibold transition-all whitespace-nowrap flex-shrink-0 ${
                 activeType === tab.id
-                  ? `bg-md-surface-lowest shadow-sm font-bold ${tab.activeClass}`
-                  : "text-md-on-surface-variant hover:text-md-on-surface"
+                  ? "bg-md-primary text-md-on-primary shadow-m3-1"
+                  : "text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high"
               }`}
             >
               {tab.label}
             </button>
           ))}
         </div>
+
+        {/* Business -> Personal Profit Shift Flow Card */}
+        {activeType === "shift_profit" && (
+          <div className="flex flex-col gap-3 bg-md-primary-container/45 p-4 rounded-[22px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* From: Business Mode */}
+              <div className="flex flex-col gap-1.5 bg-md-surface-lowest dark:bg-md-surface-low p-3 rounded-[18px]">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-md-on-surface">
+                  <Building2 className="w-3.5 h-3.5 text-md-primary" />
+                  <span>From: Business Mode</span>
+                </div>
+                <div className="grid grid-cols-2 gap-1 bg-md-surface-container p-1 rounded-full">
+                  <button
+                    type="button"
+                    onClick={() => setMode("Bank")}
+                    className={`py-1.5 rounded-full text-xs font-semibold flex items-center justify-center gap-1 transition-all ${
+                      mode === "Bank"
+                        ? "bg-md-primary text-md-on-primary shadow-sm"
+                        : "text-md-on-surface-variant hover:text-md-on-surface"
+                    }`}
+                  >
+                    <Landmark className="w-3 h-3" />
+                    <span>Bank</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMode("Cash")}
+                    className={`py-1.5 rounded-full text-xs font-semibold flex items-center justify-center gap-1 transition-all ${
+                      mode === "Cash"
+                        ? "bg-md-primary text-md-on-primary shadow-sm"
+                        : "text-md-on-surface-variant hover:text-md-on-surface"
+                    }`}
+                  >
+                    <Banknote className="w-3 h-3" />
+                    <span>Cash</span>
+                  </button>
+                </div>
+                {commercialMetrics && (
+                  <div className="text-[11px] text-md-on-surface-variant font-mono mt-0.5">
+                    Available:{" "}
+                    <strong className="text-md-on-surface">
+                      {formatINRCompact(
+                        mode === "Bank"
+                          ? commercialMetrics.netBankLiquidity
+                          : commercialMetrics.netCashLiquidity
+                      )}
+                    </strong>
+                  </div>
+                )}
+              </div>
+
+              {/* To: Personal Mode */}
+              <div className="flex flex-col gap-1.5 bg-md-surface-lowest dark:bg-md-surface-low p-3 rounded-[18px]">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-md-on-surface">
+                  <Home className="w-3.5 h-3.5 text-md-positive" />
+                  <span>To: Personal Mode</span>
+                </div>
+                <div className="grid grid-cols-2 gap-1 bg-md-surface-container p-1 rounded-full">
+                  <button
+                    type="button"
+                    onClick={() => setShiftDestMode("Bank")}
+                    className={`py-1.5 rounded-full text-xs font-semibold flex items-center justify-center gap-1 transition-all ${
+                      shiftDestMode === "Bank"
+                        ? "bg-md-primary text-md-on-primary shadow-sm"
+                        : "text-md-on-surface-variant hover:text-md-on-surface"
+                    }`}
+                  >
+                    <Landmark className="w-3 h-3" />
+                    <span>Bank</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShiftDestMode("Cash")}
+                    className={`py-1.5 rounded-full text-xs font-semibold flex items-center justify-center gap-1 transition-all ${
+                      shiftDestMode === "Cash"
+                        ? "bg-md-primary text-md-on-primary shadow-sm"
+                        : "text-md-on-surface-variant hover:text-md-on-surface"
+                    }`}
+                  >
+                    <Banknote className="w-3 h-3" />
+                    <span>Cash</span>
+                  </button>
+                </div>
+                <div className="text-[11px] text-md-positive font-semibold mt-0.5 flex items-center gap-1">
+                  <ArrowRight className="w-3 h-3" />
+                  <span>Credits Personal {shiftDestMode}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-[11px] font-semibold text-md-on-primary-container bg-md-primary-container/70 px-3 py-2 rounded-2xl">
+              Deducts {formatINRCompact(amount || 0)} from Business {mode} and adds{" "}
+              {formatINRCompact(amount || 0)} to Personal {shiftDestMode}.
+            </div>
+          </div>
+        )}
 
         {/* Loan Flow Selector */}
         {activeType === "loan" && (
@@ -831,38 +1059,117 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   type="button"
                   key={idx}
                   onClick={() => handleAddPreset(chip.val)}
-                  className="px-2.5 py-1 rounded-lg bg-md-surface-container hover:bg-md-surface-high text-xs font-mono font-semibold text-md-on-surface transition-colors"
+                  className="px-3 py-1 rounded-full bg-md-surface-container hover:bg-md-surface-high text-xs font-mono font-semibold text-md-on-surface transition-colors"
                 >
                   {chip.label}
                 </button>
               ))}
             </div>
+
+            {/* Two-Way Property Percentage <-> Amount Calculator */}
+            {propertyReferenceBases &&
+              activeType !== "transfer" &&
+              activeType !== "withdrawal" &&
+              activeType !== "shift_profit" &&
+              activeType !== "loan" && (
+                <div className="flex flex-col gap-2.5 bg-md-secondary-container/45 p-3.5 rounded-[20px] mt-1.5">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-md-on-surface">
+                      <Percent className="w-3.5 h-3.5 text-md-primary" />
+                      <span>% of {selectedProperty?.propertyCode}</span>
+                    </div>
+                    <div className="flex items-center gap-1 bg-md-surface-container p-0.5 rounded-full">
+                      <button
+                        type="button"
+                        onClick={() => setPctBasis("base")}
+                        className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all ${
+                          pctBasis === "base"
+                            ? "bg-md-primary text-md-on-primary shadow-sm"
+                            : "text-md-on-surface-variant hover:text-md-on-surface"
+                        }`}
+                      >
+                        {propertyReferenceBases.baseLabel}:{" "}
+                        {formatINRCompact(propertyReferenceBases.baseAmount)}
+                      </button>
+                      {propertyReferenceBases.hasDistinctTotal && (
+                        <button
+                          type="button"
+                          onClick={() => setPctBasis("total")}
+                          className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all ${
+                            pctBasis === "total"
+                              ? "bg-md-primary text-md-on-primary shadow-sm"
+                              : "text-md-on-surface-variant hover:text-md-on-surface"
+                          }`}
+                        >
+                          Total Cost:{" "}
+                          {formatINRCompact(propertyReferenceBases.totalAmount)}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <div className="relative w-28 sm:w-32 flex-shrink-0">
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={pctInput}
+                        onChange={(e) => handlePctChange(e.target.value)}
+                        placeholder="0"
+                        className="w-full bg-md-surface-lowest dark:bg-md-surface-high rounded-full pl-3.5 pr-7 py-1.5 text-sm font-mono font-bold text-md-on-surface outline-none focus:ring-2 focus:ring-md-primary"
+                      />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-md-on-surface-variant">
+                        %
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 overflow-x-auto scrollbar-none py-0.5">
+                      {[5, 10, 20, 25, 50, 100].map((pct) => (
+                        <button
+                          key={pct}
+                          type="button"
+                          onClick={() => handlePctChange(String(pct))}
+                          className={`px-2.5 py-1 rounded-full text-[11px] font-mono font-semibold transition-all flex-shrink-0 ${
+                            pctInput === String(pct)
+                              ? "bg-md-primary text-md-on-primary shadow-sm"
+                              : "bg-md-surface-lowest dark:bg-md-surface-high text-md-on-surface hover:bg-md-surface-high"
+                          }`}
+                        >
+                          {pct}%
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
           </div>
 
-          {/* Payment Mode */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-md-on-surface">
-              Payment Mode
-            </label>
-            <div className="grid grid-cols-2 gap-1.5 bg-md-surface-container p-1 rounded-[18px]">
-              <button
-                type="button"
-                onClick={() => setMode("Bank")}
-                className={`py-2 rounded-lg flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-all ${ mode === "Bank" ? "bg-md-surface-lowest text-md-on-surface shadow-sm" : "text-md-on-surface-variant hover:text-md-on-surface" }`}
-              >
-                <Landmark className="w-4 h-4 text-md-tertiary" />
-                <span>Bank / UPI / Cheque</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setMode("Cash")}
-                className={`py-2 rounded-lg flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-all ${ mode === "Cash" ? "bg-md-surface-lowest text-md-on-surface shadow-sm" : "text-md-on-surface-variant hover:text-md-on-surface" }`}
-              >
-                <Banknote className="w-4 h-4 text-md-primary" />
-                <span>Cash</span>
-              </button>
+          {/* Payment Mode (hidden for shift_profit which has dual source/dest selectors) */}
+          {activeType !== "shift_profit" && (
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-md-on-surface">
+                Payment Mode
+              </label>
+              <div className="grid grid-cols-2 gap-1.5 bg-md-surface-container p-1 rounded-full">
+                <button
+                  type="button"
+                  onClick={() => setMode("Bank")}
+                  className={`py-2 rounded-full flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-all ${ mode === "Bank" ? "bg-md-primary text-md-on-primary shadow-sm" : "text-md-on-surface-variant hover:text-md-on-surface" }`}
+                >
+                  <Landmark className="w-4 h-4" />
+                  <span>Bank / UPI</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMode("Cash")}
+                  className={`py-2 rounded-full flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-all ${ mode === "Cash" ? "bg-md-primary text-md-on-primary shadow-sm" : "text-md-on-surface-variant hover:text-md-on-surface" }`}
+                >
+                  <Banknote className="w-4 h-4" />
+                  <span>Cash</span>
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Transfer Direction */}
           {activeType === "transfer" && (
@@ -894,7 +1201,9 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           )}
 
           {/* Link to Property */}
-          {activeType !== "transfer" && activeType !== "withdrawal" && (
+          {activeType !== "transfer" &&
+            activeType !== "withdrawal" &&
+            activeType !== "shift_profit" && (
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-md-on-surface">
                 Which Property?
@@ -944,7 +1253,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           )}
 
           {/* Category */}
-          {activeType !== "transfer" && (
+          {activeType !== "transfer" && activeType !== "shift_profit" && (
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between flex-wrap gap-1">
                 <label className="text-xs font-semibold text-md-on-surface">
@@ -1288,9 +1597,16 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   (amountSelf || 0) + (amountSeller || 0) + (amountBuyer || 0) !==
                     amount)
               }
-              className="btn-action-brand flex-1 py-2.5 rounded-[18px] text-sm disabled:opacity-50"
+              className="btn-action-brand flex-1 py-2.5 rounded-full text-sm disabled:opacity-60 inline-flex items-center justify-center gap-2"
             >
-              {isSubmitting ? "Saving..." : "Save Entry"}
+              {isSubmitting && <M3LoadingIndicator size="xs" />}
+              <span>
+                {isSubmitting
+                  ? "Saving..."
+                  : activeType === "shift_profit"
+                  ? `Shift ${formatINRCompact(amount || 0)} to Personal`
+                  : "Save Entry"}
+              </span>
             </button>
             <button
               type="button"

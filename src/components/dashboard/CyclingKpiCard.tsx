@@ -168,13 +168,13 @@ export const CyclingKpiCard: React.FC<CyclingKpiCardProps> = ({
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onClick={handleCardClick}
-      className={`m3-card p-4 flex flex-col justify-between relative overflow-hidden select-none min-h-[136px] cursor-pointer active:scale-[0.985] ${className}`}
+      className={`m3-card p-3 sm:p-4 flex flex-col justify-between relative overflow-hidden select-none min-h-[124px] sm:min-h-[136px] min-w-0 cursor-pointer active:scale-[0.985] ${className}`}
       title="Tap to switch between overview and details"
     >
       {/* Top Row: Expressive Squircle Icon + M3 View Dots */}
-      <div className="flex items-center justify-between gap-2 mb-3">
+      <div className="flex items-center justify-between gap-2 mb-2.5 sm:mb-3">
         <div
-          className={`w-9 h-9 rounded-[14px] flex items-center justify-center flex-shrink-0 ${theme.iconBg} ${theme.iconText}`}
+          className={`w-8 h-8 sm:w-9 sm:h-9 rounded-[12px] sm:rounded-[14px] flex items-center justify-center flex-shrink-0 ${theme.iconBg} ${theme.iconText}`}
         >
           <IconComponent className="w-4 h-4" />
         </div>
@@ -214,22 +214,23 @@ export const CyclingKpiCard: React.FC<CyclingKpiCardProps> = ({
 
       {/* Main Content */}
       <div
-        className={`flex flex-col justify-between flex-1 transition-all duration-150 ease-out transform ${ isFlipping ? "opacity-0 -translate-y-0.5" : "opacity-100 translate-y-0" }`}
+        className={`flex flex-col justify-between flex-1 min-w-0 transition-all duration-150 ease-out transform ${ isFlipping ? "opacity-0 -translate-y-0.5" : "opacity-100 translate-y-0" }`}
       >
         <div
-          className="text-xs font-semibold text-md-on-surface-variant truncate"
+          className="text-[11px] sm:text-xs font-semibold text-md-on-surface-variant truncate"
           title={currentPanel.title}
         >
           {currentPanel.title}
         </div>
 
         <div
-          className={`font-display text-xl md:text-2xl font-bold font-mono tracking-tight my-1 ${ currentPanel.valueColor || "text-md-on-surface" }`}
+          className={`font-display text-base sm:text-xl md:text-2xl font-bold font-mono tracking-tight my-1 truncate ${ currentPanel.valueColor || "text-md-on-surface" }`}
+          title={currentPanel.value}
         >
           {currentPanel.value}
         </div>
 
-        <div className="text-[11px] text-md-on-surface-variant font-medium mt-0.5 truncate">
+        <div className="text-[10px] sm:text-[11px] text-md-on-surface-variant font-medium mt-0.5 truncate">
           {currentPanel.subtitle}
         </div>
       </div>

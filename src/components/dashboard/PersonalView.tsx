@@ -202,8 +202,8 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
   return (
     <div className="flex flex-col gap-5">
       {/* M3 Expressive Pill Navigation Tabs */}
-      <div className="flex items-center justify-between overflow-x-auto gap-3 scrollbar-none">
-        <div className="flex items-center gap-1 bg-md-surface-container p-1.5 rounded-full">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div className="flex items-center gap-1 bg-md-surface-container p-1.5 rounded-full overflow-x-auto scrollbar-none max-w-full">
           <button
             onClick={() => setActiveSubTab("properties")}
             className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-full whitespace-nowrap transition-all flex items-center gap-1.5 ${ activeSubTab === "properties" ? "bg-md-primary text-md-on-primary shadow-m3-1" : "text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high" }`}

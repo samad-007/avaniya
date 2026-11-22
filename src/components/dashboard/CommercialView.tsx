@@ -42,7 +42,7 @@ interface CommercialViewProps {
   onOpenNewDealModal: () => void;
   onOpenNewLoanModal?: () => void;
   onOpenEntryModal?: (
-    type: "outflow" | "inflow" | "transfer" | "withdrawal" | "loan",
+    type: "outflow" | "inflow" | "transfer" | "withdrawal" | "loan" | "shift_profit",
     propertyCode?: string,
     loanCode?: string
   ) => void;
@@ -346,8 +346,8 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
       )}
 
       {/* M3 Expressive Pill Navigation Tabs */}
-      <div className="flex items-center justify-between overflow-x-auto gap-3 scrollbar-none">
-        <div className="flex items-center gap-1 bg-md-surface-container p-1.5 rounded-full">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div className="flex items-center gap-1 bg-md-surface-container p-1.5 rounded-full overflow-x-auto scrollbar-none max-w-full">
           <button
             onClick={() => setActiveTab("deals")}
             className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-full whitespace-nowrap transition-all flex items-center gap-1.5 ${ activeTab === "deals" ? "bg-md-primary text-md-on-primary shadow-m3-1" : "text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high" }`}
@@ -442,17 +442,24 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
           )}
 
           {activeTab === "capital" && onOpenEntryModal && (
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <button
+                onClick={() => onOpenEntryModal("shift_profit")}
+                className="m3-btn-tonal px-3 py-1.5 text-xs flex items-center gap-1 whitespace-nowrap"
+              >
+                <ArrowLeftRight className="w-3.5 h-3.5" />
+                <span>Shift to Personal</span>
+              </button>
               <button
                 onClick={() => onOpenEntryModal("inflow")}
-                className="btn-action-brand px-3 py-1.5 rounded-[18px] text-xs flex items-center gap-1 whitespace-nowrap"
+                className="btn-action-brand px-3 py-1.5 rounded-full text-xs flex items-center gap-1 whitespace-nowrap"
               >
                 <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
                 <span>Add Capital</span>
               </button>
               <button
                 onClick={() => onOpenEntryModal("withdrawal")}
-                className="btn-action-secondary px-3 py-1.5 rounded-[18px] text-xs flex items-center gap-1 whitespace-nowrap"
+                className="btn-action-secondary px-3 py-1.5 rounded-full text-xs flex items-center gap-1 whitespace-nowrap"
               >
                 <span>Withdraw</span>
               </button>
