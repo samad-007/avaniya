@@ -1096,7 +1096,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                         setAmountSeller(amount - half);
                         setAmountBuyer(0);
                       }}
-                      className="px-2 py-0.5 rounded-md bg-md-surface-container dark:bg-md-surface-high text-[11px] text-md-on-surface hover:bg-md-surface-container"
+                      className="px-2.5 py-0.5 rounded-full bg-md-surface-container dark:bg-md-surface-high text-[11px] text-md-on-surface hover:bg-md-surface-container"
                     >
                       50/50 Self &amp; Seller
                     </button>
@@ -1108,7 +1108,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                         setAmountSeller(amount - half);
                         setAmountSelf(0);
                       }}
-                      className="px-2 py-0.5 rounded-md bg-md-surface-container dark:bg-md-surface-high text-[11px] text-md-on-surface hover:bg-md-surface-container"
+                      className="px-2.5 py-0.5 rounded-full bg-md-surface-container dark:bg-md-surface-high text-[11px] text-md-on-surface hover:bg-md-surface-container"
                     >
                       50/50 Buyer &amp; Seller
                     </button>
@@ -1120,7 +1120,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                         setAmountSeller(third);
                         setAmountBuyer(amount - third * 2);
                       }}
-                      className="px-2 py-0.5 rounded-md bg-md-surface-container dark:bg-md-surface-high text-[11px] text-md-on-surface hover:bg-md-surface-container"
+                      className="px-2.5 py-0.5 rounded-full bg-md-surface-container dark:bg-md-surface-high text-[11px] text-md-on-surface hover:bg-md-surface-container"
                     >
                       Equal 3-Way
                     </button>

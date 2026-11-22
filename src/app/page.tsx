@@ -19,6 +19,10 @@ import { AuthModal, AuthUserData } from "@/components/auth/AuthModal";
 import { LogoutConfirmModal } from "@/components/modals/LogoutConfirmModal";
 import { SuperAdminDashboard } from "@/components/admin/SuperAdminDashboard";
 import {
+  M3LoadingIndicator,
+  M3LinearLoadingBar,
+} from "@/components/ui/M3ExpressivePrimitives";
+import {
   CommercialDashboardMetrics,
   PersonalDashboardMetrics,
   PropertyFinancialMetrics,
@@ -690,14 +694,15 @@ export default function DashboardPage() {
   // Initial Session Verification Splash
   if (isAuthChecking) {
     return (
-      <div className="min-h-screen bg-md-surface text-md-on-surface flex items-center justify-center font-sans">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-12 h-12 rounded-[18px] bg-md-primary-container flex items-center justify-center animate-pulse">
-            <div className="w-4 h-4 rounded-full bg-md-primary"></div>
+      <div className="min-h-screen bg-md-surface text-md-on-surface flex items-center justify-center font-sans px-6">
+        <div className="flex flex-col items-center gap-4 w-full max-w-[220px]">
+          <M3LoadingIndicator size="lg" contained label="Loading your portfolio" />
+          <div className="flex flex-col items-center gap-2 w-full">
+            <span className="font-display text-sm text-md-on-surface font-bold tracking-tight">
+              Loading your portfolio
+            </span>
+            <M3LinearLoadingBar />
           </div>
-          <span className="text-xs text-md-on-surface-variant tracking-wide font-semibold">
-            Loading your portfolio...
-          </span>
         </div>
       </div>
     );

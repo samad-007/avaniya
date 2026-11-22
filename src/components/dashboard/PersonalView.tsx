@@ -22,6 +22,7 @@ import {
   Receipt,
   Wallet,
 } from "lucide-react";
+import { M3ProgressBar } from "@/components/ui/M3ExpressivePrimitives";
 
 interface PersonalViewProps {
   metrics: PersonalDashboardMetrics;
@@ -328,7 +329,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                           <span className="text-base sm:text-lg font-bold text-md-on-surface group-hover:text-md-positive transition-colors">
                             {p.name}
                           </span>
-                          <span className="font-mono text-[11px] font-semibold px-2 py-0.5 rounded-md bg-md-surface-container text-md-on-surface-variant">
+                          <span className="font-mono text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-md-secondary-container text-md-on-secondary-container">
                             {p.propertyCode}
                           </span>
                         </div>
@@ -343,7 +344,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                             <span>Booked {formatDateIN(p.acquisitionDate)}</span>
                           )}
                           {p.agreementDueDate && (
-                            <span className="flex items-center gap-1 font-mono text-[11px] font-semibold px-2 py-0.5 rounded-full bg-md-warning-container text-md-warning">
+                            <span className="flex items-center gap-1 font-mono text-[11px] font-semibold px-2 py-0.5 rounded-full bg-md-warning-container text-md-on-warning-container">
                               <Clock className="w-3 h-3" />
                               Due {formatDateIN(p.agreementDueDate)}
                             </span>
@@ -360,7 +361,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                               formatPersonalPropertyWhatsApp(pData)
                             );
                           }}
-                          className="p-2 rounded-[18px] bg-md-primary-container text-md-positive hover:bg-md-primary-container transition-colors"
+                          className="p-2 rounded-[18px] bg-md-positive-container text-md-on-positive-container hover:bg-md-primary-container transition-colors"
                           title="Share summary on WhatsApp"
                         >
                           <Share2 className="w-3.5 h-3.5" />
@@ -371,7 +372,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="p-2 rounded-[18px] bg-md-tertiary-container text-md-tertiary hover:bg-md-tertiary-container transition-colors"
+                            className="p-2 rounded-[18px] bg-md-tertiary-container text-md-on-tertiary-container hover:bg-md-tertiary-container transition-colors"
                             title="Open documents"
                           >
                             <Link2 className="w-3.5 h-3.5" />
@@ -440,17 +441,15 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                           {progress}%
                         </span>
                       </div>
-                      <div className="w-full h-2 bg-md-surface-container rounded-full overflow-hidden">
-                        <div
-                          className={`h-full rounded-full transition-all duration-300 ${ progress >= 100 ? "bg-md-primary" : "bg-md-primary" }`}
-                          style={{ width: `${progress}%` }}
-                        ></div>
-                      </div>
+                      <M3ProgressBar
+                        value={progress}
+                        tone={progress >= 100 ? "positive" : "primary"}
+                      />
                     </div>
 
                     {/* Footer Row */}
                     <div className="flex items-center justify-between pt-2 text-xs">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-semibold bg-md-warning-container text-md-warning">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-semibold bg-md-warning-container text-md-on-warning-container">
                         <span className="w-1.5 h-1.5 rounded-full bg-md-warning" />
                         {formatStatusLabel(p.status)}
                       </span>
@@ -510,7 +509,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                       </td>
                       <td className="py-3.5 px-4">
                         <span
-                          className={`font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full ${ t.mode === "Cash" ? "bg-md-warning-container text-md-warning " : "bg-md-tertiary-container text-md-tertiary " }`}
+                          className={`font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full ${ t.mode === "Cash" ? "bg-md-warning-container text-md-on-warning-container " : "bg-md-tertiary-container text-md-on-tertiary-container " }`}
                         >
                           {t.mode}
                         </span>
@@ -538,7 +537,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                         {onEditTransaction && (
                           <button
                             onClick={() => onEditTransaction(t)}
-                            className="p-1.5 rounded-lg bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container inline-flex items-center justify-center transition-colors"
+                            className="p-2 rounded-full bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container inline-flex items-center justify-center transition-colors"
                             title="Edit entry"
                           >
                             <Pencil className="w-3.5 h-3.5" />
@@ -607,7 +606,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                         </td>
                         <td className="py-3.5 px-4">
                           <span
-                            className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${ isInflow ? "bg-md-primary-container text-md-positive " : "bg-md-error-container text-md-error " }`}
+                            className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${ isInflow ? "bg-md-positive-container text-md-on-positive-container " : "bg-md-error-container text-md-on-error-container " }`}
                           >
                             {isInflow ? "Funds Added" : "Withdrawn"}
                           </span>
@@ -616,7 +615,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                           {t.recipientOrSource || t.category}
                         </td>
                         <td className="py-3.5 px-4">
-                          <span className="font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full bg-md-tertiary-container text-md-tertiary">
+                          <span className="font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full bg-md-tertiary-container text-md-on-tertiary-container">
                             {t.mode}
                           </span>
                         </td>
@@ -646,7 +645,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                           {onEditTransaction && (
                             <button
                               onClick={() => onEditTransaction(t)}
-                              className="p-1.5 rounded-lg bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container inline-flex items-center justify-center transition-colors"
+                              className="p-2 rounded-full bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container inline-flex items-center justify-center transition-colors"
                               title="Edit entry"
                             >
                               <Pencil className="w-3.5 h-3.5" />
@@ -706,12 +705,11 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                         </span>
                       </span>
                     </div>
-                    <div className="w-full h-2 bg-md-surface-container rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-md-primary rounded-full"
-                        style={{ width: `${cat.percentage}%` }}
-                      ></div>
-                    </div>
+                    <M3ProgressBar
+                      value={cat.percentage}
+                      tone="primary"
+                      height="sm"
+                    />
                   </div>
                 ))}
               </div>

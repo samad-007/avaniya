@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { X, FileSpreadsheet, FileText, Database, Download } from "lucide-react";
+import { M3LoadingIndicator } from "@/components/ui/M3ExpressivePrimitives";
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -96,9 +97,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
             <button
               onClick={() => handleDownload("excel")}
               disabled={downloading === "excel"}
-              className="m3-btn-filled px-4 py-2 text-xs whitespace-nowrap disabled:opacity-50 flex-shrink-0 w-full sm:w-auto"
+              className="m3-btn-filled px-4 py-2 text-xs whitespace-nowrap disabled:opacity-70 flex-shrink-0 w-full sm:w-auto inline-flex items-center justify-center gap-1.5"
             >
-              {downloading === "excel" ? "Preparing..." : "Download Excel"}
+              {downloading === "excel" && <M3LoadingIndicator size="xs" />}
+              <span>{downloading === "excel" ? "Preparing..." : "Download Excel"}</span>
             </button>
           </div>
 
@@ -119,9 +121,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
             <button
               onClick={() => handleDownload("pdf")}
               disabled={downloading === "pdf"}
-              className="m3-btn-primary-tonal px-4 py-2 text-xs whitespace-nowrap disabled:opacity-50 flex-shrink-0 w-full sm:w-auto"
+              className="m3-btn-primary-tonal px-4 py-2 text-xs whitespace-nowrap disabled:opacity-70 flex-shrink-0 w-full sm:w-auto inline-flex items-center justify-center gap-1.5"
             >
-              {downloading === "pdf" ? "Preparing..." : "Download PDF"}
+              {downloading === "pdf" && <M3LoadingIndicator size="xs" />}
+              <span>{downloading === "pdf" ? "Preparing..." : "Download PDF"}</span>
             </button>
           </div>
 
@@ -142,9 +145,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
             <button
               onClick={() => handleDownload("csv")}
               disabled={downloading === "csv"}
-              className="m3-btn-outlined px-4 py-2 text-xs whitespace-nowrap disabled:opacity-50 flex-shrink-0 w-full sm:w-auto"
+              className="m3-btn-outlined px-4 py-2 text-xs whitespace-nowrap disabled:opacity-70 flex-shrink-0 w-full sm:w-auto inline-flex items-center justify-center gap-1.5"
             >
-              {downloading === "csv" ? "Exporting..." : "Download CSV"}
+              {downloading === "csv" && <M3LoadingIndicator size="xs" />}
+              <span>{downloading === "csv" ? "Exporting..." : "Download CSV"}</span>
             </button>
           </div>
         </div>

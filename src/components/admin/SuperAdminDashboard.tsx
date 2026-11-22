@@ -15,6 +15,10 @@ import {
   LogOut,
 } from "lucide-react";
 import { generateSecurePassword } from "@/lib/passwordGenerator";
+import {
+  M3LoadingIndicator,
+  M3LinearLoadingBar,
+} from "@/components/ui/M3ExpressivePrimitives";
 
 interface AdminUser {
   id: string;
@@ -243,7 +247,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                 <h2 className="text-base md:text-lg font-bold text-md-on-surface tracking-tight">
                   Admin Console
                 </h2>
-                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-md-primary-container text-md-positive">
+                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-md-positive-container text-md-on-positive-container">
                   Admin Access
                 </span>
               </div>
@@ -295,7 +299,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
         {/* Scrollable Content */}
         <div className="p-4 md:p-6 overflow-y-auto flex-1 flex flex-col gap-5">
           {errorMsg && (
-            <div className="bg-md-error-container text-md-error text-xs sm:text-sm px-3.5 py-2.5 rounded-[18px] flex items-center gap-2 font-medium">
+            <div className="bg-md-error-container text-md-on-error-container text-xs sm:text-sm px-3.5 py-2.5 rounded-[18px] flex items-center gap-2 font-medium">
               <AlertCircle className="w-4 h-4 text-md-error" />
               <span>{errorMsg}</span>
             </div>
@@ -408,14 +412,18 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
               </div>
               <button
                 onClick={loadAdminData}
-                className="flex items-center gap-1.5 text-xs text-md-on-surface-variant hover:text-md-on-surface font-semibold"
+                className="m3-btn-outlined flex items-center gap-1.5 px-3 py-1.5 text-xs"
               >
-                <RefreshCw
-                  className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`}
-                />
-                <span>Refresh</span>
+                {isLoading ? (
+                  <M3LoadingIndicator size="xs" />
+                ) : (
+                  <RefreshCw className="w-3.5 h-3.5" />
+                )}
+                <span>{isLoading ? "Refreshing..." : "Refresh"}</span>
               </button>
             </div>
+
+            {isLoading && <M3LinearLoadingBar className="my-0.5" />}
 
             <div className="rounded-[24px] overflow-x-auto bg-md-surface-lowest dark:bg-md-surface-container">
               <table className="w-full text-left text-sm border-collapse">
@@ -456,7 +464,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                         </td>
                         <td className="py-3 px-4">
                           <span
-                            className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${ u.role === "super_admin" ? "bg-md-warning-container text-md-on-warning-container " : u.role === "admin" ? "bg-md-tertiary-container text-md-tertiary " : "bg-md-surface-container text-md-on-surface-variant " }`}
+                            className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${ u.role === "super_admin" ? "bg-md-warning-container text-md-on-warning-container " : u.role === "admin" ? "bg-md-tertiary-container text-md-on-tertiary-container " : "bg-md-surface-container text-md-on-surface-variant " }`}
                           >
                             {u.role.toUpperCase()}
                           </span>
@@ -477,14 +485,14 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                                 onSwitchDataset(u.datasetId);
                                 onClose();
                               }}
-                              className="btn-action-secondary px-2.5 py-1 rounded-lg text-xs"
+                              className="btn-action-secondary px-3 py-1.5 rounded-full text-xs"
                             >
                               Open
                             </button>
 
                             <button
                               onClick={() => handleResetPassword(u)}
-                              className="p-1.5 rounded-lg bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant hover:text-md-warning hover:bg-md-warning-container transition-colors"
+                              className="p-2 rounded-full bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant hover:text-md-warning hover:bg-md-warning-container transition-colors"
                               title="Reset password"
                             >
                               <KeyRound className="w-3.5 h-3.5" />
@@ -493,7 +501,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                             {u.role !== "super_admin" && (
                               <button
                                 onClick={() => handleDeleteUser(u)}
-                                className="p-1.5 rounded-lg bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant hover:text-md-error hover:bg-md-error-container transition-colors"
+                                className="p-2 rounded-full bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant hover:text-md-error hover:bg-md-error-container transition-colors"
                                 title="Delete user"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -628,7 +636,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                     <button
                       type="button"
                       onClick={() => handleCopyPassword(generatedPassword)}
-                      className="p-2 rounded-lg bg-md-surface-container dark:bg-md-surface-high text-md-on-surface even:bg-md-surface-low/50 dark:even:bg-md-surface-low/40 hover:bg-md-surface-high/60 transition-colors"
+                      className="p-2 rounded-full bg-md-surface-container dark:bg-md-surface-high text-md-on-surface even:bg-md-surface-low/50 dark:even:bg-md-surface-low/40 hover:bg-md-surface-high/60 transition-colors"
                       title="Copy password"
                     >
                       {copied ? (

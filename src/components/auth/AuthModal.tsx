@@ -16,6 +16,7 @@ import {
   Moon,
 } from "lucide-react";
 import { useTheme } from "@/components/theme/ThemeProvider";
+import { M3LoadingIndicator } from "@/components/ui/M3ExpressivePrimitives";
 
 export interface AuthUserData {
   name: string;
@@ -261,8 +262,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <button
             type="submit"
             disabled={isLoading}
-            className="m3-btn-filled w-full mt-1 py-3 text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+            className="m3-btn-filled w-full mt-1 py-3 text-sm flex items-center justify-center gap-2 disabled:opacity-75"
           >
+            {isLoading && <M3LoadingIndicator size="xs" />}
             <span>
               {isLoading
                 ? "Signing you in..."
@@ -270,7 +272,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 ? "Sign In to My Portfolio"
                 : "Create Free Account"}
             </span>
-            <ArrowRight className="w-4 h-4" />
+            {!isLoading && <ArrowRight className="w-4 h-4" />}
           </button>
         </form>
 

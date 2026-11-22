@@ -23,16 +23,16 @@ export const Footer: React.FC<FooterProps> = ({
       <div className="max-w-[1440px] mx-auto flex flex-wrap items-center justify-between gap-3">
         {/* Left: Live Sync Indicator */}
         <div className="flex items-center gap-2.5">
-          <div className="flex items-center gap-2">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-md-primary-container/65 text-md-on-primary-container">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-md-primary opacity-75"></span>
+              <span className="m3-live-halo absolute inline-flex h-full w-full rounded-full bg-md-primary"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-md-primary"></span>
             </span>
-            <span className="text-md-on-surface font-semibold">
+            <span className="font-semibold text-[11px]">
               Live Portfolio Sync
             </span>
           </div>
-          <span className="text-md-outline-variant">•</span>
+          <span className="text-md-on-surface-variant/60">•</span>
           <span>Amounts in Indian Rupees (₹)</span>
         </div>
 

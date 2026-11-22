@@ -338,3 +338,61 @@ textarea {
 .animate-backdrop-exit {
   animation: backdropExit 150ms ease-in forwards;
 }
+
+/* Material 3 Expressive Morphing Shape Loader & Indeterminate Bar */
+@keyframes m3ExpressiveSpin {
+  0% {
+    transform: rotate(0deg) scale(0.92);
+  }
+  25% {
+    transform: rotate(90deg) scale(1.06);
+  }
+  50% {
+    transform: rotate(180deg) scale(0.9);
+  }
+  75% {
+    transform: rotate(270deg) scale(1.06);
+  }
+  100% {
+    transform: rotate(360deg) scale(0.92);
+  }
+}
+
+.m3-expressive-loader {
+  animation: m3ExpressiveSpin 2.2s cubic-bezier(0.38, 0.05, 0.22, 1) infinite;
+}
+
+@keyframes m3IndeterminateSlide {
+  0% {
+    left: -45%;
+    width: 35%;
+  }
+  50% {
+    left: 35%;
+    width: 55%;
+  }
+  100% {
+    left: 105%;
+    width: 35%;
+  }
+}
+
+.m3-indeterminate-bar {
+  animation: m3IndeterminateSlide 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes m3LiveBreathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.45);
+    opacity: 0.25;
+  }
+}
+
+.m3-live-halo {
+  animation: m3LiveBreathe 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}

@@ -204,7 +204,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
             <div className="min-w-0 flex-1">
               <h2 className="text-base sm:text-lg font-bold text-md-on-surface tracking-tight flex items-center gap-2 flex-wrap">
                 <span className="break-words">Edit Property: {property.name}</span>
-                <span className="text-xs font-mono font-semibold text-md-on-surface-variant bg-md-surface-container px-2 py-0.5 rounded-md flex-shrink-0">
+                <span className="text-xs font-mono font-semibold text-md-on-secondary-container bg-md-secondary-container px-2.5 py-0.5 rounded-full flex-shrink-0">
                   {property.propertyCode}
                 </span>
               </h2>
@@ -224,7 +224,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
         </div>
 
         {errorMsg && (
-          <div className="bg-md-error-container text-md-error text-xs px-3.5 py-2.5 rounded-[18px] font-medium">
+          <div className="bg-md-error-container text-md-on-error-container text-xs px-3.5 py-2.5 rounded-[18px] font-medium">
             {errorMsg}
           </div>
         )}
