@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { SeedCategory, FinancialRole } from "@/lib/seedData";
-import { X, ShieldCheck } from "lucide-react";
+import { X, ShieldCheck, Tag } from "lucide-react";
 
 interface CategoryModalProps {
   isOpen: boolean;
@@ -54,24 +54,26 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
           onClose();
         }
       }}
-      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto overflow-x-hidden animate-backdrop"
+      className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto overflow-x-hidden animate-backdrop"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-w-full min-w-0 max-h-[92vh] overflow-y-auto overflow-x-hidden p-5 sm:p-6 shadow-2xl my-auto flex flex-col gap-5 animate-modal"
+        className="bg-white border border-slate-200 rounded-2xl max-w-lg w-full min-w-0 max-h-[92vh] overflow-y-auto overflow-x-hidden p-5 sm:p-6 shadow-modal my-auto flex flex-col gap-5 animate-modal"
       >
-        <div className="flex items-center justify-between border-b border-[#262626] pb-3.5 gap-2">
+        <div className="flex items-start justify-between border-b border-slate-100 pb-4 gap-2">
           <div className="min-w-0 flex-1">
-            <h2 className="text-base sm:text-lg font-bold text-white tracking-tight break-words">
-              Dynamic Categories &amp; Financial Formula Engine
+            <h2 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
+              <Tag className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+              <span>Manage Categories</span>
             </h2>
-            <div className="text-xs text-[#A1A1AA] mt-0.5 font-medium">
-              Add new categories without modifying any underlying code
-            </div>
+            <p className="text-xs text-slate-500 mt-1">
+              Create your own expense or income labels so your ledger matches how you work.
+            </p>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] flex-shrink-0"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex-shrink-0 transition-colors"
+            aria-label="Close"
           >
             <X className="w-5 h-5" />
           </button>
@@ -79,124 +81,123 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-sm">
           <div className="flex flex-col gap-1.5 min-w-0">
-            <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
+            <label className="text-xs font-semibold text-slate-700">
               Category Name
             </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Panchayat Approval Charges, Borewell Drilling"
-              className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555]"
+              placeholder="e.g. Panchayat Approval, Borewell Drilling, Brokerage"
+              className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 placeholder:text-slate-400 text-sm outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 transition-all"
               required
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div className="flex flex-col gap-1.5 min-w-0">
-              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
-                Transaction Direction
+              <label className="text-xs font-semibold text-slate-700">
+                Money Direction
               </label>
               <select
                 value={type}
                 onChange={(e) =>
                   setType(e.target.value as "outflow" | "inflow" | "transfer")
                 }
-                className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555] truncate"
+                className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500 truncate"
               >
-                <option value="outflow">Outflow (Expense / Payment)</option>
-                <option value="inflow">Inflow (Receipt / Revenue)</option>
-                <option value="transfer">Internal Transfer</option>
+                <option value="outflow">Money Paid (Expense)</option>
+                <option value="inflow">Money Received (Income)</option>
+                <option value="transfer">Bank ↔ Cash Transfer</option>
               </select>
             </div>
 
             <div className="flex flex-col gap-1.5 min-w-0">
-              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
-                Applicable Mode
+              <label className="text-xs font-semibold text-slate-700">
+                Where to Use
               </label>
               <select
                 value={scope}
                 onChange={(e) =>
                   setScope(e.target.value as "commercial" | "personal" | "both")
                 }
-                className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-sm outline-none focus:border-[#555555] truncate"
+                className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500 truncate"
               >
-                <option value="both">Both Commercial &amp; Personal</option>
-                <option value="commercial">Commercial Land Only</option>
-                <option value="personal">Personal Asset Only</option>
+                <option value="both">Both Business &amp; Personal</option>
+                <option value="commercial">Business Deals Only</option>
+                <option value="personal">Personal Homes Only</option>
               </select>
             </div>
           </div>
 
-          {/* Mathematical Financial Role Mapping */}
-          <div className="flex flex-col gap-2 bg-[#050505] p-3.5 rounded-lg border border-[#262626] min-w-0">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-[#22C55E]">
-              <ShieldCheck className="w-4 h-4" />
-              <span>Zero-Break Formula Role Mapping</span>
+          {/* Calculation Role */}
+          <div className="flex flex-col gap-2 bg-emerald-50/60 p-3.5 rounded-xl border border-emerald-200/80 min-w-0">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <span>How should this affect your totals?</span>
             </div>
-            <div className="text-xs text-[#A1A1AA] leading-relaxed font-medium">
-              Select how this category maps into balance sheets, pending
-              receivables, payables, and P&amp;L aggregations.
-            </div>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Choose what this category counts toward so your balances and profit stay accurate automatically.
+            </p>
             <select
               value={financialRole}
               onChange={(e) => setFinancialRole(e.target.value as FinancialRole)}
-              className="w-full max-w-full min-w-0 bg-[#111111] border border-[#383838] rounded-lg p-2.5 text-white font-medium text-xs sm:text-sm mt-1 outline-none focus:border-[#555555] truncate"
+              className="w-full min-w-0 bg-white border border-emerald-200 rounded-xl p-2.5 text-slate-900 font-medium text-xs sm:text-sm mt-1 outline-none focus:border-emerald-500 truncate"
             >
               <option value="property_expense">
-                Property Deal Expense (Adds to Total Cost &amp; Reduces Profit)
+                Extra Property Cost (Adds to total cost &amp; reduces profit)
               </option>
               <option value="purchase_principal">
-                Purchase Principal (Directly Reduces Pending Seller Outflow)
+                Seller Payment (Reduces balance owed to seller)
               </option>
               <option value="sale_receipt">
-                Sale Receipt (Adds to Revenue &amp; Reduces Buyer Receivable)
+                Buyer Payment (Adds to sales &amp; reduces buyer dues)
               </option>
               <option value="capital_infusion">
-                External Capital Funding (Injects Liquidity into Business)
+                Capital Added (Adds money into your available balance)
               </option>
               <option value="personal_milestone">
-                Personal Milestone Payment (Direct Asset Stage Completion)
+                Personal Home Milestone (Counts toward home payment)
               </option>
               <option value="personal_overhead">
-                Personal Overhead (Stamp Duty, GST, Maintenance)
+                Personal Extra Cost (Stamp duty, GST, maintenance)
               </option>
               <option value="internal_transfer">
-                Internal Transfer (Neutral Net Effect, Reallocates Bank &lt;-&gt; Cash)
+                Internal Transfer (Moves money between Bank &amp; Cash)
               </option>
             </select>
           </div>
 
           {/* Existing Categories List */}
           <div className="flex flex-col gap-2">
-            <div className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
-              Currently Registered Categories ({categories.length})
+            <div className="text-xs font-semibold text-slate-600">
+              Saved Categories ({categories.length})
             </div>
-            <div className="max-h-36 overflow-y-auto border border-[#262626] rounded-lg p-2.5 bg-[#050505] flex flex-wrap gap-1.5">
+            <div className="max-h-36 overflow-y-auto border border-slate-200 rounded-xl p-2.5 bg-slate-50 flex flex-wrap gap-1.5">
               {categories.map((c, idx) => (
                 <span
                   key={idx}
-                  className="px-2.5 py-1 rounded bg-[#111111] text-xs font-medium text-[#D4D4D8] border border-[#262626]"
+                  className="px-2.5 py-1 rounded-lg bg-white text-xs font-medium text-slate-700 border border-slate-200 shadow-soft"
                 >
-                  {c.name} ({c.financialRole})
+                  {c.name}
                 </span>
               ))}
             </div>
           </div>
 
-          {/* Action Buttons (Key Ingress Action with Hover-to-White) */}
-          <div className="flex items-center gap-2.5 pt-2.5 border-t border-[#262626] flex-wrap sm:flex-nowrap">
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2.5 pt-3 border-t border-slate-100 flex-wrap sm:flex-nowrap">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="btn-action-primary flex-1 py-2.5 rounded-lg text-xs sm:text-sm disabled:opacity-50"
+              className="btn-action-brand flex-1 py-2.5 rounded-xl text-sm disabled:opacity-50"
             >
-              {isSubmitting ? "Registering..." : "Register Custom Category"}
+              {isSubmitting ? "Saving..." : "Add Category"}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-lg bg-[#161616] text-white border border-[#2a2a2a] text-xs sm:text-sm font-medium hover:bg-[#222222] transition-all duration-150"
+              className="btn-action-secondary px-4 py-2.5 rounded-xl text-sm"
             >
               Cancel
             </button>

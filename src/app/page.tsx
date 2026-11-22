@@ -688,11 +688,13 @@ export default function DashboardPage() {
   // Initial Session Verification Splash
   if (isAuthChecking) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center font-sans">
-        <div className="flex flex-col items-center gap-3 animate-pulse">
-          <div className="w-10 h-10 rounded-lg bg-[#111111] border border-[#333333]"></div>
-          <span className="text-xs text-[#71717A] tracking-wider uppercase font-semibold">
-            Loading Avaniya Workspace...
+      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex items-center justify-center font-sans">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-11 h-11 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center animate-pulse">
+            <div className="w-4 h-4 rounded-full bg-emerald-500"></div>
+          </div>
+          <span className="text-xs text-slate-500 tracking-wide font-semibold">
+            Loading your portfolio...
           </span>
         </div>
       </div>
@@ -702,7 +704,7 @@ export default function DashboardPage() {
   // Clean Login Landing Screen (When unauthenticated)
   if (!user) {
     return (
-      <div className="min-h-screen bg-black text-white flex flex-col justify-between font-sans">
+      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col justify-between font-sans">
         <AuthModal
           isOpen={true}
           allowClose={false}
@@ -727,7 +729,7 @@ export default function DashboardPage() {
 
   // Authenticated Main Dashboard
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col font-sans">
       {/* Header Bar with Mode Switcher & Quick Actions */}
       <Header
         currentMode={appMode}
@@ -746,7 +748,7 @@ export default function DashboardPage() {
       />
 
       {/* Main Container */}
-      <main className="max-w-[1440px] w-full mx-auto p-3.5 md:p-6 flex-1 flex flex-col gap-5">
+      <main className="max-w-[1440px] w-full mx-auto px-3.5 sm:px-5 py-5 md:py-6 flex-1 flex flex-col gap-6">
         {/* Top Summary Liquidity Strip */}
         <KpiStrip
           mode={appMode}

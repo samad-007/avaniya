@@ -14,7 +14,7 @@ import {
   MapPin,
   Maximize2,
   Plus,
-  ArrowUpRight,
+  ArrowDownRight,
   Landmark,
   Banknote,
   CheckCircle2,
@@ -44,6 +44,21 @@ interface PropertyLedgerModalProps {
   onEditProperty?: (property: SeedProperty) => void;
   onEditTransaction?: (transaction: SeedTransaction) => void;
 }
+
+const formatStatusLabel = (status: string) => {
+  switch (status) {
+    case "in_progress":
+      return "In Progress";
+    case "registered":
+      return "Registered";
+    case "sold":
+      return "Sold";
+    case "closed":
+      return "Closed";
+    default:
+      return "Open";
+  }
+};
 
 export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
   isOpen,
@@ -78,76 +93,78 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
           onClose();
         }
       }}
-      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 md:p-6 overflow-y-auto overflow-x-hidden animate-backdrop"
+      className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-3 md:p-6 overflow-y-auto overflow-x-hidden animate-backdrop"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-4xl w-full max-w-full min-w-0 max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto animate-modal"
+        className="bg-white border border-slate-200 rounded-2xl max-w-4xl w-full min-w-0 max-h-[92vh] flex flex-col shadow-modal overflow-hidden my-auto animate-modal"
       >
         {/* Modal Header */}
-        <div className="p-4 md:p-5 border-b border-[#262626] flex items-start justify-between bg-[#0e0e0e] gap-3 flex-wrap sm:flex-nowrap">
+        <div className="p-4 md:p-5 border-b border-slate-200 flex items-start justify-between bg-slate-50/80 gap-3 flex-wrap sm:flex-nowrap">
           <div className="flex items-start gap-3.5 min-w-0 flex-1">
-            <div className="w-11 h-11 rounded-lg bg-[#1a1a1a] border border-[#383838] flex items-center justify-center text-white font-bold font-mono text-base flex-shrink-0">
+            <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 font-bold font-mono text-sm flex-shrink-0">
               {prop.propertyCode.slice(0, 3)}
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight break-words">
+                <h2 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight break-words">
                   {prop.name}
                 </h2>
-                <span className="font-mono text-xs font-semibold px-2.5 py-0.5 rounded bg-[#161616] text-[#A1A1AA] border border-[#262626]">
+                <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded-md bg-white text-slate-600 border border-slate-200">
                   {prop.propertyCode}
                 </span>
                 <span
-                  className={`text-xs px-2.5 py-0.5 rounded font-semibold uppercase tracking-wider ${
+                  className={`text-xs px-2.5 py-0.5 rounded-full font-semibold border ${
                     prop.status === "sold"
-                      ? "bg-green-950/40 text-green-400 border border-green-800/40"
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                       : prop.status === "in_progress"
-                      ? "bg-amber-950/40 text-amber-400 border border-amber-800/40"
-                      : "bg-[#1c1c1c] text-[#A1A1AA] border border-[#383838]"
+                      ? "bg-amber-50 text-amber-700 border-amber-200"
+                      : "bg-slate-100 text-slate-700 border-slate-200"
                   }`}
                 >
-                  {prop.status}
+                  {formatStatusLabel(prop.status)}
                 </span>
                 {prop.agreementDueDate && (
                   <span
-                    className={`flex items-center gap-1 font-mono text-xs font-semibold px-2 py-0.5 rounded border ${
+                    className={`flex items-center gap-1 font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
                       propertyMetrics?.deadlineStatus === "overdue"
-                        ? "bg-rose-950/50 text-rose-300 border-rose-800/50"
+                        ? "bg-rose-50 text-rose-700 border-rose-200"
                         : propertyMetrics?.deadlineStatus === "urgent"
-                        ? "bg-amber-950/50 text-amber-300 border-amber-800/50"
-                        : "bg-[#181818] text-[#A1A1AA] border-[#2e2e2e]"
+                        ? "bg-amber-50 text-amber-700 border-amber-200"
+                        : "bg-white text-slate-600 border-slate-200"
                     }`}
                   >
                     <Clock className="w-3 h-3" />
-                    Due: {formatDateIN(prop.agreementDueDate)}
+                    Due {formatDateIN(prop.agreementDueDate)}
                     {propertyMetrics?.daysToDeadline !== undefined && (
-                      <span className="text-[10px]">
-                        ({propertyMetrics.daysToDeadline < 0
+                      <span className="text-[11px]">
+                        (
+                        {propertyMetrics.daysToDeadline < 0
                           ? `${Math.abs(propertyMetrics.daysToDeadline)}d overdue`
                           : propertyMetrics.daysToDeadline === 0
                           ? "due today"
-                          : `${propertyMetrics.daysToDeadline}d left`})
+                          : `${propertyMetrics.daysToDeadline}d left`}
+                        )
                       </span>
                     )}
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-4 text-xs text-[#A1A1AA] mt-1.5 flex-wrap font-medium">
+              <div className="flex items-center gap-4 text-xs text-slate-500 mt-1.5 flex-wrap font-medium">
                 {prop.location && (
                   <span className="flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-[#71717A]" />
+                    <MapPin className="w-3.5 h-3.5 text-slate-400" />
                     {prop.location}
                   </span>
                 )}
                 {prop.acquisitionDate && (
                   <span className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-[#71717A]" />
-                    Acquired: {formatDateIN(prop.acquisitionDate)}
+                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                    Acquired {formatDateIN(prop.acquisitionDate)}
                   </span>
                 )}
                 {prop.sqftArea ? (
-                  <span className="flex items-center gap-1 font-mono text-[#F59E0B] font-semibold">
+                  <span className="flex items-center gap-1 font-mono text-amber-700 font-semibold">
                     <Maximize2 className="w-3.5 h-3.5" />
                     {prop.sqftArea.toLocaleString("en-IN")} sq.ft
                     {prop.ratePerSqft
@@ -163,9 +180,11 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
             {isCommercial && propertyMetrics && (
               <button
                 type="button"
-                onClick={() => openWhatsAppShare(formatPropertyWhatsApp(propertyMetrics))}
-                className="p-2 rounded-lg bg-emerald-950/40 border border-emerald-800/40 text-emerald-400 hover:bg-emerald-900/60 transition-all duration-150 flex items-center gap-1.5 text-xs font-semibold"
-                title="Share Property Snapshot on WhatsApp"
+                onClick={() =>
+                  openWhatsAppShare(formatPropertyWhatsApp(propertyMetrics))
+                }
+                className="p-2 sm:px-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 transition-colors flex items-center gap-1.5 text-xs font-semibold"
+                title="Share summary on WhatsApp"
               >
                 <Share2 className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">WhatsApp</span>
@@ -177,8 +196,8 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                 href={prop.attachmentUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 rounded-lg bg-blue-950/40 border border-blue-800/40 text-blue-400 hover:bg-blue-900/60 transition-all duration-150 flex items-center gap-1.5 text-xs font-semibold"
-                title="Open Cloud Proof Documents"
+                className="p-2 sm:px-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 transition-colors flex items-center gap-1.5 text-xs font-semibold"
+                title="Open attached documents"
               >
                 <Link2 className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Docs</span>
@@ -188,17 +207,18 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
             {onEditProperty && (
               <button
                 onClick={() => onEditProperty(prop)}
-                className="btn-action-primary px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5"
-                title="Edit Valuation, Price & Details"
+                className="btn-action-secondary px-3 py-2 rounded-xl text-xs flex items-center gap-1.5"
+                title="Edit property details and prices"
               >
-                <Pencil className="w-3.5 h-3.5 text-[#22C55E]" />
-                <span className="hidden sm:inline">Edit Property</span>
+                <Pencil className="w-3.5 h-3.5 text-slate-600" />
+                <span className="hidden sm:inline">Edit Details</span>
               </button>
             )}
 
             <button
               onClick={onClose}
-              className="p-2 rounded-lg text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] transition-all duration-150"
+              className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors"
+              aria-label="Close"
             >
               <X className="w-5 h-5" />
             </button>
@@ -206,129 +226,124 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
         </div>
 
         {/* Modal Scrollable Body */}
-        <div className="p-4 md:p-6 overflow-y-auto overflow-x-hidden flex-1 flex flex-col gap-5 w-full max-w-full min-w-0">
-          {/* Financial Breakdown Cards */}
+        <div className="p-4 md:p-6 overflow-y-auto overflow-x-hidden flex-1 flex flex-col gap-5 w-full min-w-0">
+          {/* Commercial Financial Breakdown */}
           {isCommercial && propertyMetrics && (
             <div className="flex flex-col gap-3.5">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-[#050505] p-4 rounded-xl border border-[#1a1a1a]">
-                {/* 1. Agreed Buy Price */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
                 <div>
-                  <div className="text-xs font-semibold uppercase tracking-wider text-[#A1A1AA]">
-                    1. Agreed Buy Price
+                  <div className="text-xs font-semibold text-slate-500">
+                    Buy Price
                   </div>
-                  <div className="text-lg md:text-xl font-bold font-mono text-white mt-1">
+                  <div className="text-lg md:text-xl font-bold font-mono text-slate-900 mt-1">
                     {formatINR(prop.agreedPurchasePrice)}
                   </div>
-                  <div className="text-xs text-[#71717A] mt-0.5">
-                    Seller Consideration
+                  <div className="text-[11px] text-slate-500 mt-0.5">
+                    Agreed with seller
                   </div>
                 </div>
 
-                {/* 2. Total Property Expenses */}
                 <div>
-                  <div className="text-xs font-semibold uppercase tracking-wider text-[#F59E0B] flex items-center gap-1">
-                    <span>2. Property Expenses</span>
+                  <div className="text-xs font-semibold text-amber-700 flex items-center gap-1">
+                    <span>Extra Costs</span>
                     {isExpensesHigherThanBuy && (
-                      <AlertCircle className="w-3.5 h-3.5 text-[#F59E0B]" />
+                      <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
                     )}
                   </div>
-                  <div className="text-lg md:text-xl font-bold font-mono text-bold text-[#F59E0B] mt-1">
+                  <div className="text-lg md:text-xl font-bold font-mono text-amber-700 mt-1">
                     {formatINR(propertyMetrics.propertyExpenses)}
                   </div>
-                  <div className="text-xs text-[#71717A] mt-0.5">
-                    Stamp, Legal, DTCP, Fencing
+                  <div className="text-[11px] text-slate-500 mt-0.5">
+                    Stamp, legal, approvals
                   </div>
                 </div>
 
-                {/* 3. Total Project Acquisition Outlay */}
                 <div>
-                  <div className="text-xs font-semibold uppercase tracking-wider text-white">
-                    Total Project Outlay
+                  <div className="text-xs font-semibold text-slate-700">
+                    Total Deal Cost
                   </div>
-                  <div className="text-lg md:text-xl font-bold font-mono text-white mt-1">
+                  <div className="text-lg md:text-xl font-bold font-mono text-slate-900 mt-1">
                     {formatINR(propertyMetrics.totalProjectOutlay)}
                   </div>
-                  <div className="text-xs text-[#71717A] mt-0.5">
-                    Buy Price + All Expenses
+                  <div className="text-[11px] text-slate-500 mt-0.5">
+                    Buy price + extra costs
                   </div>
                 </div>
 
-                {/* 4. Target & Selling Price */}
                 <div>
-                  <div className="text-xs font-semibold uppercase tracking-wider text-[#22C55E]">
-                    Target / Agreed Sale
+                  <div className="text-xs font-semibold text-emerald-700">
+                    Sale Price
                   </div>
-                  <div className="text-lg md:text-xl font-bold font-mono text-[#22C55E] mt-1">
+                  <div className="text-lg md:text-xl font-bold font-mono text-emerald-700 mt-1">
                     {prop.agreedSellingPrice
                       ? formatINR(prop.agreedSellingPrice)
                       : prop.targetSalePrice
                       ? formatINR(prop.targetSalePrice)
-                      : "Not Listed"}
+                      : "Not set"}
                   </div>
-                  <div className="text-xs text-[#71717A] mt-0.5">
+                  <div className="text-[11px] text-slate-500 mt-0.5">
                     {prop.status === "sold" || prop.status === "closed" ? (
                       propertyMetrics.realizedProfit > 0 ? (
-                        <span className="text-[#22C55E] font-medium">
-                          Realized Gain: +{formatINR(propertyMetrics.realizedProfit)}
-                          {propertyMetrics.pendingProfit > 0 && ` (${formatINR(propertyMetrics.pendingProfit)} pending)`}
+                        <span className="text-emerald-700 font-semibold">
+                          Profit: +{formatINR(propertyMetrics.realizedProfit)}
                         </span>
                       ) : (
-                        <span className="text-amber-400 font-medium">
-                          Cost Recovering ({formatINR(propertyMetrics.pendingProfit)} pending)
+                        <span className="text-amber-700 font-semibold">
+                          Recovering cost
                         </span>
                       )
                     ) : propertyMetrics.projectedProfit !== 0 ? (
-                      <span className="text-purple-400 font-medium">
-                        Est. Pipeline Gain: +{formatINR(propertyMetrics.projectedProfit)}
+                      <span className="text-violet-700 font-semibold">
+                        Est. profit: +{formatINR(propertyMetrics.projectedProfit)}
                       </span>
                     ) : (
-                      "Exit Valuation"
+                      "Expected exit value"
                     )}
                   </div>
                 </div>
               </div>
 
-              {/* Sub-strip for Outstandings & Liquidity */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-[#0a0a0a] p-3.5 rounded-lg border border-[#1a1a1a] text-xs sm:text-sm">
+              {/* Sub-strip for Payments & Balances */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white p-4 rounded-2xl border border-slate-200/90 text-xs sm:text-sm shadow-soft">
                 <div>
-                  <span className="text-[#A1A1AA] text-xs font-medium block">
+                  <span className="text-slate-500 text-xs font-medium block">
                     Paid to Seller (Bank)
                   </span>
-                  <span className="font-mono text-white font-bold text-sm mt-0.5 block">
+                  <span className="font-mono text-slate-900 font-bold text-sm mt-0.5 block">
                     {formatINR(propertyMetrics.purchasePaidBank)}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[#A1A1AA] text-xs font-medium block">
+                  <span className="text-slate-500 text-xs font-medium block">
                     Paid to Seller (Cash)
                   </span>
-                  <span className="font-mono text-white font-bold text-sm mt-0.5 block">
+                  <span className="font-mono text-slate-900 font-bold text-sm mt-0.5 block">
                     {formatINR(propertyMetrics.purchasePaidCash)}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[#F59E0B] text-xs font-semibold block">
-                    Pending Payable to Seller
+                  <span className="text-amber-700 text-xs font-semibold block">
+                    Still Owed to Seller
                   </span>
-                  <span className="font-mono text-[#F59E0B] font-bold text-sm mt-0.5 block">
+                  <span className="font-mono text-amber-700 font-bold text-sm mt-0.5 block">
                     {formatINR(propertyMetrics.pendingOutflow)}
                   </span>
                   {propertyMetrics.sellerPaidExpenses > 0 && (
-                    <span className="text-[10px] text-amber-500/90 block mt-0.5 font-medium">
-                      (-{formatINR(propertyMetrics.sellerPaidExpenses)} paid on behalf)
+                    <span className="text-[11px] text-amber-600 block mt-0.5">
+                      (-{formatINR(propertyMetrics.sellerPaidExpenses)} paid on their behalf)
                     </span>
                   )}
                 </div>
                 <div>
-                  <span className="text-[#22C55E] text-xs font-semibold block">
-                    Pending Receivable from Buyer
+                  <span className="text-emerald-700 text-xs font-semibold block">
+                    Buyer Still Owes You
                   </span>
-                  <span className="font-mono text-[#22C55E] font-bold text-sm mt-0.5 block">
+                  <span className="font-mono text-emerald-700 font-bold text-sm mt-0.5 block">
                     {formatINR(propertyMetrics.pendingInflow)}
                   </span>
                   {propertyMetrics.buyerPaidExpenses > 0 && (
-                    <span className="text-[10px] text-blue-400/90 block mt-0.5 font-medium">
-                      (+{formatINR(propertyMetrics.buyerPaidExpenses)} charges billed)
+                    <span className="text-[11px] text-blue-600 block mt-0.5">
+                      (+{formatINR(propertyMetrics.buyerPaidExpenses)} billed to buyer)
                     </span>
                   )}
                 </div>
@@ -338,71 +353,75 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
 
           {/* Personal Mode Financial Breakdown */}
           {!isCommercial && personalPropertyData && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5 bg-[#050505] p-4 rounded-xl border border-[#1a1a1a]">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
               <div>
-                <div className="text-xs font-semibold uppercase tracking-wider text-[#A1A1AA]">
-                  Agreed Asset Cost
+                <div className="text-xs font-semibold text-slate-500">
+                  Total Property Cost
                 </div>
-                <div className="text-lg md:text-xl font-bold font-mono text-white mt-1">
+                <div className="text-lg md:text-xl font-bold font-mono text-slate-900 mt-1">
                   {formatINR(prop.agreedPurchasePrice)}
                 </div>
               </div>
 
               <div>
-                <div className="text-xs font-semibold uppercase tracking-wider text-[#22C55E]">
-                  Total Invested So Far
+                <div className="text-xs font-semibold text-emerald-700">
+                  Paid So Far
                 </div>
-                <div className="text-lg md:text-xl font-bold font-mono text-[#22C55E] mt-1">
+                <div className="text-lg md:text-xl font-bold font-mono text-emerald-700 mt-1">
                   {formatINR(personalPropertyData.totalInvested)}
                 </div>
               </div>
 
               <div>
-                <div className="text-xs font-semibold uppercase tracking-wider text-[#F59E0B]">
-                  Remaining Commitment
+                <div className="text-xs font-semibold text-amber-700">
+                  Balance Left to Pay
                 </div>
-                <div className="text-lg md:text-xl font-bold font-mono text-[#F59E0B] mt-1">
+                <div className="text-lg md:text-xl font-bold font-mono text-amber-700 mt-1">
                   {formatINR(personalPropertyData.pendingCommitment)}
                 </div>
               </div>
             </div>
           )}
 
-          {/* Personal Mode Milestones Tracker */}
+          {/* Personal Mode Milestones */}
           {!isCommercial && prop.milestones && prop.milestones.length > 0 && (
             <div className="flex flex-col gap-2.5">
-              <div className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider flex items-center justify-between">
-                <span>Construction &amp; Payment Milestones</span>
-                <span className="text-xs text-[#A1A1AA] font-medium">
+              <div className="text-xs sm:text-sm font-bold text-slate-900 flex items-center justify-between">
+                <span>Payment Milestones</span>
+                <span className="text-xs text-slate-500 font-medium">
                   {prop.milestones.filter((m) => m.status === "completed").length}{" "}
-                  of {prop.milestones.length} Stages Completed
+                  of {prop.milestones.length} completed
                 </span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                 {prop.milestones.map((m, idx) => (
                   <div
                     key={idx}
-                    className={`p-3.5 rounded-lg border flex flex-col justify-between gap-2 ${
+                    className={`p-3.5 rounded-xl border flex flex-col justify-between gap-2 ${
                       m.status === "completed"
-                        ? "bg-green-950/20 border-green-800/40 text-white"
-                        : "bg-[#111111] border-[#222222] text-[#A1A1AA]"
+                        ? "bg-emerald-50/70 border-emerald-200 text-slate-900"
+                        : "bg-slate-50 border-slate-200 text-slate-600"
                     }`}
                   >
                     <div className="flex items-center justify-between text-xs sm:text-sm">
-                      <span className="font-semibold text-white">{m.name}</span>
+                      <span className="font-semibold text-slate-900">
+                        {m.name}
+                      </span>
                       {m.status === "completed" ? (
-                        <CheckCircle2 className="w-4 h-4 text-[#22C55E]" />
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
                       ) : (
-                        <Clock className="w-4 h-4 text-[#71717A]" />
+                        <Clock className="w-4 h-4 text-slate-400 flex-shrink-0" />
                       )}
                     </div>
                     <div className="flex items-center justify-between text-xs sm:text-sm font-mono">
-                      <span className="font-bold">{formatINR(m.targetAmount)}</span>
+                      <span className="font-bold text-slate-900">
+                        {formatINR(m.targetAmount)}
+                      </span>
                       <span
-                        className={`font-semibold uppercase ${
+                        className={`text-[11px] font-semibold uppercase ${
                           m.status === "completed"
-                            ? "text-[#22C55E]"
-                            : "text-[#71717A]"
+                            ? "text-emerald-700"
+                            : "text-slate-400"
                         }`}
                       >
                         {m.status}
@@ -414,71 +433,75 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
             </div>
           )}
 
-          {/* Commercial Mode: Sub-Plots Inventory Grid */}
+          {/* Sub-Plots Inventory */}
           {isCommercial && prop.subPlots && prop.subPlots.length > 0 && (
             <div className="flex flex-col gap-2.5">
               <div className="flex items-center justify-between flex-wrap gap-2">
-                <div className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                  <LayoutGrid className="w-4 h-4 text-emerald-400" />
-                  <span>Sub-Plot Inventory ({prop.subPlots.length} Plots)</span>
+                <div className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <LayoutGrid className="w-4 h-4 text-emerald-600" />
+                  <span>Sub-Plots ({prop.subPlots.length})</span>
                 </div>
                 {propertyMetrics?.subPlotStats && (
                   <div className="flex items-center gap-2 text-xs font-mono">
-                    <span className="px-2 py-0.5 rounded bg-emerald-950/40 text-emerald-400 border border-emerald-800/40 font-semibold">
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">
                       {propertyMetrics.subPlotStats.sold} Sold
                     </span>
-                    <span className="px-2 py-0.5 rounded bg-amber-950/40 text-amber-400 border border-amber-800/40 font-semibold">
+                    <span className="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-semibold">
                       {propertyMetrics.subPlotStats.booked} Booked
                     </span>
-                    <span className="px-2 py-0.5 rounded bg-[#181818] text-[#A1A1AA] border border-[#2c2c2c] font-semibold">
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 font-semibold">
                       {propertyMetrics.subPlotStats.available} Available
                     </span>
                   </div>
                 )}
               </div>
 
-              <div className="w-full max-w-full min-w-0 border border-[#262626] rounded-xl overflow-x-auto bg-[#050505]">
+              <div className="w-full min-w-0 border border-slate-200 rounded-2xl overflow-x-auto bg-white">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="bg-[#111111] border-b border-[#262626] text-[#A1A1AA] uppercase font-bold tracking-wider">
-                      <th className="py-2.5 px-3">Plot #</th>
-                      <th className="py-2.5 px-3">Area (Sq.ft)</th>
-                      <th className="py-2.5 px-3 text-right">Target Price</th>
-                      <th className="py-2.5 px-3">Status</th>
-                      <th className="py-2.5 px-3">Buyer</th>
-                      <th className="py-2.5 px-3 text-right">Sold Amount</th>
+                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-bold tracking-wider">
+                      <th className="py-2.5 px-3.5">Plot #</th>
+                      <th className="py-2.5 px-3.5">Area (Sq.ft)</th>
+                      <th className="py-2.5 px-3.5 text-right">Target Price</th>
+                      <th className="py-2.5 px-3.5">Status</th>
+                      <th className="py-2.5 px-3.5">Buyer</th>
+                      <th className="py-2.5 px-3.5 text-right">Sold Amount</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#181818]">
+                  <tbody className="divide-y divide-slate-100">
                     {prop.subPlots.map((sp, idx) => (
-                      <tr key={idx} className="hover:bg-[#101010]">
-                        <td className="py-2.5 px-3 font-mono font-bold text-white">
+                      <tr key={idx} className="hover:bg-slate-50">
+                        <td className="py-2.5 px-3.5 font-mono font-bold text-slate-900">
                           Plot #{sp.plotNumber}
                         </td>
-                        <td className="py-2.5 px-3 font-mono text-[#D4D4D8]">
-                          {sp.sqftArea ? `${sp.sqftArea.toLocaleString("en-IN")} sqft` : "-"}
+                        <td className="py-2.5 px-3.5 font-mono text-slate-600">
+                          {sp.sqftArea
+                            ? `${sp.sqftArea.toLocaleString("en-IN")} sqft`
+                            : "-"}
                         </td>
-                        <td className="py-2.5 px-3 text-right font-mono text-white">
+                        <td className="py-2.5 px-3.5 text-right font-mono text-slate-900">
                           {sp.targetPrice ? formatINR(sp.targetPrice) : "-"}
                         </td>
-                        <td className="py-2.5 px-3">
+                        <td className="py-2.5 px-3.5">
                           <span
-                            className={`font-mono text-[10px] font-semibold px-2 py-0.5 rounded border uppercase ${
+                            className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border capitalize ${
                               sp.status === "sold"
-                                ? "bg-emerald-950/40 text-emerald-400 border-emerald-800/40"
+                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                                 : sp.status === "booked"
-                                ? "bg-amber-950/40 text-amber-400 border-amber-800/40"
-                                : "bg-[#161616] text-[#A1A1AA] border-[#2c2c2c]"
+                                ? "bg-amber-50 text-amber-700 border-amber-200"
+                                : "bg-slate-100 text-slate-600 border-slate-200"
                             }`}
                           >
                             {sp.status}
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 text-[#D4D4D8]">
+                        <td className="py-2.5 px-3.5 text-slate-700">
                           {sp.buyerName || "-"}
                         </td>
-                        <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-400">
-                          {sp.status === "sold" ? formatINR(sp.targetPrice) : "-"}
+                        <td className="py-2.5 px-3.5 text-right font-mono font-bold text-emerald-700">
+                          {sp.status === "sold"
+                            ? formatINR(sp.targetPrice)
+                            : "-"}
                         </td>
                       </tr>
                     ))}
@@ -488,50 +511,54 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
             </div>
           )}
 
-          {/* Commercial Mode: Multi-Partner JV Equity Distribution */}
+          {/* JV Partners */}
           {isCommercial && prop.partners && prop.partners.length > 0 && (
             <div className="flex flex-col gap-2.5">
-              <div className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                <Users className="w-4 h-4 text-purple-400" />
-                <span>Joint Venture (JV) Partners Equity Split ({prop.partners.length} Partners)</span>
+              <div className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <Users className="w-4 h-4 text-violet-600" />
+                <span>Partners Equity Split ({prop.partners.length})</span>
               </div>
 
-              <div className="w-full max-w-full min-w-0 border border-[#262626] rounded-xl overflow-x-auto bg-[#050505]">
+              <div className="w-full min-w-0 border border-slate-200 rounded-2xl overflow-x-auto bg-white">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="bg-[#111111] border-b border-[#262626] text-[#A1A1AA] uppercase font-bold tracking-wider">
-                      <th className="py-2.5 px-3">Partner Name</th>
-                      <th className="py-2.5 px-3 text-right">Equity %</th>
-                      <th className="py-2.5 px-3 text-right">Committed Capital</th>
-                      <th className="py-2.5 px-3 text-right">Cost Outlay Share</th>
-                      <th className="py-2.5 px-3 text-right">Realized Profit Share</th>
-                      <th className="py-2.5 px-3 text-right">Projected Profit Share</th>
+                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-bold tracking-wider">
+                      <th className="py-2.5 px-3.5">Partner</th>
+                      <th className="py-2.5 px-3.5 text-right">Share %</th>
+                      <th className="py-2.5 px-3.5 text-right">Committed</th>
+                      <th className="py-2.5 px-3.5 text-right">Cost Share</th>
+                      <th className="py-2.5 px-3.5 text-right">Earned Profit</th>
+                      <th className="py-2.5 px-3.5 text-right">Expected Profit</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#181818]">
+                  <tbody className="divide-y divide-slate-100">
                     {prop.partners.map((partner, idx) => {
                       const alloc = propertyMetrics?.partnerAllocations?.find(
                         (pa) => pa.name === partner.name
                       );
                       return (
-                        <tr key={idx} className="hover:bg-[#101010]">
-                          <td className="py-2.5 px-3 font-semibold text-white">
+                        <tr key={idx} className="hover:bg-slate-50">
+                          <td className="py-2.5 px-3.5 font-semibold text-slate-900">
                             {partner.name}
                           </td>
-                          <td className="py-2.5 px-3 text-right font-mono font-bold text-purple-400">
+                          <td className="py-2.5 px-3.5 text-right font-mono font-bold text-violet-700">
                             {partner.equityPct}%
                           </td>
-                          <td className="py-2.5 px-3 text-right font-mono text-[#D4D4D8]">
-                            {partner.capitalCommitted ? formatINR(partner.capitalCommitted) : "-"}
+                          <td className="py-2.5 px-3.5 text-right font-mono text-slate-700">
+                            {partner.capitalCommitted
+                              ? formatINR(partner.capitalCommitted)
+                              : "-"}
                           </td>
-                          <td className="py-2.5 px-3 text-right font-mono text-[#A1A1AA]">
+                          <td className="py-2.5 px-3.5 text-right font-mono text-slate-600">
                             {alloc ? formatINR(alloc.costShare) : "-"}
                           </td>
-                          <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-400">
+                          <td className="py-2.5 px-3.5 text-right font-mono font-bold text-emerald-700">
                             {alloc ? formatINR(alloc.realizedProfitShare) : "-"}
                           </td>
-                          <td className="py-2.5 px-3 text-right font-mono text-white">
-                            {alloc ? formatINR(alloc.projectedProfitShare) : "-"}
+                          <td className="py-2.5 px-3.5 text-right font-mono text-slate-900">
+                            {alloc
+                              ? formatINR(alloc.projectedProfitShare)
+                              : "-"}
                           </td>
                         </tr>
                       );
@@ -542,93 +569,91 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
             </div>
           )}
 
-          {/* Action Row & Transaction Ledger Table */}
-          <div className="flex flex-col gap-3.5">
+          {/* Transactions History */}
+          <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between flex-wrap gap-2.5">
-              <div className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                <span>Itemized Property Ledger</span>
-                <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-[#161616] text-[#A1A1AA] border border-[#262626]">
-                  {txs.length} Transactions
+              <div className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <span>All Transactions for This Property</span>
+                <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                  {txs.length}
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
-                {/* Key Action: Log Outflow (Hover-to-White) */}
                 <button
                   onClick={() => onOpenEntryModal("outflow", prop.propertyCode)}
-                  className="btn-action-primary flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 transition-colors"
                 >
                   <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-                  <span>Log Outflow</span>
+                  <span>Record Payment</span>
                 </button>
                 {isCommercial && (
                   <button
                     onClick={() =>
                       onOpenEntryModal("inflow", prop.propertyCode)
                     }
-                    className="btn-action-primary flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm"
+                    className="btn-action-brand flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs"
                   >
-                    <ArrowUpRight className="w-3.5 h-3.5 text-[#22C55E]" />
-                    <span>Log Receipt</span>
+                    <ArrowDownRight className="w-3.5 h-3.5" />
+                    <span>Record Receipt</span>
                   </button>
                 )}
               </div>
             </div>
 
-            {/* Table */}
-            <div className="w-full max-w-full min-w-0 border border-[#262626] rounded-xl overflow-x-auto bg-[#050505]">
+            <div className="w-full min-w-0 border border-slate-200 rounded-2xl overflow-x-auto bg-white">
               <table className="w-full text-left text-sm border-collapse">
                 <thead>
-                  <tr className="bg-[#111111] border-b border-[#262626] text-[#D4D4D8] uppercase text-xs font-bold tracking-wider">
-                    <th className="py-3 px-3.5">Trans ID</th>
+                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-[11px] font-bold tracking-wider">
+                    <th className="py-3 px-3.5">ID</th>
                     <th className="py-3 px-3.5">Date</th>
                     <th className="py-3 px-3.5">Category</th>
                     <th className="py-3 px-3.5">Mode</th>
                     <th className="py-3 px-3.5 text-right">Amount</th>
-                    <th className="py-3 px-3.5">Recipient / Notes</th>
-                    <th className="py-3 px-3.5 text-right">Action</th>
+                    <th className="py-3 px-3.5">Party / Notes</th>
+                    <th className="py-3 px-3.5 text-right">Edit</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#181818]">
+                <tbody className="divide-y divide-slate-100">
                   {txs.length === 0 ? (
                     <tr>
                       <td
                         colSpan={7}
-                        className="py-8 text-center text-[#71717A] text-sm font-medium"
+                        className="py-10 text-center text-slate-400 text-sm font-medium"
                       >
                         No transactions recorded for this property yet.
                       </td>
                     </tr>
                   ) : (
                     txs.map((t) => (
-                      <tr key={t.id} className="hover:bg-[#101010] transition-colors">
-                        <td className="py-3 px-3.5 font-mono text-[#A1A1AA] font-semibold">
+                      <tr key={t.id} className="hover:bg-slate-50/80 transition-colors">
+                        <td className="py-3 px-3.5 font-mono text-slate-500 text-xs font-semibold">
                           {t.transCode || "-"}
                         </td>
-                        <td className="py-3 px-3.5 text-[#D4D4D8]">
+                        <td className="py-3 px-3.5 text-slate-600 whitespace-nowrap">
                           {formatDateIN(t.date)}
                         </td>
-                        <td className="py-3 px-3.5 font-semibold text-white">
+                        <td className="py-3 px-3.5 font-semibold text-slate-900">
                           <div className="flex items-center gap-1.5 flex-wrap">
                             <span>{t.category}</span>
                             {t.subPlotNumber && (
-                              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/40 text-emerald-400 border border-emerald-800/40">
+                              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                                 Plot #{t.subPlotNumber}
                               </span>
                             )}
                             {t.borneBy === "seller" && (
-                              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-950/50 text-amber-300 border border-amber-800/60 font-bold uppercase tracking-wider">
-                                Seller Borne
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-bold">
+                                For Seller
                               </span>
                             )}
                             {t.borneBy === "buyer" && (
-                              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-950/50 text-blue-300 border border-blue-800/60 font-bold uppercase tracking-wider">
-                                Buyer Borne
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-bold">
+                                For Buyer
                               </span>
                             )}
                             {t.borneBy === "split" && (
                               <span
-                                className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-950/50 text-purple-300 border border-purple-800/60 font-bold uppercase tracking-wider"
+                                className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-50 text-violet-700 border border-violet-200 font-bold"
                                 title={`Self: ₹${(t.amountSelf || 0).toLocaleString("en-IN")} | Seller: ₹${(t.amountSeller || 0).toLocaleString("en-IN")} | Buyer: ₹${(t.amountBuyer || 0).toLocaleString("en-IN")}`}
                               >
                                 Split
@@ -638,10 +663,10 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                         </td>
                         <td className="py-3 px-3.5">
                           <span
-                            className={`inline-flex items-center gap-1 font-mono text-xs font-semibold px-2 py-0.5 rounded border ${
+                            className={`inline-flex items-center gap-1 font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
                               t.mode === "Cash"
-                                ? "bg-amber-950/20 text-amber-400 border-amber-800/30"
-                                : "bg-blue-950/20 text-blue-400 border-blue-800/30"
+                                ? "bg-amber-50 text-amber-700 border-amber-200"
+                                : "bg-blue-50 text-blue-700 border-blue-200"
                             }`}
                           >
                             {t.mode === "Cash" ? (
@@ -655,23 +680,25 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                         <td
                           className={`py-3 px-3.5 text-right font-mono font-bold ${
                             t.transactionType === "deal_inflow"
-                              ? "text-[#22C55E]"
-                              : "text-white"
+                              ? "text-emerald-700"
+                              : "text-slate-900"
                           }`}
                         >
                           {t.transactionType === "deal_inflow" ? "+ " : ""}
                           {formatINR(t.amount)}
                         </td>
-                        <td className="py-3 px-3.5 text-[#A1A1AA]">
+                        <td className="py-3 px-3.5 text-slate-500">
                           <div className="flex items-center gap-2">
-                            <span className="max-w-[200px] truncate">{t.remarks || t.recipientOrSource || "-"}</span>
+                            <span className="max-w-[200px] truncate">
+                              {t.remarks || t.recipientOrSource || "-"}
+                            </span>
                             {t.attachmentUrl && (
                               <a
                                 href={t.attachmentUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-blue-400 hover:text-blue-300 flex-shrink-0"
-                                title="Open Attachment Proof"
+                                className="text-blue-600 hover:text-blue-800 flex-shrink-0"
+                                title="Open proof"
                               >
                                 <Link2 className="w-3.5 h-3.5" />
                               </a>
@@ -682,10 +709,10 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                           {onEditTransaction && (
                             <button
                               onClick={() => onEditTransaction(t)}
-                              className="btn-action-primary p-1.5 rounded-md inline-flex items-center justify-center"
-                              title="Edit Transaction"
+                              className="p-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100 inline-flex items-center justify-center transition-colors"
+                              title="Edit entry"
                             >
-                              <Pencil className="w-3.5 h-3.5 text-[#22C55E]" />
+                              <Pencil className="w-3.5 h-3.5" />
                             </button>
                           )}
                         </td>
@@ -695,11 +722,11 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                 </tbody>
                 {txs.length > 0 && (
                   <tfoot>
-                    <tr className="bg-[#111111] border-t-2 border-[#262626] font-bold text-white text-sm">
+                    <tr className="bg-slate-50 border-t border-slate-200 font-bold text-slate-900 text-sm">
                       <td colSpan={4} className="py-3.5 px-3.5">
                         Total Recorded for {prop.propertyCode}
                       </td>
-                      <td className="py-3.5 px-3.5 text-right font-mono text-[#22C55E]">
+                      <td className="py-3.5 px-3.5 text-right font-mono text-emerald-700">
                         {formatINR(
                           txs.reduce((sum, t) => sum + (t.amount || 0), 0)
                         )}
@@ -714,14 +741,14 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-3.5 border-t border-[#262626] bg-[#0c0c0c] flex justify-between items-center gap-2">
+        <div className="p-4 border-t border-slate-100 bg-slate-50/70 flex justify-between items-center gap-2">
           {onEditProperty ? (
             <button
               onClick={() => onEditProperty(prop)}
-              className="btn-action-primary px-3.5 py-2 rounded-lg text-xs sm:text-sm flex items-center gap-1.5"
+              className="btn-action-secondary px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5"
             >
-              <Pencil className="w-3.5 h-3.5 text-[#22C55E]" />
-              <span>Edit Property Valuations</span>
+              <Pencil className="w-3.5 h-3.5" />
+              <span>Edit Property Prices &amp; Details</span>
             </button>
           ) : (
             <div></div>
@@ -729,9 +756,9 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
 
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg bg-[#1a1a1a] text-white text-xs sm:text-sm font-semibold hover:bg-[#252525] border border-[#383838] transition-all duration-150"
+            className="btn-action-primary px-4 py-2 rounded-xl text-xs"
           >
-            Close Ledger
+            Done
           </button>
         </div>
       </div>

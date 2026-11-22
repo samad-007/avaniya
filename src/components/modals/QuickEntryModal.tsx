@@ -2,9 +2,17 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { amountToVerbalSummary } from "@/lib/formatters";
-import { SeedProperty, SeedCategory, SeedTransaction, SeedLoan } from "@/lib/seedData";
-import { PropertyFinancialMetrics, LoanFinancialMetrics } from "@/lib/formulaEngine";
-import { X, Banknote, Landmark, Plus, Edit3, HandCoins, Zap, Link2 } from "lucide-react";
+import {
+  SeedProperty,
+  SeedCategory,
+  SeedTransaction,
+  SeedLoan,
+} from "@/lib/seedData";
+import {
+  PropertyFinancialMetrics,
+  LoanFinancialMetrics,
+} from "@/lib/formulaEngine";
+import { X, Banknote, Landmark, Plus, Edit3, Zap, Link2 } from "lucide-react";
 
 interface QuickEntryModalProps {
   isOpen: boolean;
@@ -51,9 +59,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
   const [propertyCode, setPropertyCode] = useState<string>(
     defaultPropertyCode || ""
   );
-  const [loanCode, setLoanCode] = useState<string>(
-    defaultLoanCode || ""
-  );
+  const [loanCode, setLoanCode] = useState<string>(defaultLoanCode || "");
   const [subPlotNumber, setSubPlotNumber] = useState<string>("");
   const [attachmentUrl, setAttachmentUrl] = useState<string>("");
   const [category, setCategory] = useState<string>("");
@@ -70,13 +76,14 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
     | "Cash to Bank"
     | "Bank to Cash"
   >("Bank Withdrawal to Cash");
-  const [borneBy, setBorneBy] = useState<"self" | "seller" | "buyer" | "split">("self");
+  const [borneBy, setBorneBy] = useState<"self" | "seller" | "buyer" | "split">(
+    "self"
+  );
   const [amountSelf, setAmountSelf] = useState<number>(500000);
   const [amountSeller, setAmountSeller] = useState<number>(0);
   const [amountBuyer, setAmountBuyer] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Automatically keep allocation amounts in sync when mode is self, seller, or buyer
   useEffect(() => {
     if (borneBy === "self") {
       setAmountSelf(amount || 0);
@@ -117,7 +124,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
     if (activeType === "outflow") {
       if (activePropMetric && activePropMetric.pendingOutflow > 0) {
         return {
-          label: `Pay Deal Balance Due (${activePropMetric.property.propertyCode})`,
+          label: `Fill remaining seller balance (${activePropMetric.property.propertyCode})`,
           amount: activePropMetric.pendingOutflow,
           remarks: `Balance settlement for ${activePropMetric.property.propertyCode}`,
         };
@@ -125,7 +132,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
     } else if (activeType === "inflow") {
       if (activePropMetric && activePropMetric.pendingInflow > 0) {
         return {
-          label: `Collect Remaining Sale Value (${activePropMetric.property.propertyCode})`,
+          label: `Fill remaining buyer due (${activePropMetric.property.propertyCode})`,
           amount: activePropMetric.pendingInflow,
           remarks: `Sale value settlement for ${activePropMetric.property.propertyCode}`,
         };
@@ -134,7 +141,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
       if (loanSubtype === "loan_repayment") {
         if (activeLoanMetric && activeLoanMetric.outstandingPrincipal > 0) {
           return {
-            label: `Settle Loan Principal (${activeLoanMetric.loan.loanCode})`,
+            label: `Fill remaining loan principal (${activeLoanMetric.loan.loanCode})`,
             amount: activeLoanMetric.outstandingPrincipal,
             remarks: `Principal settlement for ${activeLoanMetric.loan.loanCode}`,
           };
@@ -148,15 +155,18 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           const annualInt = Math.round((principal * rate) / 100);
           const monthlyInt = Math.round(annualInt / 12);
           return {
-            label: `Pay Monthly Interest (${activeLoanMetric.loan.loanCode})`,
+            label: `Fill monthly interest (${activeLoanMetric.loan.loanCode})`,
             amount: monthlyInt,
             remarks: `Monthly interest payment for ${activeLoanMetric.loan.loanCode}`,
           };
         }
       } else if (loanSubtype === "loan_profit_share") {
-        if (activeLoanMetric && (activeLoanMetric.loan.profitSharePct || 0) > 0) {
+        if (
+          activeLoanMetric &&
+          (activeLoanMetric.loan.profitSharePct || 0) > 0
+        ) {
           return {
-            label: `Pay Profit Share (${activeLoanMetric.loan.loanCode})`,
+            label: `Pay profit share (${activeLoanMetric.loan.loanCode})`,
             amount: 0,
             remarks: `Profit share for ${activeLoanMetric.loan.loanCode}`,
           };
@@ -193,14 +203,13 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
     }
   }, [defaultPropertyCode, properties, currentScope, isOpen]);
 
-  // Robust category filtration matching scope and entry type
   const availableCategories = useMemo(() => {
     const list = categories.filter((c) => {
       const scopeMatches =
         c.scope === "both" ||
         c.scope === currentScope ||
         (!c.scope && currentScope === "commercial");
-      
+
       if (activeType === "transfer") {
         return scopeMatches && c.type === "transfer";
       }
@@ -234,7 +243,6 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
 
     if (list.length > 0) return list;
 
-    // Safety fallback defaults
     if (activeType === "loan") {
       if (loanSubtype === "loan_inflow") {
         return [
@@ -451,7 +459,6 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
     }
   }, [categories, currentScope, activeType, withdrawalSubtype, loanSubtype]);
 
-  // Synchronize category on modal open or type switch
   useEffect(() => {
     if (isOpen) {
       setIsCustomCategory(false);
@@ -462,7 +469,14 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
         }
       }
     }
-  }, [isOpen, activeType, withdrawalSubtype, loanSubtype, currentScope, availableCategories]);
+  }, [
+    isOpen,
+    activeType,
+    withdrawalSubtype,
+    loanSubtype,
+    currentScope,
+    availableCategories,
+  ]);
 
   if (!isOpen) return null;
 
@@ -483,7 +497,6 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           : "General Inflow")
       : category || (availableCategories[0]?.name ?? "General");
 
-    // Determine precise transaction type
     let finalTxType:
       | "outflow"
       | "deal_inflow"
@@ -588,185 +601,149 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           onClose();
         }
       }}
-      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto overflow-x-hidden animate-backdrop"
+      className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto overflow-x-hidden animate-backdrop"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-w-full min-w-0 max-h-[92vh] overflow-y-auto overflow-x-hidden p-4 sm:p-6 shadow-2xl my-auto flex flex-col gap-4 sm:gap-5 animate-modal"
+        className="bg-white border border-slate-200 rounded-2xl max-w-lg w-full min-w-0 max-h-[92vh] overflow-y-auto overflow-x-hidden p-5 sm:p-6 shadow-modal my-auto flex flex-col gap-4 sm:gap-5 animate-modal"
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#262626] pb-3 sm:pb-3.5 gap-2">
-          <div className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2 flex-wrap min-w-0 flex-1">
-            <span className="break-words">
+        <div className="flex items-start justify-between border-b border-slate-100 pb-3.5 gap-2">
+          <div className="min-w-0 flex-1">
+            <div className="text-base sm:text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2 flex-wrap">
+              <span>
+                {activeType === "outflow"
+                  ? "Record a Payment"
+                  : activeType === "inflow"
+                  ? "Record Money Received"
+                  : activeType === "withdrawal"
+                  ? "Record a Withdrawal"
+                  : activeType === "loan"
+                  ? "Record Loan Activity"
+                  : "Move Money (Bank ↔ Cash)"}
+              </span>
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                {currentScope === "commercial" ? "Business" : "Personal"}
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 mt-0.5">
               {activeType === "outflow"
-                ? "Record Outflow / Expense"
+                ? "Money you paid for a property, registration, or expense."
                 : activeType === "inflow"
-                ? "Record Inflow / Receipt"
+                ? "Money received from a buyer, partner, or personal savings."
                 : activeType === "withdrawal"
-                ? "Record Fund / Capital Withdrawal"
+                ? "Profit taken out or capital returned to a partner."
                 : activeType === "loan"
-                ? "Record Loan / Debt Transaction"
-                : "Internal Liquidity Transfer"}
-            </span>
-            <span className="text-[10px] sm:text-xs font-mono font-semibold px-2 py-0.5 rounded bg-[#161616] text-[#A1A1AA] border border-[#262626] flex-shrink-0">
-              {currentScope.toUpperCase()}
-            </span>
+                ? "Loan amount borrowed, repaid, or interest paid."
+                : "Transfer cash between your bank account and cash in hand."}
+            </p>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] transition-all duration-150 flex-shrink-0"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors flex-shrink-0"
+            aria-label="Close"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Entry Type Selector Tabs */}
-        <div className="grid grid-cols-5 gap-1 bg-[#111111] p-1 rounded-lg border border-[#262626] min-w-0">
-          <button
-            type="button"
-            onClick={() => setActiveType("outflow")}
-            className={`py-1.5 px-1 rounded-md text-[11px] sm:text-xs font-semibold transition-all duration-150 truncate min-w-0 ${
-              activeType === "outflow"
-                ? "bg-[#262626] text-white shadow-sm font-bold"
-                : "text-[#A1A1AA] hover:text-white"
-            }`}
-          >
-            Outflow
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveType("inflow")}
-            className={`py-1.5 px-1 rounded-md text-[11px] sm:text-xs font-semibold transition-all duration-150 truncate min-w-0 ${
-              activeType === "inflow"
-                ? "bg-[#262626] text-white shadow-sm font-bold text-[#22C55E]"
-                : "text-[#A1A1AA] hover:text-white"
-            }`}
-          >
-            Inflow
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveType("withdrawal")}
-            className={`py-1.5 px-1 rounded-md text-[11px] sm:text-xs font-semibold transition-all duration-150 truncate min-w-0 ${
-              activeType === "withdrawal"
-                ? "bg-[#262626] text-white shadow-sm font-bold text-amber-400"
-                : "text-[#A1A1AA] hover:text-white"
-            }`}
-          >
-            Withdraw
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveType("loan")}
-            className={`py-1.5 px-1 rounded-md text-[11px] sm:text-xs font-semibold transition-all duration-150 truncate min-w-0 ${
-              activeType === "loan"
-                ? "bg-[#262626] text-white shadow-sm font-bold text-emerald-400"
-                : "text-[#A1A1AA] hover:text-white"
-            }`}
-          >
-            Loan
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveType("transfer")}
-            className={`py-1.5 px-1 rounded-md text-[11px] sm:text-xs font-semibold transition-all duration-150 truncate min-w-0 ${
-              activeType === "transfer"
-                ? "bg-[#262626] text-white shadow-sm font-bold text-[#3B82F6]"
-                : "text-[#A1A1AA] hover:text-white"
-            }`}
-          >
-            Transfer
-          </button>
+        <div className="grid grid-cols-5 gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200/80 min-w-0">
+          {(
+            [
+              { id: "outflow", label: "Payment", activeClass: "text-rose-700" },
+              { id: "inflow", label: "Receipt", activeClass: "text-emerald-700" },
+              { id: "withdrawal", label: "Withdraw", activeClass: "text-amber-700" },
+              { id: "loan", label: "Loan", activeClass: "text-teal-700" },
+              { id: "transfer", label: "Transfer", activeClass: "text-blue-700" },
+            ] as const
+          ).map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveType(tab.id)}
+              className={`py-1.5 px-1 rounded-lg text-[11px] sm:text-xs font-semibold transition-all truncate min-w-0 ${
+                activeType === tab.id
+                  ? `bg-white shadow-sm font-bold ${tab.activeClass}`
+                  : "text-slate-500 hover:text-slate-900"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
-        {/* Loan Flow Selector (Only if activeType === "loan") */}
+        {/* Loan Flow Selector */}
         {activeType === "loan" && (
-          <div className="flex flex-col gap-2 bg-[#111111] p-3 rounded-lg border border-emerald-900/30">
-            <label className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">
-              Loan Action / Cashflow Direction
+          <div className="flex flex-col gap-2.5 bg-emerald-50/60 p-3.5 rounded-xl border border-emerald-200/80">
+            <label className="text-xs font-bold text-emerald-800">
+              What kind of loan entry is this?
             </label>
             <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setLoanSubtype("loan_inflow")}
-                className={`p-2 rounded-md text-left text-xs transition-all duration-150 border ${
-                  loanSubtype === "loan_inflow"
-                    ? "bg-emerald-950/50 border-emerald-500 text-white font-bold"
-                    : "bg-[#161616] border-[#2a2a2a] text-[#A1A1AA] hover:text-white"
-                }`}
-              >
-                <div className="font-semibold text-emerald-300">+ Borrow Funds</div>
-                <div className="text-[10px] text-[#A1A1AA] mt-0.5">
-                  Receiving loan injection (+ Bank/Cash)
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setLoanSubtype("loan_repayment")}
-                className={`p-2 rounded-md text-left text-xs transition-all duration-150 border ${
-                  loanSubtype === "loan_repayment"
-                    ? "bg-emerald-950/50 border-emerald-500 text-white font-bold"
-                    : "bg-[#161616] border-[#2a2a2a] text-[#A1A1AA] hover:text-white"
-                }`}
-              >
-                <div className="font-semibold text-emerald-300">- Repay Principal</div>
-                <div className="text-[10px] text-[#A1A1AA] mt-0.5">
-                  Paying back borrowed loan principal
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setLoanSubtype("loan_interest")}
-                className={`p-2 rounded-md text-left text-xs transition-all duration-150 border ${
-                  loanSubtype === "loan_interest"
-                    ? "bg-emerald-950/50 border-emerald-500 text-white font-bold"
-                    : "bg-[#161616] border-[#2a2a2a] text-[#A1A1AA] hover:text-white"
-                }`}
-              >
-                <div className="font-semibold text-emerald-300">- Pay Interest</div>
-                <div className="text-[10px] text-[#A1A1AA] mt-0.5">
-                  Finance charge / interest expense
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setLoanSubtype("loan_profit_share")}
-                className={`p-2 rounded-md text-left text-xs transition-all duration-150 border ${
-                  loanSubtype === "loan_profit_share"
-                    ? "bg-emerald-950/50 border-emerald-500 text-white font-bold"
-                    : "bg-[#161616] border-[#2a2a2a] text-[#A1A1AA] hover:text-white"
-                }`}
-              >
-                <div className="font-semibold text-emerald-300">- Pay Profit Share</div>
-                <div className="text-[10px] text-[#A1A1AA] mt-0.5">
-                  Distribute partner/friend profit bonus
-                </div>
-              </button>
+              {(
+                [
+                  {
+                    id: "loan_inflow",
+                    title: "+ Borrowed Money",
+                    desc: "Loan received into bank/cash",
+                  },
+                  {
+                    id: "loan_repayment",
+                    title: "- Repaid Principal",
+                    desc: "Paying back the loan amount",
+                  },
+                  {
+                    id: "loan_interest",
+                    title: "- Paid Interest",
+                    desc: "Monthly or periodic interest",
+                  },
+                  {
+                    id: "loan_profit_share",
+                    title: "- Paid Profit Share",
+                    desc: "Share of profit given to lender",
+                  },
+                ] as const
+              ).map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setLoanSubtype(opt.id)}
+                  className={`p-2.5 rounded-xl text-left text-xs transition-all border ${
+                    loanSubtype === opt.id
+                      ? "bg-white border-emerald-500 text-slate-900 shadow-sm ring-2 ring-emerald-500/15"
+                      : "bg-white/60 border-slate-200 text-slate-600 hover:bg-white"
+                  }`}
+                >
+                  <div className="font-bold text-emerald-800">{opt.title}</div>
+                  <div className="text-[11px] text-slate-500 mt-0.5">
+                    {opt.desc}
+                  </div>
+                </button>
+              ))}
             </div>
 
-            {/* Loan Facility Selector Dropdown */}
-            <div className="flex flex-col gap-1 mt-1 pt-2 border-t border-[#1e1e1e]">
-              <label className="text-[11px] font-semibold text-[#A1A1AA] uppercase tracking-wider">
-                Tag to Loan Facility Agreement
+            <div className="flex flex-col gap-1 pt-2 border-t border-emerald-200/60">
+              <label className="text-xs font-semibold text-slate-700">
+                Which Loan?
               </label>
               <select
                 value={loanCode}
                 onChange={(e) => {
                   setLoanCode(e.target.value);
-                  const selLoan = loans.find((l) => l.loanCode === e.target.value);
+                  const selLoan = loans.find(
+                    (l) => l.loanCode === e.target.value
+                  );
                   if (selLoan && !recipient) {
                     setRecipient(selLoan.lenderName);
                   }
                 }}
-                className="w-full max-w-full min-w-0 bg-[#161616] border border-[#2a2a2a] rounded-lg p-2 text-white text-xs outline-none focus:border-emerald-500 cursor-pointer truncate"
+                className="w-full min-w-0 bg-white border border-slate-200 rounded-xl p-2 text-slate-900 text-xs outline-none focus:border-emerald-500 cursor-pointer truncate"
               >
-                <option value="">-- General Unlinked Debt --</option>
+                <option value="">-- General Unlinked Loan --</option>
                 {loans.map((l) => (
                   <option key={l.id} value={l.loanCode}>
-                    {l.loanCode} : {l.lenderName} (₹{l.principalAmount.toLocaleString("en-IN")})
+                    {l.loanCode} : {l.lenderName} (₹
+                    {l.principalAmount.toLocaleString("en-IN")})
                   </option>
                 ))}
               </select>
@@ -774,49 +751,49 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           </div>
         )}
 
-        {/* Withdrawal Purpose Selector (Only if activeType === "withdrawal") */}
+        {/* Withdrawal Purpose Selector */}
         {activeType === "withdrawal" && (
-          <div className="flex flex-col gap-1.5 bg-[#111111] p-2.5 rounded-lg border border-amber-900/30">
-            <label className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
-              Withdrawal Type &amp; Purpose
+          <div className="flex flex-col gap-2 bg-amber-50/60 p-3.5 rounded-xl border border-amber-200/80">
+            <label className="text-xs font-bold text-amber-800">
+              What are you withdrawing?
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setWithdrawalSubtype("profit_withdrawal")}
-                className={`p-2 rounded-md text-left text-xs transition-all duration-150 border ${
+                className={`p-2.5 rounded-xl text-left text-xs transition-all border ${
                   withdrawalSubtype === "profit_withdrawal"
-                    ? "bg-amber-950/50 border-amber-500 text-white font-bold"
-                    : "bg-[#161616] border-[#2a2a2a] text-[#A1A1AA] hover:text-white"
+                    ? "bg-white border-amber-500 text-slate-900 shadow-sm ring-2 ring-amber-500/15"
+                    : "bg-white/60 border-slate-200 text-slate-600 hover:bg-white"
                 }`}
               >
-                <div className="font-semibold text-amber-300">Profit / Business Draw</div>
-                <div className="text-[10px] text-[#A1A1AA] mt-0.5">
-                  Draw profit to fund other venture / personal dividend
+                <div className="font-bold text-amber-800">Profit Drawing</div>
+                <div className="text-[11px] text-slate-500 mt-0.5">
+                  Take out earned profit for personal use
                 </div>
               </button>
               <button
                 type="button"
                 onClick={() => setWithdrawalSubtype("capital_withdrawal")}
-                className={`p-2 rounded-md text-left text-xs transition-all duration-150 border ${
+                className={`p-2.5 rounded-xl text-left text-xs transition-all border ${
                   withdrawalSubtype === "capital_withdrawal"
-                    ? "bg-amber-950/50 border-amber-500 text-white font-bold"
-                    : "bg-[#161616] border-[#2a2a2a] text-[#A1A1AA] hover:text-white"
+                    ? "bg-white border-amber-500 text-slate-900 shadow-sm ring-2 ring-amber-500/15"
+                    : "bg-white/60 border-slate-200 text-slate-600 hover:bg-white"
                 }`}
               >
-                <div className="font-semibold text-amber-300">Investment Capital Refund</div>
-                <div className="text-[10px] text-[#A1A1AA] mt-0.5">
-                  Return invested capital principal / reduce equity pool
+                <div className="font-bold text-amber-800">Capital Refund</div>
+                <div className="text-[11px] text-slate-500 mt-0.5">
+                  Return original invested money
                 </div>
               </button>
             </div>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3.5 sm:gap-4 text-sm">
-          {/* Big Amount Input with Live Indian Verbal Conversion */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-sm">
+          {/* Amount Input */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
+            <label className="text-xs font-semibold text-slate-700">
               Amount (₹ INR)
             </label>
             <input
@@ -824,15 +801,13 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
               value={amount || ""}
               onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
               placeholder="0"
-              className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 sm:p-3 text-xl sm:text-2xl font-mono font-bold text-white outline-none focus:border-[#555555] transition-all duration-150"
+              className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xl sm:text-2xl font-mono font-bold text-slate-900 outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 transition-all"
               required
             />
-            {/* Verbal Converter Display */}
-            <div className="bg-[#111111] border border-dashed border-[#383838] rounded-md px-3 py-1.5 text-xs font-mono font-semibold text-[#F59E0B]">
+            <div className="bg-amber-50 border border-amber-200/70 rounded-lg px-3 py-1.5 text-xs font-mono font-semibold text-amber-800">
               {amountToVerbalSummary(amount)}
             </div>
 
-            {/* Smart 1-Click Pay/Collect Balance Pre-fill */}
             {suggestedFill && (
               <button
                 type="button"
@@ -842,34 +817,33 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                     setRemarks(suggestedFill.remarks);
                   }
                 }}
-                className="flex items-center justify-between px-3 py-2 rounded-lg bg-emerald-950/40 border border-emerald-500/50 text-emerald-300 text-xs font-semibold hover:bg-emerald-900/50 hover:border-emerald-400 transition-all duration-150 text-left"
+                className="flex items-center justify-between px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold hover:bg-emerald-100/80 transition-colors text-left"
               >
                 <div className="flex items-center gap-1.5">
-                  <Zap className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                  <Zap className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
                   <span>{suggestedFill.label}</span>
                 </div>
-                <span className="font-mono font-bold text-white whitespace-nowrap ml-2">
+                <span className="font-mono font-bold text-emerald-900 whitespace-nowrap ml-2">
                   ₹{suggestedFill.amount.toLocaleString("en-IN")}
                 </span>
               </button>
             )}
 
-            {/* Quick Amount Increment Preset Chips */}
-            <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-1">
+            <div className="flex flex-wrap gap-1.5 mt-1">
               {[
                 { label: "+10k", val: 10000 },
                 { label: "+50k", val: 50000 },
-                { label: "+1 Lakh", val: 100000 },
-                { label: "+5 Lakhs", val: 500000 },
-                { label: "+10 Lakhs", val: 1000000 },
-                { label: "+50 Lakhs", val: 5000000 },
-                { label: "+1 Crore", val: 10000000 },
+                { label: "+1L", val: 100000 },
+                { label: "+5L", val: 500000 },
+                { label: "+10L", val: 1000000 },
+                { label: "+50L", val: 5000000 },
+                { label: "+1Cr", val: 10000000 },
               ].map((chip, idx) => (
                 <button
                   type="button"
                   key={idx}
                   onClick={() => handleAddPreset(chip.val)}
-                  className="px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-md bg-[#141414] border border-[#262626] text-[11px] sm:text-xs font-mono font-medium text-[#D4D4D8] hover:text-black hover:bg-white hover:border-white transition-all duration-150"
+                  className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-xs font-mono font-semibold text-slate-700 transition-colors"
                 >
                   {chip.label}
                 </button>
@@ -877,43 +851,43 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
             </div>
           </div>
 
-          {/* Payment Mode (Bank vs Cash) */}
+          {/* Payment Mode */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
+            <label className="text-xs font-semibold text-slate-700">
               Payment Mode
             </label>
-            <div className="grid grid-cols-2 gap-2 bg-[#111111] p-1 rounded-lg border border-[#262626]">
+            <div className="grid grid-cols-2 gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200/80">
               <button
                 type="button"
                 onClick={() => setMode("Bank")}
-                className={`py-2 sm:py-2.5 rounded-md flex items-center justify-center gap-1.5 sm:gap-2 font-semibold text-xs sm:text-sm transition-all duration-150 ${
+                className={`py-2 rounded-lg flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-all ${
                   mode === "Bank"
-                    ? "bg-[#262626] text-white shadow-sm font-bold"
-                    : "text-[#A1A1AA] hover:text-white"
+                    ? "bg-white text-slate-900 shadow-sm"
+                    : "text-slate-500 hover:text-slate-900"
                 }`}
               >
-                <Landmark className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#3B82F6]" />
-                <span>Bank (NEFT / RTGS)</span>
+                <Landmark className="w-4 h-4 text-blue-600" />
+                <span>Bank / UPI / Cheque</span>
               </button>
               <button
                 type="button"
                 onClick={() => setMode("Cash")}
-                className={`py-2 sm:py-2.5 rounded-md flex items-center justify-center gap-1.5 sm:gap-2 font-semibold text-xs sm:text-sm transition-all duration-150 ${
+                className={`py-2 rounded-lg flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-all ${
                   mode === "Cash"
-                    ? "bg-[#262626] text-white shadow-sm font-bold"
-                    : "text-[#A1A1AA] hover:text-white"
+                    ? "bg-white text-slate-900 shadow-sm"
+                    : "text-slate-500 hover:text-slate-900"
                 }`}
               >
-                <Banknote className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#22C55E]" />
-                <span>Cash in Hand</span>
+                <Banknote className="w-4 h-4 text-emerald-600" />
+                <span>Cash</span>
               </button>
             </div>
           </div>
 
-          {/* Transfer Type (Only if transfer mode) */}
+          {/* Transfer Direction */}
           {activeType === "transfer" && (
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
+              <label className="text-xs font-semibold text-slate-700">
                 Transfer Direction
               </label>
               <select
@@ -927,13 +901,13 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                       | "Bank to Cash"
                   )
                 }
-                className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#555555] truncate"
+                className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500 truncate"
               >
                 <option value="Bank Withdrawal to Cash">
-                  Bank Withdrawal to Cash (Withdraw from Bank into Cash Hand)
+                  Bank → Cash (Withdrew cash from bank)
                 </option>
                 <option value="Cash Deposit to Bank">
-                  Cash Deposit to Bank (Deposit Cash into Bank Account)
+                  Cash → Bank (Deposited cash into bank)
                 </option>
               </select>
             </div>
@@ -942,20 +916,19 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           {/* Link to Property */}
           {activeType !== "transfer" && activeType !== "withdrawal" && (
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
-                Link to Property / Land Deal
+              <label className="text-xs font-semibold text-slate-700">
+                Which Property?
               </label>
               <select
                 value={propertyCode}
                 onChange={(e) => setPropertyCode(e.target.value)}
-                className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#555555] truncate"
+                className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500 truncate"
               >
-                <option value="">-- General Portfolio (Unlinked) --</option>
+                <option value="">-- General Portfolio (Not linked to one property) --</option>
                 {properties
                   .filter(
                     (p) =>
-                      p.type === currentScope ||
-                      currentScope === "commercial"
+                      p.type === currentScope || currentScope === "commercial"
                   )
                   .map((p) => (
                     <option key={p.id} value={p.propertyCode}>
@@ -964,37 +937,40 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   ))}
               </select>
 
-              {/* Sub-Plot Dropdown (if land deal has sub-plots) */}
-              {selectedProperty?.subPlots && selectedProperty.subPlots.length > 0 && (
-                <div className="flex flex-col gap-1.5 mt-2 bg-[#141414] p-2.5 rounded-lg border border-[#262626]">
-                  <label className="text-[11px] font-semibold text-emerald-400 uppercase tracking-wider">
-                    Tag to Sub-Plot / Unit (Optional)
-                  </label>
-                  <select
-                    value={subPlotNumber}
-                    onChange={(e) => setSubPlotNumber(e.target.value)}
-                    className="w-full max-w-full min-w-0 bg-[#1c1c1c] border border-[#333333] rounded-lg p-2 text-white text-xs outline-none focus:border-emerald-500 cursor-pointer truncate"
-                  >
-                    <option value="">-- Deal Level (Whole Land Parcel) --</option>
-                    {selectedProperty.subPlots.map((sp) => (
-                      <option key={sp.id} value={sp.plotNumber}>
-                        Plot #{sp.plotNumber} ({sp.sqftArea.toLocaleString("en-IN")} sqft - {sp.status.toUpperCase()}{sp.buyerName ? ` - ${sp.buyerName}` : ""})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
+              {selectedProperty?.subPlots &&
+                selectedProperty.subPlots.length > 0 && (
+                  <div className="flex flex-col gap-1.5 mt-1 bg-emerald-50/50 p-2.5 rounded-xl border border-emerald-200/70">
+                    <label className="text-[11px] font-bold text-emerald-800">
+                      Specific Sub-Plot (Optional)
+                    </label>
+                    <select
+                      value={subPlotNumber}
+                      onChange={(e) => setSubPlotNumber(e.target.value)}
+                      className="w-full min-w-0 bg-white border border-slate-200 rounded-lg p-2 text-slate-900 text-xs outline-none focus:border-emerald-500 cursor-pointer truncate"
+                    >
+                      <option value="">-- Whole Property --</option>
+                      {selectedProperty.subPlots.map((sp) => (
+                        <option key={sp.id} value={sp.plotNumber}>
+                          Plot #{sp.plotNumber} (
+                          {sp.sqftArea.toLocaleString("en-IN")} sqft -{" "}
+                          {sp.status.toUpperCase()}
+                          {sp.buyerName ? ` - ${sp.buyerName}` : ""})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
             </div>
           )}
 
-          {/* Category Selector (Select / Custom Toggle) */}
+          {/* Category */}
           {activeType !== "transfer" && (
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between flex-wrap gap-1">
-                <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
+                <label className="text-xs font-semibold text-slate-700">
                   Category
                 </label>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2.5">
                   <button
                     type="button"
                     onClick={() => {
@@ -1003,18 +979,20 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                         setCustomCategoryInput(category);
                       }
                     }}
-                    className="text-xs text-[#22C55E] hover:underline flex items-center gap-1 font-semibold"
+                    className="text-xs text-emerald-700 hover:underline flex items-center gap-1 font-semibold"
                   >
                     <Edit3 className="w-3 h-3" />
-                    <span>{isCustomCategory ? "Pick from List" : "+ Type Custom"}</span>
+                    <span>
+                      {isCustomCategory ? "Pick from List" : "Type Custom"}
+                    </span>
                   </button>
                   <button
                     type="button"
                     onClick={onOpenCategoryModal}
-                    className="text-xs text-[#3B82F6] hover:underline flex items-center gap-1 font-semibold"
+                    className="text-xs text-blue-600 hover:underline flex items-center gap-1 font-semibold"
                   >
                     <Plus className="w-3 h-3" />
-                    <span className="hidden sm:inline">Engine</span>
+                    <span>Manage</span>
                   </button>
                 </div>
               </div>
@@ -1025,9 +1003,9 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                     type="text"
                     value={customCategoryInput}
                     onChange={(e) => setCustomCategoryInput(e.target.value)}
-                    placeholder="Type custom category name..."
+                    placeholder="Type category name..."
                     list="custom-inflow-suggestions"
-                    className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#22C55E]"
+                    className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500"
                     required
                     autoFocus
                   />
@@ -1041,10 +1019,10 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#555555] cursor-pointer truncate"
+                  className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500 cursor-pointer truncate"
                 >
                   {availableCategories.map((c, idx) => (
-                    <option key={idx} value={c.name} className="bg-[#111111] text-white">
+                    <option key={idx} value={c.name}>
                       {c.name}
                     </option>
                   ))}
@@ -1053,25 +1031,25 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
             </div>
           )}
 
-          {/* Expense Allocation / Borne By (Only for Outflows) */}
+          {/* Who Pays / Bears This Cost (Outflows only) */}
           {activeType === "outflow" && (
-            <div className="flex flex-col gap-2 bg-[#0c0c0c] p-3 rounded-lg border border-[#222222]">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
-                  Cost Borne By / Allocation
+            <div className="flex flex-col gap-2 bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
+              <div className="flex items-center justify-between flex-wrap gap-1">
+                <label className="text-xs font-semibold text-slate-700">
+                  Who bears this cost?
                 </label>
-                <span className="text-[11px] text-[#71717A] font-mono">
+                <span className="text-[11px] text-slate-500">
                   {borneBy === "self"
-                    ? "Developer project cost"
+                    ? "Your own project expense"
                     : borneBy === "seller"
-                    ? "Deducted from seller dues"
+                    ? "Deducted from seller balance"
                     : borneBy === "buyer"
-                    ? "Added to buyer receivables"
-                    : "Multi-party apportioned"}
+                    ? "Added to buyer bill"
+                    : "Split between parties"}
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-[#141414] p-1 rounded-lg border border-[#262626]">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200/70">
                 <button
                   type="button"
                   onClick={() => {
@@ -1080,13 +1058,13 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                     setAmountSeller(0);
                     setAmountBuyer(0);
                   }}
-                  className={`py-1.5 px-2 rounded-md text-xs font-medium transition-all duration-150 ${
+                  className={`py-1.5 px-2 rounded-lg text-xs font-semibold transition-all ${
                     borneBy === "self"
-                      ? "bg-[#262626] text-white font-bold shadow-sm"
-                      : "text-[#A1A1AA] hover:text-white"
+                      ? "bg-white text-slate-900 shadow-sm"
+                      : "text-slate-500 hover:text-slate-900"
                   }`}
                 >
-                  Self (Project)
+                  Myself
                 </button>
                 <button
                   type="button"
@@ -1096,10 +1074,10 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                     setAmountSelf(0);
                     setAmountBuyer(0);
                   }}
-                  className={`py-1.5 px-2 rounded-md text-xs font-medium transition-all duration-150 ${
+                  className={`py-1.5 px-2 rounded-lg text-xs font-semibold transition-all ${
                     borneBy === "seller"
-                      ? "bg-amber-950/60 border border-amber-600/50 text-amber-300 font-bold shadow-sm"
-                      : "text-[#A1A1AA] hover:text-white"
+                      ? "bg-amber-100 text-amber-900 shadow-sm"
+                      : "text-slate-500 hover:text-slate-900"
                   }`}
                 >
                   For Seller
@@ -1112,10 +1090,10 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                     setAmountSelf(0);
                     setAmountSeller(0);
                   }}
-                  className={`py-1.5 px-2 rounded-md text-xs font-medium transition-all duration-150 ${
+                  className={`py-1.5 px-2 rounded-lg text-xs font-semibold transition-all ${
                     borneBy === "buyer"
-                      ? "bg-blue-950/60 border border-blue-600/50 text-blue-300 font-bold shadow-sm"
-                      : "text-[#A1A1AA] hover:text-white"
+                      ? "bg-blue-100 text-blue-900 shadow-sm"
+                      : "text-slate-500 hover:text-slate-900"
                   }`}
                 >
                   For Buyer
@@ -1130,46 +1108,22 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                       setAmountBuyer(0);
                     }
                   }}
-                  className={`py-1.5 px-2 rounded-md text-xs font-medium transition-all duration-150 ${
+                  className={`py-1.5 px-2 rounded-lg text-xs font-semibold transition-all ${
                     borneBy === "split"
-                      ? "bg-purple-950/60 border border-purple-600/50 text-purple-300 font-bold shadow-sm"
-                      : "text-[#A1A1AA] hover:text-white"
+                      ? "bg-violet-100 text-violet-900 shadow-sm"
+                      : "text-slate-500 hover:text-slate-900"
                   }`}
                 >
-                  Custom Split
+                  Split Cost
                 </button>
               </div>
 
-              {/* Context Explanation */}
-              <div className="text-[11px] text-[#888888] leading-relaxed">
-                {borneBy === "self" && (
-                  <span>
-                    Regular project expenditure. Increases project outlay and directly reduces deal net profit.
-                  </span>
-                )}
-                {borneBy === "seller" && (
-                  <span className="text-amber-300/90">
-                    Paid on behalf of seller (e.g. taluk surveyor, court litigation, Section 194-IA TDS). Deducted from pending consideration dues to seller.
-                  </span>
-                )}
-                {borneBy === "buyer" && (
-                  <span className="text-blue-300/90">
-                    Paid on behalf of buyer (e.g. stamp duty, sub-registrar registration, Patta transfer). Added to outstanding customer receivable.
-                  </span>
-                )}
-                {borneBy === "split" && (
-                  <span className="text-purple-300/90">
-                    Disburse once from bank/cash, divided between developer outlay, seller deduction, and buyer billing.
-                  </span>
-                )}
-              </div>
-
-              {/* Split Inputs & Presets (Only when borneBy === "split") */}
               {borneBy === "split" && (
-                <div className="flex flex-col gap-2.5 pt-2 border-t border-[#1e1e1e]">
-                  {/* Preset Buttons */}
+                <div className="flex flex-col gap-2.5 pt-2 border-t border-slate-200/70">
                   <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="text-[11px] text-[#71717A] uppercase font-semibold mr-1">Presets:</span>
+                    <span className="text-[11px] text-slate-500 font-semibold mr-1">
+                      Quick split:
+                    </span>
                     <button
                       type="button"
                       onClick={() => {
@@ -1178,7 +1132,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                         setAmountSeller(amount - half);
                         setAmountBuyer(0);
                       }}
-                      className="px-2 py-0.5 rounded bg-[#181818] border border-[#2c2c2c] text-[11px] text-[#D4D4D8] hover:text-white hover:border-[#555]"
+                      className="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-[11px] text-slate-700 hover:bg-slate-100"
                     >
                       50/50 Self &amp; Seller
                     </button>
@@ -1190,7 +1144,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                         setAmountSeller(amount - half);
                         setAmountSelf(0);
                       }}
-                      className="px-2 py-0.5 rounded bg-[#181818] border border-[#2c2c2c] text-[11px] text-[#D4D4D8] hover:text-white hover:border-[#555]"
+                      className="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-[11px] text-slate-700 hover:bg-slate-100"
                     >
                       50/50 Buyer &amp; Seller
                     </button>
@@ -1200,62 +1154,90 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                         const third = Math.floor(amount / 3);
                         setAmountSelf(third);
                         setAmountSeller(third);
-                        setAmountBuyer(amount - (third * 2));
+                        setAmountBuyer(amount - third * 2);
                       }}
-                      className="px-2 py-0.5 rounded bg-[#181818] border border-[#2c2c2c] text-[11px] text-[#D4D4D8] hover:text-white hover:border-[#555]"
+                      className="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-[11px] text-slate-700 hover:bg-slate-100"
                     >
                       Equal 3-Way
                     </button>
                   </div>
 
-                  {/* 3 Input Fields */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div className="flex flex-col gap-1">
-                      <label className="text-[11px] font-semibold text-white">Self Share (₹)</label>
+                      <label className="text-[11px] font-semibold text-slate-700">
+                        My Share (₹)
+                      </label>
                       <input
                         type="number"
                         value={amountSelf || ""}
-                        onChange={(e) => setAmountSelf(parseFloat(e.target.value) || 0)}
+                        onChange={(e) =>
+                          setAmountSelf(parseFloat(e.target.value) || 0)
+                        }
                         placeholder="0"
-                        className="bg-[#141414] border border-[#282828] rounded-md px-2.5 py-1.5 text-xs text-white font-mono focus:border-purple-500 outline-none"
+                        className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 font-mono focus:border-violet-500 outline-none"
                       />
                     </div>
                     <div className="flex flex-col gap-1">
-                      <label className="text-[11px] font-semibold text-amber-400">Seller Share (₹)</label>
+                      <label className="text-[11px] font-semibold text-amber-700">
+                        Seller Share (₹)
+                      </label>
                       <input
                         type="number"
                         value={amountSeller || ""}
-                        onChange={(e) => setAmountSeller(parseFloat(e.target.value) || 0)}
+                        onChange={(e) =>
+                          setAmountSeller(parseFloat(e.target.value) || 0)
+                        }
                         placeholder="0"
-                        className="bg-[#141414] border border-[#282828] rounded-md px-2.5 py-1.5 text-xs text-amber-300 font-mono focus:border-amber-500 outline-none"
+                        className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-amber-800 font-mono focus:border-amber-500 outline-none"
                       />
                     </div>
                     <div className="flex flex-col gap-1">
-                      <label className="text-[11px] font-semibold text-blue-400">Buyer Share (₹)</label>
+                      <label className="text-[11px] font-semibold text-blue-700">
+                        Buyer Share (₹)
+                      </label>
                       <input
                         type="number"
                         value={amountBuyer || ""}
-                        onChange={(e) => setAmountBuyer(parseFloat(e.target.value) || 0)}
+                        onChange={(e) =>
+                          setAmountBuyer(parseFloat(e.target.value) || 0)
+                        }
                         placeholder="0"
-                        className="bg-[#141414] border border-[#282828] rounded-md px-2.5 py-1.5 text-xs text-blue-300 font-mono focus:border-blue-500 outline-none"
+                        className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-blue-800 font-mono focus:border-blue-500 outline-none"
                       />
                     </div>
                   </div>
 
-                  {/* Allocation Balance Status */}
                   <div className="flex items-center justify-between text-xs pt-1">
-                    <span className="text-[#A1A1AA]">
-                      Allocated: <span className="font-mono font-bold text-white">₹{((amountSelf || 0) + (amountSeller || 0) + (amountBuyer || 0)).toLocaleString("en-IN")}</span> / ₹{amount.toLocaleString("en-IN")}
+                    <span className="text-slate-600">
+                      Split Total:{" "}
+                      <span className="font-mono font-bold text-slate-900">
+                        ₹
+                        {(
+                          (amountSelf || 0) +
+                          (amountSeller || 0) +
+                          (amountBuyer || 0)
+                        ).toLocaleString("en-IN")}
+                      </span>{" "}
+                      / ₹{amount.toLocaleString("en-IN")}
                     </span>
-                    {amount - ((amountSelf || 0) + (amountSeller || 0) + (amountBuyer || 0)) === 0 ? (
-                      <span className="text-[#22C55E] font-medium flex items-center gap-1">
-                        Fully Allocated (100%)
+                    {amount -
+                      ((amountSelf || 0) +
+                        (amountSeller || 0) +
+                        (amountBuyer || 0)) ===
+                    0 ? (
+                      <span className="text-emerald-700 font-semibold">
+                        Matches 100%
                       </span>
                     ) : (
-                      <span className="text-amber-400 font-medium">
-                        {amount - ((amountSelf || 0) + (amountSeller || 0) + (amountBuyer || 0)) > 0
-                          ? `₹${(amount - ((amountSelf || 0) + (amountSeller || 0) + (amountBuyer || 0))).toLocaleString("en-IN")} unallocated`
-                          : `Over-allocated by ₹${Math.abs(amount - ((amountSelf || 0) + (amountSeller || 0) + (amountBuyer || 0))).toLocaleString("en-IN")}`}
+                      <span className="text-amber-700 font-semibold">
+                        ₹
+                        {Math.abs(
+                          amount -
+                            ((amountSelf || 0) +
+                              (amountSeller || 0) +
+                              (amountBuyer || 0))
+                        ).toLocaleString("en-IN")}{" "}
+                        difference
                       </span>
                     )}
                   </div>
@@ -1264,27 +1246,27 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
             </div>
           )}
 
-          {/* Date & Recipient Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5">
+          {/* Date & Person */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div className="flex flex-col gap-1.5 min-w-0">
-              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
+              <label className="text-xs font-semibold text-slate-700">
                 Date
               </label>
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
+                className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500"
                 required
               />
             </div>
             <div className="flex flex-col gap-1.5 min-w-0">
-              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
+              <label className="text-xs font-semibold text-slate-700">
                 {activeType === "inflow"
-                  ? "Received From / Source"
+                  ? "Received From"
                   : activeType === "withdrawal"
-                  ? "Beneficiary / Partner Withdrawing"
-                  : "Paid To / Beneficiary"}
+                  ? "Taken By"
+                  : "Paid To"}
               </label>
               <input
                 type="text"
@@ -1292,63 +1274,64 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                 onChange={(e) => setRecipient(e.target.value)}
                 placeholder={
                   activeType === "inflow"
-                    ? "e.g. Partner, Buyer, Escrow..."
+                    ? "e.g. Buyer name, Partner..."
                     : activeType === "withdrawal"
-                    ? "e.g. Samad (Draw), Partner A, Other Business LLC..."
-                    : "e.g. Seller, Lawyer, Stalin..."
+                    ? "e.g. Personal account, Partner..."
+                    : "e.g. Seller, Lawyer, Broker..."
                 }
-                className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
+                className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 placeholder:text-slate-400 text-sm outline-none focus:bg-white focus:border-emerald-500"
               />
             </div>
           </div>
 
-          {/* Remarks */}
+          {/* Notes */}
           <div className="flex flex-col gap-1.5 min-w-0">
-            <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
-              Remarks / Transaction Notes
+            <label className="text-xs font-semibold text-slate-700">
+              Notes (Optional)
             </label>
             <input
               type="text"
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
-              placeholder="e.g. Token advance paid at lawyer office, Cheque #004521"
-              className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
+              placeholder="e.g. Token advance paid, Cheque #004521"
+              className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 placeholder:text-slate-400 text-sm outline-none focus:bg-white focus:border-emerald-500"
             />
           </div>
 
-          {/* Document / Receipt Proof URL */}
+          {/* Receipt Link */}
           <div className="flex flex-col gap-1.5 min-w-0">
-            <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider flex items-center gap-1.5">
-              <Link2 className="w-3.5 h-3.5 text-[#A1A1AA]" />
-              <span>Document / Receipt Proof URL (Optional)</span>
+            <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+              <Link2 className="w-3.5 h-3.5 text-slate-400" />
+              <span>Receipt / Document Link (Optional)</span>
             </label>
             <input
               type="url"
               value={attachmentUrl}
               onChange={(e) => setAttachmentUrl(e.target.value)}
-              placeholder="https://drive.google.com/... or Dropbox / iCloud link"
-              className="w-full max-w-full min-w-0 bg-[#111111] border border-[#262626] rounded-lg p-2.5 text-white text-base sm:text-sm outline-none focus:border-[#555555]"
+              placeholder="https://drive.google.com/..."
+              className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 placeholder:text-slate-400 text-sm outline-none focus:bg-white focus:border-emerald-500"
             />
           </div>
 
-          {/* Submit Action Buttons */}
-          <div className="flex items-center gap-2.5 pt-2.5 border-t border-[#262626] flex-wrap sm:flex-nowrap">
+          {/* Submit */}
+          <div className="flex items-center gap-2.5 pt-3 border-t border-slate-100 flex-wrap sm:flex-nowrap">
             <button
               type="submit"
               disabled={
                 isSubmitting ||
                 (activeType === "outflow" &&
                   borneBy === "split" &&
-                  (amountSelf || 0) + (amountSeller || 0) + (amountBuyer || 0) !== amount)
+                  (amountSelf || 0) + (amountSeller || 0) + (amountBuyer || 0) !==
+                    amount)
               }
-              className="btn-action-primary flex-1 py-2.5 rounded-lg text-xs sm:text-sm disabled:opacity-50 font-semibold"
+              className="btn-action-brand flex-1 py-2.5 rounded-xl text-sm disabled:opacity-50"
             >
-              {isSubmitting ? "Saving Transaction..." : "Save Transaction"}
+              {isSubmitting ? "Saving..." : "Save Entry"}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-lg bg-[#161616] text-white border border-[#2a2a2a] text-xs sm:text-sm font-medium hover:bg-[#222222] transition-all duration-150"
+              className="btn-action-secondary px-4 py-2.5 rounded-xl text-sm"
             >
               Cancel
             </button>

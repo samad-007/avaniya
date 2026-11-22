@@ -53,116 +53,112 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
           onClose();
         }
       }}
-      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto overflow-x-hidden animate-backdrop"
+      className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto overflow-x-hidden animate-backdrop"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-lg w-full max-w-full min-w-0 max-h-[92vh] overflow-y-auto overflow-x-hidden p-5 sm:p-6 shadow-2xl my-auto flex flex-col gap-5 animate-modal"
+        className="bg-white border border-slate-200 rounded-2xl max-w-lg w-full min-w-0 max-h-[92vh] overflow-y-auto overflow-x-hidden p-5 sm:p-6 shadow-modal my-auto flex flex-col gap-5 animate-modal"
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#262626] pb-3.5 gap-2">
+        <div className="flex items-start justify-between border-b border-slate-100 pb-4 gap-2">
           <div className="min-w-0 flex-1">
-            <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2 break-words">
-              <Download className="w-5 h-5 flex-shrink-0" />
-              <span>Export Real Estate Portfolios</span>
+            <h2 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
+              <Download className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+              <span>Download Your Portfolio Report</span>
             </h2>
-            <div className="text-xs text-[#A1A1AA] mt-0.5 font-medium">
-              Take out your entire data in offline-compatible spreadsheets or
-              documents
-            </div>
+            <p className="text-xs text-slate-500 mt-1">
+              Save a copy of your properties and transactions for Excel, printing, or your CA.
+            </p>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-md text-[#A1A1AA] hover:text-white hover:bg-[#1a1a1a] flex-shrink-0"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex-shrink-0 transition-colors"
+            aria-label="Close"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Options */}
-        <div className="flex flex-col gap-3.5 min-w-0">
-          {/* Excel Export Card (Key Egress Action) */}
-          <div className="bg-[#111111] border border-[#262626] rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 hover:border-[#383838] transition-all duration-150 min-w-0">
+        <div className="flex flex-col gap-3 min-w-0">
+          {/* Excel Export Card */}
+          <div className="bg-slate-50/80 border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 hover:border-emerald-300 hover:bg-white transition-all min-w-0">
             <div className="flex items-start gap-3.5 min-w-0 flex-1">
-              <div className="w-10 h-10 rounded-lg bg-emerald-950/40 border border-emerald-800/40 flex items-center justify-center text-emerald-400 flex-shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 flex-shrink-0">
                 <FileSpreadsheet className="w-5 h-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="text-sm font-bold text-white">
-                  Multi-Tab Excel Workbook (.xlsx)
+                <div className="text-sm font-bold text-slate-900">
+                  Excel Workbook (.xlsx)
                 </div>
-                <div className="text-xs text-[#A1A1AA] mt-1 leading-relaxed font-medium">
-                  Interactive sheets (`Dashboard`, `Land_Master`, `Outflows`,
-                  `Deal_Inflows`, `Capital_Inflows`, `Transfers`) with live SUMIFS
-                  formulas and Indian Rupee formatting.
+                <div className="text-xs text-slate-500 mt-0.5 leading-relaxed">
+                  Multi-sheet workbook with live formulas and ₹ formatting — great for detailed review.
                 </div>
               </div>
             </div>
             <button
               onClick={() => handleDownload("excel")}
               disabled={downloading === "excel"}
-              className="btn-action-primary px-3.5 py-2 rounded-lg text-xs sm:text-sm whitespace-nowrap disabled:opacity-50 flex-shrink-0 w-full sm:w-auto"
+              className="btn-action-brand px-4 py-2 rounded-xl text-xs whitespace-nowrap disabled:opacity-50 flex-shrink-0 w-full sm:w-auto"
             >
-              {downloading === "excel" ? "Generating..." : "Download .xlsx"}
+              {downloading === "excel" ? "Preparing..." : "Download Excel"}
             </button>
           </div>
 
-          {/* PDF Export Card (Key Egress Action) */}
-          <div className="bg-[#111111] border border-[#262626] rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 hover:border-[#383838] transition-all duration-150 min-w-0">
+          {/* PDF Export Card */}
+          <div className="bg-slate-50/80 border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 hover:border-rose-300 hover:bg-white transition-all min-w-0">
             <div className="flex items-start gap-3.5 min-w-0 flex-1">
-              <div className="w-10 h-10 rounded-lg bg-rose-950/40 border border-rose-800/40 flex items-center justify-center text-rose-400 flex-shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 flex-shrink-0">
                 <FileText className="w-5 h-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="text-sm font-bold text-white">
-                  Executive PDF Deal Statement (.pdf)
+                <div className="text-sm font-bold text-slate-900">
+                  Summary PDF Statement (.pdf)
                 </div>
-                <div className="text-xs text-[#A1A1AA] mt-1 leading-relaxed font-medium">
-                  Print-ready executive summary of property deals, liquidity
-                  breakdowns, and pending buyer/seller statements.
+                <div className="text-xs text-slate-500 mt-0.5 leading-relaxed">
+                  Clean print-ready summary of your deals, cash &amp; bank balances, and pending dues.
                 </div>
               </div>
             </div>
             <button
               onClick={() => handleDownload("pdf")}
               disabled={downloading === "pdf"}
-              className="btn-action-primary px-3.5 py-2 rounded-lg text-xs sm:text-sm whitespace-nowrap disabled:opacity-50 flex-shrink-0 w-full sm:w-auto"
+              className="btn-action-primary px-4 py-2 rounded-xl text-xs whitespace-nowrap disabled:opacity-50 flex-shrink-0 w-full sm:w-auto"
             >
-              {downloading === "pdf" ? "Generating..." : "Download .pdf"}
+              {downloading === "pdf" ? "Preparing..." : "Download PDF"}
             </button>
           </div>
 
-          {/* CSV Export Card (Key Egress Action) */}
-          <div className="bg-[#111111] border border-[#262626] rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 hover:border-[#383838] transition-all duration-150 min-w-0">
+          {/* CSV Export Card */}
+          <div className="bg-slate-50/80 border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 hover:border-blue-300 hover:bg-white transition-all min-w-0">
             <div className="flex items-start gap-3.5 min-w-0 flex-1">
-              <div className="w-10 h-10 rounded-lg bg-blue-950/40 border border-blue-800/40 flex items-center justify-center text-blue-400 flex-shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 flex-shrink-0">
                 <Database className="w-5 h-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="text-sm font-bold text-white">
-                  Raw Transactions Ledger (.csv)
+                <div className="text-sm font-bold text-slate-900">
+                  All Transactions (.csv)
                 </div>
-                <div className="text-xs text-[#A1A1AA] mt-1 leading-relaxed font-medium">
-                  Normalized universal accounting CSV export for easy import
-                  into Tally or auditor software.
+                <div className="text-xs text-slate-500 mt-0.5 leading-relaxed">
+                  Simple spreadsheet file ready to import into Tally or any accounting tool.
                 </div>
               </div>
             </div>
             <button
               onClick={() => handleDownload("csv")}
               disabled={downloading === "csv"}
-              className="btn-action-primary px-3.5 py-2 rounded-lg text-xs sm:text-sm whitespace-nowrap disabled:opacity-50 flex-shrink-0 w-full sm:w-auto"
+              className="btn-action-secondary px-4 py-2 rounded-xl text-xs whitespace-nowrap disabled:opacity-50 flex-shrink-0 w-full sm:w-auto"
             >
-              {downloading === "csv" ? "Exporting..." : "Download .csv"}
+              {downloading === "csv" ? "Exporting..." : "Download CSV"}
             </button>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="pt-2 border-t border-[#262626] flex justify-end">
+        <div className="pt-3 border-t border-slate-100 flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg bg-[#161616] text-white text-xs sm:text-sm font-medium hover:bg-[#222222] transition-all duration-150"
+            className="btn-action-secondary px-4 py-2 rounded-xl text-xs"
           >
             Close
           </button>

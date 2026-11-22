@@ -28,43 +28,38 @@ export const ProfitKpiCard: React.FC<ProfitKpiCardProps> = ({
     <CyclingKpiCard
       cardAccentColor="emerald"
       panelA={{
-        title: "Actual Profit",
-        badge: "REALIZED",
-        badgeColor: "bg-emerald-950/60 text-emerald-400 border border-emerald-800/40",
-        titleColor: "text-emerald-400",
+        title: "Profit Earned",
+        badge: "Earned",
         value: formatINR(totalRealizedProfit),
-        valueColor: "text-emerald-400",
+        valueColor:
+          totalRealizedProfit >= 0 ? "text-emerald-700" : "text-rose-600",
         subtitle:
           totalPendingProfit > 0 ? (
-            <span className="text-amber-400/90">
-              Pending: {formatINR(totalPendingProfit)} to collect
+            <span className="text-amber-700 font-medium">
+              {formatINR(totalPendingProfit)} still to collect
             </span>
           ) : profitWithdrawalsTotal > 0 ? (
-            <span>Drawings: -{formatINR(profitWithdrawalsTotal)}</span>
+            <span>Withdrawn: {formatINR(profitWithdrawalsTotal)}</span>
           ) : (
             <span>
-              Settled Gains ({soldDealsCount}{" "}
-              {soldDealsCount === 1 ? "Deal" : "Deals"} Sold)
+              From {soldDealsCount} sold{" "}
+              {soldDealsCount === 1 ? "property" : "properties"}
             </span>
           ),
         icon: TrendingUp,
-        iconColor: "text-[#22C55E]",
       }}
       panelB={{
-        title: "Projected Profit",
-        badge: "PIPELINE",
-        badgeColor: "bg-emerald-950/60 text-emerald-400 border border-emerald-800/40",
-        titleColor: "text-emerald-400",
+        title: "Expected Profit",
+        badge: "Projected",
         value: formatINR(totalProjectedProfit),
-        valueColor: "text-emerald-400",
+        valueColor: "text-emerald-700",
         subtitle: (
           <span>
-            Across {activeDealsCount} Active{" "}
-            {activeDealsCount === 1 ? "Deal" : "Deals"} (Unsold)
+            Est. gain on {activeDealsCount} active{" "}
+            {activeDealsCount === 1 ? "deal" : "deals"}
           </span>
         ),
         icon: Target,
-        iconColor: "text-[#22C55E]",
       }}
       {...cyclingProps}
     />

@@ -1,8 +1,21 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { X, Save, Trash2, Calendar, AlertTriangle, ArrowRightLeft, DollarSign, Link2, ExternalLink } from "lucide-react";
-import { SeedTransaction, SeedProperty, SeedCategory, SeedLoan } from "@/lib/seedData";
+import {
+  X,
+  Save,
+  Trash2,
+  Calendar,
+  AlertTriangle,
+  Link2,
+  ExternalLink,
+} from "lucide-react";
+import {
+  SeedTransaction,
+  SeedProperty,
+  SeedCategory,
+  SeedLoan,
+} from "@/lib/seedData";
 import { formatINRCompact } from "@/lib/formatters";
 
 interface EditTransactionModalProps {
@@ -12,7 +25,10 @@ interface EditTransactionModalProps {
   properties: SeedProperty[];
   loans?: SeedLoan[];
   categories: SeedCategory[];
-  onSave: (transIdOrCode: string, updates: Partial<SeedTransaction>) => Promise<void>;
+  onSave: (
+    transIdOrCode: string,
+    updates: Partial<SeedTransaction>
+  ) => Promise<void>;
   onDelete?: (transIdOrCode: string) => Promise<void>;
 }
 
@@ -124,17 +140,20 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
       return;
     }
     if (!formData.amount || formData.amount <= 0) {
-      setErrorMsg("Amount must be a positive number greater than ₹0");
+      setErrorMsg("Amount must be greater than ₹0");
       return;
     }
 
-    if (formData.transactionType === "outflow" && formData.borneBy === "split") {
+    if (
+      formData.transactionType === "outflow" &&
+      formData.borneBy === "split"
+    ) {
       const self = formData.amountSelf || 0;
       const seller = formData.amountSeller || 0;
       const buyer = formData.amountBuyer || 0;
       if (self + seller + buyer !== formData.amount) {
         setErrorMsg(
-          `Split amounts (Self: ₹${self}, Seller: ₹${seller}, Buyer: ₹${buyer}) must equal total amount (₹${formData.amount})`
+          `Split amounts (₹${self + seller + buyer}) must equal total amount (₹${formData.amount})`
         );
         return;
       }
@@ -147,7 +166,10 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
       const transIdOrCode = transaction.id || transaction.transCode || "";
       const payload: Partial<SeedTransaction> = {
         ...formData,
-        borneBy: formData.transactionType === "outflow" ? formData.borneBy || "self" : "self",
+        borneBy:
+          formData.transactionType === "outflow"
+            ? formData.borneBy || "self"
+            : "self",
         amountSelf:
           formData.transactionType === "outflow"
             ? formData.borneBy === "split"
@@ -177,7 +199,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
       onClose();
     } catch (err: unknown) {
       setErrorMsg(
-        err instanceof Error ? err.message : "Failed to update transaction"
+        err instanceof Error ? err.message : "Failed to update entry"
       );
     } finally {
       setIsSaving(false);
@@ -195,7 +217,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
       onClose();
     } catch (err: unknown) {
       setErrorMsg(
-        err instanceof Error ? err.message : "Failed to delete transaction"
+        err instanceof Error ? err.message : "Failed to delete entry"
       );
     } finally {
       setIsDeleting(false);
@@ -209,54 +231,55 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
           onClose();
         }
       }}
-      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto overflow-x-hidden animate-backdrop"
+      className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto overflow-x-hidden animate-backdrop"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-xl w-full max-w-full p-4 sm:p-6 shadow-2xl flex flex-col gap-4 my-auto max-h-[92vh] overflow-y-auto overflow-x-hidden animate-modal min-w-0"
+        className="bg-white border border-slate-200 rounded-2xl max-w-xl w-full p-5 sm:p-6 shadow-modal flex flex-col gap-4 my-auto max-h-[92vh] overflow-y-auto overflow-x-hidden animate-modal min-w-0"
       >
         {/* Header */}
-        <div className="flex items-start justify-between pb-3 border-b border-[#262626] gap-3">
+        <div className="flex items-start justify-between pb-3.5 border-b border-slate-100 gap-3">
           <div className="flex items-start gap-3 min-w-0 flex-1">
-            <div className="w-9 h-9 rounded-lg bg-[#161616] border border-[#333333] text-white flex items-center justify-center font-mono font-bold text-xs flex-shrink-0 mt-0.5">
+            <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 flex items-center justify-center font-mono font-bold text-xs flex-shrink-0">
               {transaction.transCode ? transaction.transCode.slice(0, 3) : "TX"}
             </div>
             <div className="min-w-0 flex-1">
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2 flex-wrap">
-                <span className="break-words">Edit Transaction</span>
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2 flex-wrap">
+                <span>Edit Entry</span>
                 {transaction.transCode && (
-                  <span className="text-xs font-mono font-semibold text-[#A1A1AA] bg-[#161616] border border-[#262626] px-2 py-0.5 rounded flex-shrink-0">
+                  <span className="text-xs font-mono font-semibold text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md flex-shrink-0">
                     {transaction.transCode}
                   </span>
                 )}
               </h2>
-              <p className="text-xs text-[#A1A1AA] font-medium break-words mt-0.5">
-                Correct financial amounts, categories, modes, and dates
+              <p className="text-xs text-slate-500 mt-0.5">
+                Update the amount, date, category, or notes for this entry.
               </p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-[#A1A1AA] hover:text-white p-1 rounded-md transition-all duration-150 flex-shrink-0"
+            className="text-slate-400 hover:text-slate-700 hover:bg-slate-100 p-1.5 rounded-lg transition-colors flex-shrink-0"
+            aria-label="Close"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {errorMsg && (
-          <div className="bg-rose-950/30 border border-rose-800/40 text-rose-300 text-xs px-3.5 py-2 rounded-md font-medium">
+          <div className="bg-rose-50 border border-rose-200 text-rose-700 text-xs px-3.5 py-2.5 rounded-xl font-medium">
             {errorMsg}
           </div>
         )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-3.5 text-sm">
-          {/* Row 1: Scope & Transaction Type */}
+          {/* Row 1: Portfolio & Type */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5 min-w-0">
-              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
-                Portfolio Scope
+              <label className="text-xs font-semibold text-slate-700">
+                Portfolio
               </label>
               <select
                 value={formData.scope || "commercial"}
@@ -266,16 +289,16 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                     scope: e.target.value as "commercial" | "personal",
                   })
                 }
-                className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555] min-w-0"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500 min-w-0"
               >
-                <option value="commercial">Commercial Land Business</option>
-                <option value="personal">Personal Asset Investment</option>
+                <option value="commercial">Business Deals</option>
+                <option value="personal">Personal Homes</option>
               </select>
             </div>
 
             <div className="flex flex-col gap-1.5 min-w-0">
-              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
-                Transaction Type
+              <label className="text-xs font-semibold text-slate-700">
+                Entry Type
               </label>
               <select
                 value={formData.transactionType || "outflow"}
@@ -295,18 +318,18 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                       | "loan_profit_share",
                   })
                 }
-                className="w-full max-w-full bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555] min-w-0 truncate"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500 min-w-0 truncate"
               >
-                <option value="outflow">Property Outflow / Expense</option>
-                <option value="deal_inflow">Property Sale Receipt</option>
-                <option value="capital_inflow">External Capital Inflow</option>
-                <option value="loan_inflow">Loan Borrowing Inflow (+ Liquidity)</option>
-                <option value="loan_repayment">Loan Principal Repaid (- Liquidity)</option>
-                <option value="loan_interest">Loan Interest Paid (- Finance Expense)</option>
-                <option value="loan_profit_share">Loan Profit Share Paid (- Profit Bonus)</option>
-                <option value="profit_withdrawal">Profit Drawing / Business Draw</option>
-                <option value="capital_withdrawal">Investment Capital Refund</option>
-                <option value="transfer">Internal Bank / Cash Transfer</option>
+                <option value="outflow">Payment Made (Expense)</option>
+                <option value="deal_inflow">Buyer Sale Receipt</option>
+                <option value="capital_inflow">Capital / Funds Added</option>
+                <option value="loan_inflow">Loan Borrowed</option>
+                <option value="loan_repayment">Loan Principal Repaid</option>
+                <option value="loan_interest">Loan Interest Paid</option>
+                <option value="loan_profit_share">Loan Profit Share Paid</option>
+                <option value="profit_withdrawal">Profit Withdrawn</option>
+                <option value="capital_withdrawal">Capital Refunded</option>
+                <option value="transfer">Bank ↔ Cash Transfer</option>
               </select>
             </div>
           </div>
@@ -314,69 +337,69 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
           {/* Row 2: Date & Amount */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5 min-w-0">
-              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
-                Transaction Date
+              <label className="text-xs font-semibold text-slate-700">
+                Date
               </label>
               <div className="relative">
-                <Calendar className="w-4 h-4 text-[#71717A] absolute left-3 top-1/2 -translate-y-1/2" />
+                <Calendar className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="date"
                   value={formData.date || ""}
                   onChange={(e) =>
                     setFormData({ ...formData, date: e.target.value })
                   }
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555] min-w-0"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500 min-w-0"
                   required
                 />
               </div>
             </div>
 
             <div className="flex flex-col gap-1.5 min-w-0">
-              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
-                Amount (₹ INR)
+              <label className="text-xs font-semibold text-slate-700">
+                Amount (₹)
               </label>
-              <div className="relative">
-                <input
-                  type="number"
-                  value={formData.amount ?? ""}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      amount: parseFloat(e.target.value) || 0,
-                    })
-                  }
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm font-mono font-bold outline-none focus:border-[#555555] min-w-0"
-                  placeholder="e.g. 500000"
-                  required
-                />
-              </div>
-              <span className="text-xs text-[#22C55E] font-mono font-semibold">
+              <input
+                type="number"
+                value={formData.amount ?? ""}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    amount: parseFloat(e.target.value) || 0,
+                  })
+                }
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 text-sm font-mono font-bold outline-none focus:bg-white focus:border-emerald-500 min-w-0"
+                placeholder="e.g. 500000"
+                required
+              />
+              <span className="text-xs text-emerald-700 font-mono font-semibold">
                 {formData.amount ? formatINRCompact(formData.amount) : "₹ 0"}
               </span>
             </div>
           </div>
 
-          {/* Row 3: Linked Property / Loan & Category */}
+          {/* Row 3: Property / Loan & Category */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {formData.transactionType?.startsWith("loan_") ? (
               <div className="flex flex-col gap-1.5 min-w-0">
-                <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
-                  Linked Loan Agreement
+                <label className="text-xs font-semibold text-slate-700">
+                  Linked Loan
                 </label>
                 <select
                   value={formData.loanCode || ""}
                   onChange={(e) => {
                     const selectedCode = e.target.value;
-                    const matched = loans.find((l) => l.loanCode === selectedCode);
+                    const matched = loans.find(
+                      (l) => l.loanCode === selectedCode
+                    );
                     setFormData({
                       ...formData,
                       loanCode: selectedCode,
                       loanId: matched?.id,
                     });
                   }}
-                  className="w-full max-w-full bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-emerald-500 min-w-0 truncate"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500 min-w-0 truncate"
                 >
-                  <option value="">(None / Unlinked Debt)</option>
+                  <option value="">(Unlinked Loan)</option>
                   {loans.map((l) => (
                     <option key={l.id} value={l.loanCode}>
                       {l.loanCode} : {l.lenderName}
@@ -386,7 +409,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
               </div>
             ) : (
               <div className="flex flex-col gap-1.5 min-w-0">
-                <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
+                <label className="text-xs font-semibold text-slate-700">
                   Linked Property
                 </label>
                 <select
@@ -394,9 +417,9 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                   onChange={(e) =>
                     setFormData({ ...formData, propertyCode: e.target.value })
                   }
-                  className="w-full max-w-full bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555] min-w-0 truncate"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500 min-w-0 truncate"
                 >
-                  <option value="">(None / General Liquidity)</option>
+                  <option value="">(General Portfolio)</option>
                   {properties
                     .filter((p) => p.type === formData.scope)
                     .map((p) => (
@@ -406,23 +429,28 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                     ))}
                 </select>
 
-                {/* Sub-Plot Dropdown (if land deal has sub-plots) */}
                 {selectedProp?.subPlots && selectedProp.subPlots.length > 0 && (
-                  <div className="flex flex-col gap-1 mt-2 min-w-0">
-                    <label className="text-[11px] font-semibold text-emerald-400 uppercase tracking-wider">
-                      Tag to Sub-Plot
+                  <div className="flex flex-col gap-1 mt-1 min-w-0">
+                    <label className="text-[11px] font-semibold text-emerald-700">
+                      Sub-Plot (Optional)
                     </label>
                     <select
                       value={formData.subPlotNumber || ""}
                       onChange={(e) =>
-                        setFormData({ ...formData, subPlotNumber: e.target.value })
+                        setFormData({
+                          ...formData,
+                          subPlotNumber: e.target.value,
+                        })
                       }
-                      className="w-full max-w-full bg-[#161616] border border-[#333333] rounded-lg px-2.5 py-1.5 text-white text-xs outline-none focus:border-emerald-500 cursor-pointer min-w-0 truncate"
+                      className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-900 text-xs outline-none focus:border-emerald-500 cursor-pointer min-w-0 truncate"
                     >
-                      <option value="">(None / Deal Level)</option>
+                      <option value="">(Whole Property)</option>
                       {selectedProp.subPlots.map((sp) => (
                         <option key={sp.id} value={sp.plotNumber}>
-                          Plot #{sp.plotNumber} ({sp.sqftArea.toLocaleString("en-IN")} sqft - {sp.status.toUpperCase()}{sp.buyerName ? ` - ${sp.buyerName}` : ""})
+                          Plot #{sp.plotNumber} (
+                          {sp.sqftArea.toLocaleString("en-IN")} sqft -{" "}
+                          {sp.status.toUpperCase()}
+                          {sp.buyerName ? ` - ${sp.buyerName}` : ""})
                         </option>
                       ))}
                     </select>
@@ -432,7 +460,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
             )}
 
             <div className="flex flex-col gap-1.5 min-w-0">
-              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
+              <label className="text-xs font-semibold text-slate-700">
                 Category
               </label>
               <input
@@ -442,8 +470,8 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, category: e.target.value })
                 }
-                placeholder="Select or enter category..."
-                className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555] min-w-0"
+                placeholder="Select or type category..."
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500 min-w-0"
                 required
               />
               <datalist id="category-suggestions">
@@ -454,10 +482,10 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
             </div>
           </div>
 
-          {/* Row 4: Mode & Transfer Type */}
+          {/* Row 4: Mode & Person/Transfer */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5 min-w-0">
-              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
+              <label className="text-xs font-semibold text-slate-700">
                 Payment Mode
               </label>
               <select
@@ -468,16 +496,16 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                     mode: e.target.value as "Bank" | "Cash",
                   })
                 }
-                className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555] min-w-0"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500 min-w-0"
               >
-                <option value="Bank">Bank Account (NEFT / RTGS / Cheque)</option>
-                <option value="Cash">Cash in Hand</option>
+                <option value="Bank">Bank / UPI / Cheque</option>
+                <option value="Cash">Cash</option>
               </select>
             </div>
 
             {formData.transactionType === "transfer" ? (
               <div className="flex flex-col gap-1.5 min-w-0">
-                <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
+                <label className="text-xs font-semibold text-slate-700">
                   Transfer Direction
                 </label>
                 <select
@@ -490,20 +518,20 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                         | "Cash Deposit to Bank",
                     })
                   }
-                  className="w-full max-w-full bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555] min-w-0 truncate"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500 min-w-0 truncate"
                 >
                   <option value="Bank Withdrawal to Cash">
-                    Bank Withdrawal to Cash (-Bank / +Cash)
+                    Bank → Cash (Withdrawal)
                   </option>
                   <option value="Cash Deposit to Bank">
-                    Cash Deposit to Bank (-Cash / +Bank)
+                    Cash → Bank (Deposit)
                   </option>
                 </select>
               </div>
             ) : (
               <div className="flex flex-col gap-1.5 min-w-0">
-                <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
-                  Beneficiary / Source Name
+                <label className="text-xs font-semibold text-slate-700">
+                  Person / Party
                 </label>
                 <input
                   type="text"
@@ -514,32 +542,32 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                       recipientOrSource: e.target.value,
                     })
                   }
-                  placeholder="e.g. Land Owner, Advocate, Contractor"
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555] min-w-0"
+                  placeholder="e.g. Seller, Lawyer, Buyer"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 placeholder:text-slate-400 text-sm outline-none focus:bg-white focus:border-emerald-500 min-w-0"
                 />
               </div>
             )}
           </div>
 
-          {/* Expense Allocation / Borne By (Only for Outflows) */}
+          {/* Cost Allocation (Outflows) */}
           {formData.transactionType === "outflow" && (
-            <div className="flex flex-col gap-2 bg-[#0c0c0c] p-3 rounded-lg border border-[#222222]">
+            <div className="flex flex-col gap-2 bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
               <div className="flex items-center justify-between flex-wrap gap-1">
-                <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
-                  Cost Borne By / Allocation
+                <label className="text-xs font-semibold text-slate-700">
+                  Who bears this cost?
                 </label>
-                <span className="text-[11px] text-[#71717A] font-mono">
+                <span className="text-[11px] text-slate-500">
                   {formData.borneBy === "self"
-                    ? "Developer project cost"
+                    ? "Your own project expense"
                     : formData.borneBy === "seller"
-                    ? "Deducted from seller dues"
+                    ? "Deducted from seller balance"
                     : formData.borneBy === "buyer"
-                    ? "Added to buyer receivables"
-                    : "Multi-party apportioned"}
+                    ? "Added to buyer bill"
+                    : "Split between parties"}
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-[#141414] p-1 rounded-lg border border-[#262626]">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200/70">
                 <button
                   type="button"
                   onClick={() => {
@@ -552,13 +580,13 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                       amountBuyer: 0,
                     });
                   }}
-                  className={`py-1.5 px-2 rounded-md text-xs font-medium transition-all duration-150 ${
+                  className={`py-1.5 px-2 rounded-lg text-xs font-semibold transition-all ${
                     (formData.borneBy || "self") === "self"
-                      ? "bg-[#262626] text-white font-bold shadow-sm"
-                      : "text-[#A1A1AA] hover:text-white"
+                      ? "bg-white text-slate-900 shadow-sm"
+                      : "text-slate-500 hover:text-slate-900"
                   }`}
                 >
-                  Self (Project)
+                  Myself
                 </button>
                 <button
                   type="button"
@@ -572,10 +600,10 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                       amountBuyer: 0,
                     });
                   }}
-                  className={`py-1.5 px-2 rounded-md text-xs font-medium transition-all duration-150 ${
+                  className={`py-1.5 px-2 rounded-lg text-xs font-semibold transition-all ${
                     formData.borneBy === "seller"
-                      ? "bg-amber-950/60 border border-amber-600/50 text-amber-300 font-bold shadow-sm"
-                      : "text-[#A1A1AA] hover:text-white"
+                      ? "bg-amber-100 text-amber-900 shadow-sm"
+                      : "text-slate-500 hover:text-slate-900"
                   }`}
                 >
                   For Seller
@@ -592,10 +620,10 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                       amountSeller: 0,
                     });
                   }}
-                  className={`py-1.5 px-2 rounded-md text-xs font-medium transition-all duration-150 ${
+                  className={`py-1.5 px-2 rounded-lg text-xs font-semibold transition-all ${
                     formData.borneBy === "buyer"
-                      ? "bg-blue-950/60 border border-blue-600/50 text-blue-300 font-bold shadow-sm"
-                      : "text-[#A1A1AA] hover:text-white"
+                      ? "bg-blue-100 text-blue-900 shadow-sm"
+                      : "text-slate-500 hover:text-slate-900"
                   }`}
                 >
                   For Buyer
@@ -610,105 +638,31 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                     setFormData({
                       ...formData,
                       borneBy: "split",
-                      amountSelf: curSelf + curSeller + curBuyer === amt ? curSelf : amt,
-                      amountSeller: curSelf + curSeller + curBuyer === amt ? curSeller : 0,
-                      amountBuyer: curSelf + curSeller + curBuyer === amt ? curBuyer : 0,
+                      amountSelf:
+                        curSelf + curSeller + curBuyer === amt ? curSelf : amt,
+                      amountSeller:
+                        curSelf + curSeller + curBuyer === amt ? curSeller : 0,
+                      amountBuyer:
+                        curSelf + curSeller + curBuyer === amt ? curBuyer : 0,
                     });
                   }}
-                  className={`py-1.5 px-2 rounded-md text-xs font-medium transition-all duration-150 ${
+                  className={`py-1.5 px-2 rounded-lg text-xs font-semibold transition-all ${
                     formData.borneBy === "split"
-                      ? "bg-purple-950/60 border border-purple-600/50 text-purple-300 font-bold shadow-sm"
-                      : "text-[#A1A1AA] hover:text-white"
+                      ? "bg-violet-100 text-violet-900 shadow-sm"
+                      : "text-slate-500 hover:text-slate-900"
                   }`}
                 >
-                  Custom Split
+                  Split Cost
                 </button>
               </div>
 
-              {/* Context Explanation */}
-              <div className="text-[11px] text-[#888888] leading-relaxed">
-                {(formData.borneBy || "self") === "self" && (
-                  <span>
-                    Regular project expenditure. Increases project outlay and directly reduces deal net profit.
-                  </span>
-                )}
-                {formData.borneBy === "seller" && (
-                  <span className="text-amber-300/90">
-                    Paid on behalf of seller. Deducted from pending consideration dues to seller.
-                  </span>
-                )}
-                {formData.borneBy === "buyer" && (
-                  <span className="text-blue-300/90">
-                    Paid on behalf of buyer. Added to outstanding customer receivable.
-                  </span>
-                )}
-                {formData.borneBy === "split" && (
-                  <span className="text-purple-300/90">
-                    Disbursed from bank/cash, divided between developer outlay, seller deduction, and buyer billing.
-                  </span>
-                )}
-              </div>
-
-              {/* Split Inputs & Presets (Only when borneBy === "split") */}
               {formData.borneBy === "split" && (
-                <div className="flex flex-col gap-2.5 pt-2 border-t border-[#1e1e1e]">
-                  {/* Presets */}
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="text-[11px] text-[#71717A] uppercase font-semibold mr-1">Presets:</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const amt = formData.amount || 0;
-                        const half = Math.round(amt * 0.5);
-                        setFormData({
-                          ...formData,
-                          amountSelf: half,
-                          amountSeller: amt - half,
-                          amountBuyer: 0,
-                        });
-                      }}
-                      className="px-2 py-0.5 rounded bg-[#181818] border border-[#2c2c2c] text-[11px] text-[#D4D4D8] hover:text-white hover:border-[#555]"
-                    >
-                      50/50 Self &amp; Seller
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const amt = formData.amount || 0;
-                        const half = Math.round(amt * 0.5);
-                        setFormData({
-                          ...formData,
-                          amountBuyer: half,
-                          amountSeller: amt - half,
-                          amountSelf: 0,
-                        });
-                      }}
-                      className="px-2 py-0.5 rounded bg-[#181818] border border-[#2c2c2c] text-[11px] text-[#D4D4D8] hover:text-white hover:border-[#555]"
-                    >
-                      50/50 Buyer &amp; Seller
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const amt = formData.amount || 0;
-                        const third = Math.floor(amt / 3);
-                        setFormData({
-                          ...formData,
-                          amountSelf: third,
-                          amountSeller: third,
-                          amountBuyer: amt - (third * 2),
-                        });
-                      }}
-                      className="px-2 py-0.5 rounded bg-[#181818] border border-[#2c2c2c] text-[11px] text-[#D4D4D8] hover:text-white hover:border-[#555]"
-                    >
-                      Equal 3-Way
-                    </button>
-                  </div>
-
-                  {/* 3 Input Fields */}
+                <div className="flex flex-col gap-2.5 pt-2 border-t border-slate-200/70">
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div className="flex flex-col gap-1">
-                      <label className="text-[11px] font-semibold text-white">Self Share (₹)</label>
+                      <label className="text-[11px] font-semibold text-slate-700">
+                        My Share (₹)
+                      </label>
                       <input
                         type="number"
                         value={formData.amountSelf || ""}
@@ -719,11 +673,13 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                           })
                         }
                         placeholder="0"
-                        className="bg-[#141414] border border-[#282828] rounded-md px-2.5 py-1.5 text-xs text-white font-mono focus:border-purple-500 outline-none"
+                        className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 font-mono focus:border-violet-500 outline-none"
                       />
                     </div>
                     <div className="flex flex-col gap-1">
-                      <label className="text-[11px] font-semibold text-amber-400">Seller Share (₹)</label>
+                      <label className="text-[11px] font-semibold text-amber-700">
+                        Seller Share (₹)
+                      </label>
                       <input
                         type="number"
                         value={formData.amountSeller || ""}
@@ -734,11 +690,13 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                           })
                         }
                         placeholder="0"
-                        className="bg-[#141414] border border-[#282828] rounded-md px-2.5 py-1.5 text-xs text-amber-300 font-mono focus:border-amber-500 outline-none"
+                        className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-amber-800 font-mono focus:border-amber-500 outline-none"
                       />
                     </div>
                     <div className="flex flex-col gap-1">
-                      <label className="text-[11px] font-semibold text-blue-400">Buyer Share (₹)</label>
+                      <label className="text-[11px] font-semibold text-blue-700">
+                        Buyer Share (₹)
+                      </label>
                       <input
                         type="number"
                         value={formData.amountBuyer || ""}
@@ -749,49 +707,19 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                           })
                         }
                         placeholder="0"
-                        className="bg-[#141414] border border-[#282828] rounded-md px-2.5 py-1.5 text-xs text-blue-300 font-mono focus:border-blue-500 outline-none"
+                        className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-blue-800 font-mono focus:border-blue-500 outline-none"
                       />
                     </div>
-                  </div>
-
-                  {/* Allocation Status */}
-                  <div className="flex items-center justify-between text-xs pt-1">
-                    <span className="text-[#A1A1AA]">
-                      Allocated:{" "}
-                      <span className="font-mono font-bold text-white">
-                        ₹{(((formData.amountSelf || 0) + (formData.amountSeller || 0) + (formData.amountBuyer || 0))).toLocaleString("en-IN")}
-                      </span>{" "}
-                      / ₹{(formData.amount || 0).toLocaleString("en-IN")}
-                    </span>
-                    {(formData.amount || 0) -
-                      ((formData.amountSelf || 0) +
-                        (formData.amountSeller || 0) +
-                        (formData.amountBuyer || 0)) ===
-                    0 ? (
-                      <span className="text-[#22C55E] font-medium flex items-center gap-1">
-                        Fully Allocated (100%)
-                      </span>
-                    ) : (
-                      <span className="text-amber-400 font-medium">
-                        {(formData.amount || 0) -
-                          ((formData.amountSelf || 0) +
-                            (formData.amountSeller || 0) +
-                            (formData.amountBuyer || 0)) >
-                        0
-                          ? `₹${((formData.amount || 0) - ((formData.amountSelf || 0) + (formData.amountSeller || 0) + (formData.amountBuyer || 0))).toLocaleString("en-IN")} unallocated`
-                          : `Over-allocated by ₹${Math.abs((formData.amount || 0) - ((formData.amountSelf || 0) + (formData.amountSeller || 0) + (formData.amountBuyer || 0))).toLocaleString("en-IN")}`}
-                      </span>
-                    )}
                   </div>
                 </div>
               )}
             </div>
           )}
 
-          {/* Row 5: Remarks / Notes */}
+          {/* Notes */}
           <div className="flex flex-col gap-1.5 min-w-0">
-            <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
-              Remarks &amp; Audit Notes
+            <label className="text-xs font-semibold text-slate-700">
+              Notes (Optional)
             </label>
             <textarea
               rows={2}
@@ -799,24 +727,24 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
               onChange={(e) =>
                 setFormData({ ...formData, remarks: e.target.value })
               }
-              placeholder="e.g. Advance paid against survey no. 442/1B, Cheque #004521"
-              className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555] min-w-0 resize-none"
+              placeholder="e.g. Advance paid, Cheque #004521"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-slate-900 placeholder:text-slate-400 text-sm outline-none focus:bg-white focus:border-emerald-500 min-w-0 resize-none"
             />
           </div>
 
-          {/* Row 6: Attachment URL */}
+          {/* Attachment URL */}
           <div className="flex flex-col gap-1.5 min-w-0">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider flex items-center gap-1.5">
-                <Link2 className="w-3.5 h-3.5 text-[#A1A1AA]" />
-                <span>Document / Receipt Proof URL</span>
+              <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+                <Link2 className="w-3.5 h-3.5 text-slate-400" />
+                <span>Receipt / Proof Link (Optional)</span>
               </label>
               {formData.attachmentUrl && (
                 <a
                   href={formData.attachmentUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-blue-400 hover:text-blue-300 hover:underline flex items-center gap-1"
+                  className="text-xs text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 font-medium"
                 >
                   <ExternalLink className="w-3 h-3" />
                   <span>Open Link</span>
@@ -829,36 +757,39 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
               onChange={(e) =>
                 setFormData({ ...formData, attachmentUrl: e.target.value })
               }
-              placeholder="https://drive.google.com/... or Dropbox / iCloud link"
-              className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2 text-white text-base sm:text-sm outline-none focus:border-[#555555] min-w-0"
+              placeholder="https://drive.google.com/..."
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-slate-900 placeholder:text-slate-400 text-sm outline-none focus:bg-white focus:border-emerald-500 min-w-0"
             />
           </div>
 
-          {/* Delete Confirmation Alert */}
+          {/* Delete Confirmation */}
           {showDeleteConfirm && (
-            <div className="bg-rose-950/40 border border-rose-800/60 p-3 rounded-lg flex flex-col gap-2 min-w-0">
-              <div className="flex items-center gap-2 text-rose-300 text-xs font-bold">
-                <AlertTriangle className="w-4 h-4 text-rose-400 flex-shrink-0" />
-                <span>Confirm Permanent Deletion?</span>
+            <div className="bg-rose-50 border border-rose-200 p-3.5 rounded-xl flex flex-col gap-2 min-w-0">
+              <div className="flex items-center gap-2 text-rose-800 text-xs font-bold">
+                <AlertTriangle className="w-4 h-4 text-rose-600 flex-shrink-0" />
+                <span>Delete this entry permanently?</span>
               </div>
-              <p className="text-xs text-rose-200/80 break-words">
-                This will remove transaction{" "}
-                <strong className="text-white font-mono">{transaction.transCode || transaction.id}</strong> (
-                {formData.amount ? formatINRCompact(formData.amount) : "₹ 0"}) and immediately recalculate portfolio liquidity.
+              <p className="text-xs text-rose-700 break-words">
+                This will remove{" "}
+                <strong className="font-mono">
+                  {transaction.transCode || transaction.id}
+                </strong>{" "}
+                ({formData.amount ? formatINRCompact(formData.amount) : "₹ 0"})
+                and recalculate your balances immediately.
               </p>
               <div className="flex items-center gap-2 mt-1 flex-wrap">
                 <button
                   type="button"
                   onClick={handleDelete}
                   disabled={isDeleting}
-                  className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded text-xs font-bold transition-colors"
+                  className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold transition-colors"
                 >
-                  {isDeleting ? "Deleting..." : "Yes, Delete Transaction"}
+                  {isDeleting ? "Deleting..." : "Yes, Delete"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="px-3 py-1.5 bg-[#1a1a1a] hover:bg-[#262626] text-white rounded text-xs transition-colors"
+                  className="btn-action-secondary px-3 py-1.5 rounded-lg text-xs"
                 >
                   Cancel
                 </button>
@@ -867,13 +798,13 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
           )}
 
           {/* Actions Footer */}
-          <div className="flex items-center justify-between gap-2.5 pt-3 border-t border-[#262626] mt-1 flex-wrap">
+          <div className="flex items-center justify-between gap-2.5 pt-3 border-t border-slate-100 mt-1 flex-wrap">
             {onDelete && !showDeleteConfirm ? (
               <button
                 type="button"
                 onClick={() => setShowDeleteConfirm(true)}
-                className="p-2 rounded-lg text-[#71717A] hover:text-rose-400 hover:bg-rose-950/20 border border-transparent hover:border-rose-900/40 transition-all duration-150 flex items-center gap-1.5 text-xs font-medium"
-                title="Delete this transaction"
+                className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-colors flex items-center gap-1.5 text-xs font-semibold"
+                title="Delete entry"
               >
                 <Trash2 className="w-4 h-4" />
                 <span className="hidden sm:inline">Delete</span>
@@ -886,7 +817,7 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded-lg bg-[#141414] text-white text-xs sm:text-sm font-medium border border-[#282828] hover:bg-[#202020] transition-all duration-150"
+                className="btn-action-secondary px-4 py-2 rounded-xl text-xs sm:text-sm"
               >
                 Cancel
               </button>
@@ -901,10 +832,10 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                       (formData.amountBuyer || 0) !==
                       (formData.amount || 0))
                 }
-                className="btn-action-primary px-5 py-2 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 disabled:opacity-50"
+                className="btn-action-brand px-5 py-2 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
-                <span>{isSaving ? "Saving..." : "Save Transaction"}</span>
+                <span>{isSaving ? "Saving..." : "Save Changes"}</span>
               </button>
             </div>
           </div>

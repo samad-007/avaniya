@@ -10,31 +10,44 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#000000",
-        foreground: "#FFFFFF",
+        background: "#F8FAFC",
+        foreground: "#0F172A",
         card: {
-          DEFAULT: "#0a0a0a",
-          elevated: "#111111",
-          foreground: "#FFFFFF",
+          DEFAULT: "#FFFFFF",
+          elevated: "#F8FAFC",
+          foreground: "#0F172A",
         },
         border: {
-          DEFAULT: "#222222",
-          focus: "#444444",
+          DEFAULT: "#E2E8F0",
+          focus: "#94A3B8",
         },
         muted: {
-          DEFAULT: "#141414",
-          foreground: "#888888",
+          DEFAULT: "#F1F5F9",
+          foreground: "#64748B",
+        },
+        brand: {
+          50: "#ECFDF5",
+          100: "#D1FAE5",
+          500: "#10B981",
+          600: "#059669",
+          700: "#047857",
         },
         accent: {
-          green: "#22C55E",
-          red: "#EF4444",
-          amber: "#F59E0B",
-          blue: "#3B82F6",
+          green: "#059669",
+          red: "#E11D48",
+          amber: "#D97706",
+          blue: "#2563EB",
         },
       },
       fontFamily: {
-        sans: ["var(--font-plex-sans)", "sans-serif"],
+        sans: ["var(--font-sans)", "sans-serif"],
         mono: ["var(--font-jetbrains-mono)", "monospace"],
+      },
+      boxShadow: {
+        soft: "0 1px 3px 0 rgba(15, 23, 42, 0.05), 0 1px 2px -1px rgba(15, 23, 42, 0.04)",
+        card: "0 2px 8px -2px rgba(15, 23, 42, 0.06), 0 1px 3px -1px rgba(15, 23, 42, 0.04)",
+        "card-hover": "0 10px 24px -6px rgba(15, 23, 42, 0.09), 0 4px 8px -4px rgba(15, 23, 42, 0.05)",
+        modal: "0 24px 48px -12px rgba(15, 23, 42, 0.22)",
       },
     },
   },

@@ -1,7 +1,19 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, Building2, Save, Trash2, Plus, Calendar, MapPin, Link2, ExternalLink, Users, Grid } from "lucide-react";
+import {
+  X,
+  Building2,
+  Save,
+  Trash2,
+  Plus,
+  Calendar,
+  MapPin,
+  Link2,
+  ExternalLink,
+  Users,
+  Grid,
+} from "lucide-react";
 import { SeedProperty, SeedSubPlot, SeedPartner } from "@/lib/seedData";
 import { formatINRCompact } from "@/lib/formatters";
 
@@ -53,7 +65,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name?.trim()) {
-      setErrorMsg("Property deal name is required");
+      setErrorMsg("Property name is required");
       return;
     }
     setErrorMsg("");
@@ -177,41 +189,42 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
           onClose();
         }
       }}
-      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto overflow-x-hidden animate-backdrop"
+      className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto overflow-x-hidden animate-backdrop"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-[#0a0a0a] border border-[#262626] rounded-xl max-w-2xl w-full max-w-full p-4 sm:p-6 shadow-2xl flex flex-col gap-4 sm:gap-5 my-auto max-h-[90vh] overflow-y-auto overflow-x-hidden animate-modal min-w-0"
+        className="bg-white border border-slate-200 rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-modal flex flex-col gap-5 my-auto max-h-[90vh] overflow-y-auto overflow-x-hidden animate-modal min-w-0"
       >
         {/* Header */}
-        <div className="flex items-start justify-between pb-3.5 border-b border-[#262626] gap-3">
+        <div className="flex items-start justify-between pb-4 border-b border-slate-100 gap-3">
           <div className="flex items-start gap-3 min-w-0 flex-1">
-            <div className="w-9 h-9 rounded-lg bg-emerald-950/40 border border-emerald-800/40 text-emerald-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <Building2 className="w-4 h-4" />
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center flex-shrink-0">
+              <Building2 className="w-5 h-5" />
             </div>
             <div className="min-w-0 flex-1">
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2 flex-wrap">
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2 flex-wrap">
                 <span className="break-words">Edit Property: {property.name}</span>
-                <span className="text-xs font-mono font-semibold text-[#A1A1AA] bg-[#161616] border border-[#262626] px-2 py-0.5 rounded flex-shrink-0">
+                <span className="text-xs font-mono font-semibold text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md flex-shrink-0">
                   {property.propertyCode}
                 </span>
               </h2>
-              <p className="text-xs text-[#A1A1AA] font-medium break-words mt-0.5">
-                Update valuations, price consideration, land area, status, and milestone stages
+              <p className="text-xs text-slate-500 mt-0.5">
+                Update prices, area, status, sub-plots, partners, or milestones.
               </p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-[#A1A1AA] hover:text-white p-1 rounded-md transition-all duration-150 flex-shrink-0"
+            className="text-slate-400 hover:text-slate-700 hover:bg-slate-100 p-1.5 rounded-lg transition-colors flex-shrink-0"
+            aria-label="Close"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {errorMsg && (
-          <div className="bg-rose-950/30 border border-rose-800/40 text-rose-300 text-xs px-3.5 py-2 rounded-md font-medium">
+          <div className="bg-rose-50 border border-rose-200 text-rose-700 text-xs px-3.5 py-2.5 rounded-xl font-medium">
             {errorMsg}
           </div>
         )}
@@ -221,21 +234,23 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
           {/* Section 1: Basic Information */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div className="flex flex-col gap-1.5 min-w-0">
-              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
-                Property / Deal Name
+              <label className="text-xs font-semibold text-slate-700">
+                Property / Plot Name
               </label>
               <input
                 type="text"
                 value={formData.name || ""}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555] min-w-0"
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 min-w-0"
                 required
               />
             </div>
 
             <div className="flex flex-col gap-1.5 min-w-0">
-              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
-                Asset Classification
+              <label className="text-xs font-semibold text-slate-700">
+                Category
               </label>
               <select
                 value={formData.type || "commercial"}
@@ -245,19 +260,19 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                     type: e.target.value as "commercial" | "personal",
                   })
                 }
-                className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555] min-w-0"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500 min-w-0"
               >
-                <option value="commercial">Commercial Land / Joint Venture</option>
-                <option value="personal">Personal Apartment / Villa</option>
+                <option value="commercial">Business Land Deal</option>
+                <option value="personal">Personal Home / Asset</option>
               </select>
             </div>
 
             <div className="flex flex-col gap-1.5 sm:col-span-2 min-w-0">
-              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
-                Location / Survey District
+              <label className="text-xs font-semibold text-slate-700">
+                Location / Area
               </label>
               <div className="relative">
-                <MapPin className="w-4 h-4 text-[#71717A] absolute left-3 top-1/2 -translate-y-1/2" />
+                <MapPin className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={formData.location || ""}
@@ -265,14 +280,14 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                     setFormData({ ...formData, location: e.target.value })
                   }
                   placeholder="e.g. OMR Sholinganallur, Survey No. 442/1B"
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555] min-w-0"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-slate-900 placeholder:text-slate-400 text-sm outline-none focus:bg-white focus:border-emerald-500 min-w-0"
                 />
               </div>
             </div>
 
             <div className="flex flex-col gap-1.5 min-w-0">
-              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
-                Current Deal Status
+              <label className="text-xs font-semibold text-slate-700">
+                Status
               </label>
               <select
                 value={formData.status || "open"}
@@ -287,79 +302,88 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                       | "closed",
                   })
                 }
-                className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555] min-w-0"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500 min-w-0"
               >
                 <option value="open">Open (Token / Advance Paid)</option>
-                <option value="in_progress">In Progress (Partially Paid)</option>
-                <option value="registered">Registered / Sale Deed Transferred</option>
-                <option value="sold">Sold (Receivables Collecting/Settled)</option>
-                <option value="closed">Closed Deal</option>
+                <option value="in_progress">In Progress (Paying)</option>
+                <option value="registered">Registered</option>
+                <option value="sold">Sold</option>
+                <option value="closed">Closed</option>
               </select>
             </div>
 
             <div className="flex flex-col gap-1.5 min-w-0">
-              <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
-                Acquisition / Token Date
+              <label className="text-xs font-semibold text-slate-700">
+                Purchase / Token Date
               </label>
               <div className="relative">
-                <Calendar className="w-4 h-4 text-[#71717A] absolute left-3 top-1/2 -translate-y-1/2" />
+                <Calendar className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="date"
                   value={formData.acquisitionDate || ""}
                   onChange={(e) =>
-                    setFormData({ ...formData, acquisitionDate: e.target.value })
+                    setFormData({
+                      ...formData,
+                      acquisitionDate: e.target.value,
+                    })
                   }
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555] min-w-0"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500 min-w-0"
                 />
               </div>
             </div>
 
             <div className="flex flex-col gap-1.5 min-w-0">
-              <label className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
-                Agreement Due Date / Deadline
+              <label className="text-xs font-semibold text-amber-700">
+                Payment Due Date
               </label>
               <div className="relative">
-                <Calendar className="w-4 h-4 text-amber-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Calendar className="w-4 h-4 text-amber-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="date"
                   value={formData.agreementDueDate || ""}
                   onChange={(e) =>
-                    setFormData({ ...formData, agreementDueDate: e.target.value })
+                    setFormData({
+                      ...formData,
+                      agreementDueDate: e.target.value,
+                    })
                   }
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3.5 py-2.5 text-white text-sm outline-none focus:border-amber-500 min-w-0"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-slate-900 text-sm outline-none focus:bg-white focus:border-amber-500 min-w-0"
                 />
               </div>
             </div>
 
             <div className="flex flex-col gap-1.5 min-w-0">
-              <label className="text-xs font-semibold text-blue-400 uppercase tracking-wider">
-                Target Settlement / Exit Date
+              <label className="text-xs font-semibold text-blue-700">
+                Target Registration Date
               </label>
               <div className="relative">
-                <Calendar className="w-4 h-4 text-blue-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Calendar className="w-4 h-4 text-blue-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="date"
                   value={formData.targetSettlementDate || ""}
                   onChange={(e) =>
-                    setFormData({ ...formData, targetSettlementDate: e.target.value })
+                    setFormData({
+                      ...formData,
+                      targetSettlementDate: e.target.value,
+                    })
                   }
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg pl-9 pr-3.5 py-2.5 text-white text-sm outline-none focus:border-blue-500 min-w-0"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-slate-900 text-sm outline-none focus:bg-white focus:border-blue-500 min-w-0"
                 />
               </div>
             </div>
 
             <div className="flex flex-col gap-1.5 sm:col-span-2 min-w-0">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider flex items-center gap-1.5">
-                  <Link2 className="w-3.5 h-3.5 text-[#A1A1AA]" />
-                  <span>Document / Title Proof URL (Google Drive / Cloud)</span>
+                <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+                  <Link2 className="w-3.5 h-3.5 text-slate-400" />
+                  <span>Documents Folder Link (Optional)</span>
                 </label>
                 {formData.attachmentUrl && (
                   <a
                     href={formData.attachmentUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-blue-400 hover:text-blue-300 hover:underline flex items-center gap-1"
+                    className="text-xs text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 font-medium"
                   >
                     <ExternalLink className="w-3 h-3" />
                     <span>Open Link</span>
@@ -372,21 +396,21 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, attachmentUrl: e.target.value })
                 }
-                placeholder="https://drive.google.com/... or Dropbox folder"
-                className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555] min-w-0"
+                placeholder="https://drive.google.com/..."
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder:text-slate-400 text-sm outline-none focus:bg-white focus:border-emerald-500 min-w-0"
               />
             </div>
           </div>
 
           {/* Section 2: Area & Rate */}
-          <div className="pt-3 border-t border-[#1a1a1a]">
-            <h4 className="text-xs font-bold text-[#E4E4E7] uppercase tracking-wider mb-2.5">
-              Land Measurement &amp; Unit Rates
+          <div className="pt-3 border-t border-slate-100">
+            <h4 className="text-xs font-bold text-slate-700 mb-2.5">
+              Area &amp; Rate
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div className="flex flex-col gap-1.5 min-w-0">
-                <label className="text-xs font-medium text-[#A1A1AA]">
-                  Total Area (Sq.Ft / Cents / Acres)
+                <label className="text-xs font-medium text-slate-600">
+                  Total Area (sq.ft)
                 </label>
                 <input
                   type="number"
@@ -398,17 +422,18 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                       ...formData,
                       sqftArea: sqft,
                       agreedPurchasePrice:
-                        formData.agreedPurchasePrice || (rate > 0 ? sqft * rate : 0),
+                        formData.agreedPurchasePrice ||
+                        (rate > 0 ? sqft * rate : 0),
                     });
                   }}
                   placeholder="e.g. 5400"
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm font-mono outline-none focus:border-[#555555] min-w-0"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 text-sm font-mono outline-none focus:bg-white focus:border-emerald-500 min-w-0"
                 />
               </div>
 
               <div className="flex flex-col gap-1.5 min-w-0">
-                <label className="text-xs font-medium text-[#A1A1AA]">
-                  Rate per Sq.Ft (₹)
+                <label className="text-xs font-medium text-slate-600">
+                  Rate per sq.ft (₹)
                 </label>
                 <input
                   type="number"
@@ -420,25 +445,26 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                       ...formData,
                       ratePerSqft: rate,
                       agreedPurchasePrice:
-                        formData.agreedPurchasePrice || (sqft > 0 ? sqft * rate : 0),
+                        formData.agreedPurchasePrice ||
+                        (sqft > 0 ? sqft * rate : 0),
                     });
                   }}
                   placeholder="e.g. 4500"
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm font-mono outline-none focus:border-[#555555] min-w-0"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 text-sm font-mono outline-none focus:bg-white focus:border-emerald-500 min-w-0"
                 />
               </div>
             </div>
           </div>
 
-          {/* Section 3: Financial Valuations & Prices */}
-          <div className="pt-3 border-t border-[#1a1a1a]">
-            <h4 className="text-xs font-bold text-[#E4E4E7] uppercase tracking-wider mb-2.5">
-              Financial Valuations &amp; Agreed Prices
+          {/* Section 3: Prices */}
+          <div className="pt-3 border-t border-slate-100">
+            <h4 className="text-xs font-bold text-slate-700 mb-2.5">
+              Prices &amp; Valuation
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <div className="flex flex-col gap-1.5 min-w-0">
-                <label className="text-xs font-medium text-[#A1A1AA]">
-                  Agreed Purchase Price (₹)
+                <label className="text-xs font-medium text-slate-600">
+                  Buy Price (₹)
                 </label>
                 <input
                   type="number"
@@ -449,16 +475,16 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                       agreedPurchasePrice: parseFloat(e.target.value) || 0,
                     })
                   }
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm font-mono font-bold outline-none focus:border-[#555555] min-w-0"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 text-sm font-mono font-bold outline-none focus:bg-white focus:border-emerald-500 min-w-0"
                 />
-                <span className="text-xs text-[#22C55E] font-mono font-semibold">
+                <span className="text-xs text-emerald-700 font-mono font-semibold">
                   {formatINRCompact(formData.agreedPurchasePrice || 0)}
                 </span>
               </div>
 
               <div className="flex flex-col gap-1.5 min-w-0">
-                <label className="text-xs font-medium text-[#A1A1AA]">
-                  Target Selling Price (₹)
+                <label className="text-xs font-medium text-blue-700">
+                  Target Sale (₹)
                 </label>
                 <input
                   type="number"
@@ -469,16 +495,16 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                       targetSalePrice: parseFloat(e.target.value) || 0,
                     })
                   }
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm font-mono font-bold outline-none focus:border-[#555555] min-w-0"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 text-sm font-mono font-bold outline-none focus:bg-white focus:border-blue-500 min-w-0"
                 />
-                <span className="text-xs text-[#3B82F6] font-mono font-semibold">
+                <span className="text-xs text-blue-700 font-mono font-semibold">
                   {formatINRCompact(formData.targetSalePrice || 0)}
                 </span>
               </div>
 
               <div className="flex flex-col gap-1.5 min-w-0">
-                <label className="text-xs font-medium text-[#A1A1AA]">
-                  Agreed Selling Price (₹)
+                <label className="text-xs font-medium text-amber-700">
+                  Agreed Sale (₹)
                 </label>
                 <input
                   type="number"
@@ -489,42 +515,44 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                       agreedSellingPrice: parseFloat(e.target.value) || 0,
                     })
                   }
-                  placeholder="Set once buyer is finalized"
-                  className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm font-mono font-bold outline-none focus:border-[#555555] min-w-0"
+                  placeholder="Once buyer finalized"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 text-sm font-mono font-bold outline-none focus:bg-white focus:border-amber-500 min-w-0"
                 />
-                <span className="text-xs text-[#F59E0B] font-mono font-semibold">
+                <span className="text-xs text-amber-700 font-mono font-semibold">
                   {formData.agreedSellingPrice
                     ? formatINRCompact(formData.agreedSellingPrice)
-                    : "Not finalized"}
+                    : "Not set"}
                 </span>
               </div>
             </div>
           </div>
 
           {/* Section 4: Notes */}
-          <div className="pt-3 border-t border-[#1a1a1a] flex flex-col gap-1.5 min-w-0">
-            <label className="text-xs font-semibold text-[#D4D4D8] uppercase tracking-wider">
-              Legal, EC &amp; Title Verification Notes
+          <div className="pt-3 border-t border-slate-100 flex flex-col gap-1.5 min-w-0">
+            <label className="text-xs font-semibold text-slate-700">
+              Notes (Optional)
             </label>
             <textarea
               rows={2}
               value={formData.notes || ""}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              placeholder="e.g. Encumbrance certificate clear for 30 years. Agreement signed with seller."
-              className="w-full bg-[#111111] border border-[#262626] rounded-lg px-3.5 py-2.5 text-white text-sm outline-none focus:border-[#555555] min-w-0 resize-none"
+              onChange={(e) =>
+                setFormData({ ...formData, notes: e.target.value })
+              }
+              placeholder="e.g. EC verified, agreement signed..."
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 placeholder:text-slate-400 text-sm outline-none focus:bg-white focus:border-emerald-500 min-w-0 resize-none"
             />
           </div>
 
           {/* Section 5: Milestones */}
-          <div className="pt-3 border-t border-[#1a1a1a] flex flex-col gap-2.5">
+          <div className="pt-3 border-t border-slate-100 flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-[#E4E4E7] uppercase tracking-wider">
-                Payment &amp; Construction Milestones
+              <label className="text-xs font-bold text-slate-700">
+                Payment Milestones
               </label>
               <button
                 type="button"
                 onClick={handleAddMilestone}
-                className="btn-action-primary px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5"
+                className="btn-action-secondary px-3 py-1.5 rounded-lg text-xs flex items-center gap-1"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add Milestone</span>
@@ -536,7 +564,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                 {formData.milestones.map((m, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-2 bg-[#121212] border border-[#262626] p-2.5 rounded-lg min-w-0"
+                    className="flex items-center gap-2 bg-slate-50 border border-slate-200 p-2.5 rounded-xl min-w-0"
                   >
                     <input
                       type="checkbox"
@@ -546,7 +574,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                           status: e.target.checked ? "completed" : "pending",
                         })
                       }
-                      className="rounded bg-black border-[#444444] cursor-pointer w-4 h-4 flex-shrink-0"
+                      className="rounded border-slate-300 text-emerald-600 cursor-pointer w-4 h-4 flex-shrink-0"
                     />
                     <input
                       type="text"
@@ -555,7 +583,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                         handleUpdateMilestone(idx, { name: e.target.value })
                       }
                       placeholder="Milestone title"
-                      className="flex-1 min-w-0 bg-transparent text-sm text-white outline-none border-b border-transparent focus:border-[#555555]"
+                      className="flex-1 min-w-0 bg-transparent text-sm text-slate-900 outline-none border-b border-transparent focus:border-emerald-500"
                     />
                     <input
                       type="number"
@@ -566,12 +594,12 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                         })
                       }
                       placeholder="₹ Due"
-                      className="w-24 sm:w-28 bg-[#181818] border border-[#282828] rounded-md px-2 py-1 text-sm font-mono text-right text-white font-bold flex-shrink-0"
+                      className="w-24 sm:w-28 bg-white border border-slate-200 rounded-lg px-2 py-1 text-sm font-mono text-right text-slate-900 font-bold flex-shrink-0"
                     />
                     <button
                       type="button"
                       onClick={() => handleRemoveMilestone(idx)}
-                      className="text-[#71717A] hover:text-rose-400 p-1.5 transition-all duration-150 flex-shrink-0"
+                      className="text-slate-400 hover:text-rose-600 p-1.5 transition-colors flex-shrink-0"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -579,25 +607,25 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                 ))}
               </div>
             ) : (
-              <div className="text-xs text-[#A1A1AA] italic">
-                No custom milestones defined yet. Click "Add Milestone" to track payment stages.
+              <div className="text-xs text-slate-400 italic">
+                No payment milestones yet.
               </div>
             )}
           </div>
 
-          {/* Section 6: Sub-Plot Inventory & Layout Plotting Engine */}
-          <div className="pt-3 border-t border-[#1a1a1a] flex flex-col gap-2.5">
+          {/* Section 6: Sub-Plots */}
+          <div className="pt-3 border-t border-slate-100 flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Grid className="w-4 h-4 text-emerald-400" />
-                <label className="text-xs font-bold text-[#E4E4E7] uppercase tracking-wider">
-                  Sub-Plots Inventory ({formData.subPlots?.length || 0} Units)
+                <Grid className="w-4 h-4 text-emerald-600" />
+                <label className="text-xs font-bold text-slate-700">
+                  Sub-Plots ({formData.subPlots?.length || 0})
                 </label>
               </div>
               <button
                 type="button"
                 onClick={handleAddSubPlot}
-                className="btn-action-primary px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5"
+                className="btn-action-secondary px-3 py-1.5 rounded-lg text-xs flex items-center gap-1"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add Sub-Plot</span>
@@ -609,22 +637,26 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                 {formData.subPlots.map((sp, idx) => (
                   <div
                     key={sp.id || idx}
-                    className="grid grid-cols-1 sm:grid-cols-6 gap-2 bg-[#121212] border border-[#262626] p-2.5 rounded-lg items-center text-xs min-w-0"
+                    className="grid grid-cols-1 sm:grid-cols-6 gap-2 bg-slate-50 border border-slate-200 p-2.5 rounded-xl items-center text-xs min-w-0"
                   >
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="text-[#71717A] font-mono flex-shrink-0">#</span>
+                      <span className="text-slate-400 font-mono flex-shrink-0">
+                        #
+                      </span>
                       <input
                         type="text"
                         value={sp.plotNumber}
                         onChange={(e) =>
-                          handleUpdateSubPlot(idx, { plotNumber: e.target.value })
+                          handleUpdateSubPlot(idx, {
+                            plotNumber: e.target.value,
+                          })
                         }
-                        placeholder="Plot No"
-                        className="w-full sm:w-16 bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white font-mono font-bold min-w-0"
+                        placeholder="No"
+                        className="w-full sm:w-16 bg-white border border-slate-200 rounded-lg px-2 py-1 text-slate-900 font-mono font-bold min-w-0"
                       />
                     </div>
                     <div className="flex flex-col gap-0.5 min-w-0">
-                      <span className="text-[10px] text-[#71717A]">Sqft</span>
+                      <span className="text-[10px] text-slate-500">Sqft</span>
                       <input
                         type="number"
                         value={sp.sqftArea ?? ""}
@@ -634,11 +666,13 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                           })
                         }
                         placeholder="Sq.ft"
-                        className="w-full bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white font-mono min-w-0"
+                        className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-slate-900 font-mono min-w-0"
                       />
                     </div>
                     <div className="flex flex-col gap-0.5 sm:col-span-2 min-w-0">
-                      <span className="text-[10px] text-[#71717A]">Target Price (₹)</span>
+                      <span className="text-[10px] text-slate-500">
+                        Target Price (₹)
+                      </span>
                       <input
                         type="number"
                         value={sp.targetPrice ?? ""}
@@ -648,24 +682,27 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                           })
                         }
                         placeholder="Target Price"
-                        className="w-full bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white font-mono font-semibold min-w-0"
+                        className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-slate-900 font-mono font-semibold min-w-0"
                       />
                     </div>
                     <div className="flex flex-col gap-0.5 min-w-0">
-                      <span className="text-[10px] text-[#71717A]">Status</span>
+                      <span className="text-[10px] text-slate-500">Status</span>
                       <select
                         value={sp.status}
                         onChange={(e) =>
                           handleUpdateSubPlot(idx, {
-                            status: e.target.value as "available" | "booked" | "sold",
+                            status: e.target.value as
+                              | "available"
+                              | "booked"
+                              | "sold",
                           })
                         }
-                        className={`w-full bg-[#1a1a1a] border border-[#333333] rounded px-1.5 py-1 text-xs font-semibold min-w-0 ${
+                        className={`w-full bg-white border border-slate-200 rounded-lg px-1.5 py-1 text-xs font-semibold min-w-0 ${
                           sp.status === "sold"
-                            ? "text-emerald-400"
+                            ? "text-emerald-700"
                             : sp.status === "booked"
-                            ? "text-amber-400"
-                            : "text-[#A1A1AA]"
+                            ? "text-amber-700"
+                            : "text-slate-600"
                         }`}
                       >
                         <option value="available">Available</option>
@@ -678,15 +715,17 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                         type="text"
                         value={sp.buyerName || ""}
                         onChange={(e) =>
-                          handleUpdateSubPlot(idx, { buyerName: e.target.value })
+                          handleUpdateSubPlot(idx, {
+                            buyerName: e.target.value,
+                          })
                         }
-                        placeholder="Buyer name"
-                        className="w-full bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white text-xs min-w-0"
+                        placeholder="Buyer"
+                        className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-slate-900 text-xs min-w-0"
                       />
                       <button
                         type="button"
                         onClick={() => handleRemoveSubPlot(idx)}
-                        className="text-[#71717A] hover:text-rose-400 p-1 transition-all duration-150 flex-shrink-0"
+                        className="text-slate-400 hover:text-rose-600 p-1 transition-colors flex-shrink-0"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -695,25 +734,25 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                 ))}
               </div>
             ) : (
-              <div className="text-xs text-[#A1A1AA] italic">
-                No sub-plots created. Click "Add Sub-Plot" to plot units or layout layouts.
+              <div className="text-xs text-slate-400 italic">
+                No sub-plots added.
               </div>
             )}
           </div>
 
-          {/* Section 7: Multi-Partner Joint Venture (JV) Equity Splitter */}
-          <div className="pt-3 border-t border-[#1a1a1a] flex flex-col gap-2.5">
+          {/* Section 7: Partners */}
+          <div className="pt-3 border-t border-slate-100 flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-purple-400" />
-                <label className="text-xs font-bold text-[#E4E4E7] uppercase tracking-wider">
-                  Joint Venture (JV) Partners ({formData.partners?.length || 0})
+                <Users className="w-4 h-4 text-violet-600" />
+                <label className="text-xs font-bold text-slate-700">
+                  Joint Venture Partners ({formData.partners?.length || 0})
                 </label>
               </div>
               <button
                 type="button"
                 onClick={handleAddPartner}
-                className="btn-action-primary px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5"
+                className="btn-action-secondary px-3 py-1.5 rounded-lg text-xs flex items-center gap-1"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add Partner</span>
@@ -725,7 +764,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                 {formData.partners.map((p, idx) => (
                   <div
                     key={idx}
-                    className="grid grid-cols-1 sm:grid-cols-4 gap-2 bg-[#121212] border border-[#262626] p-2.5 rounded-lg items-center text-xs min-w-0"
+                    className="grid grid-cols-1 sm:grid-cols-4 gap-2 bg-slate-50 border border-slate-200 p-2.5 rounded-xl items-center text-xs min-w-0"
                   >
                     <input
                       type="text"
@@ -734,7 +773,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                         handleUpdatePartner(idx, { name: e.target.value })
                       }
                       placeholder="Partner Name"
-                      className="w-full bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white text-xs font-semibold sm:col-span-2 min-w-0"
+                      className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-slate-900 text-xs font-semibold sm:col-span-2 min-w-0"
                     />
                     <div className="flex items-center gap-1 min-w-0">
                       <input
@@ -745,10 +784,12 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                             equityPct: parseFloat(e.target.value) || 0,
                           })
                         }
-                        placeholder="Equity %"
-                        className="w-full min-w-0 bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white text-xs font-mono font-bold"
+                        placeholder="%"
+                        className="w-full min-w-0 bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-slate-900 text-xs font-mono font-bold"
                       />
-                      <span className="text-[#71717A] font-bold flex-shrink-0">%</span>
+                      <span className="text-slate-500 font-bold flex-shrink-0">
+                        %
+                      </span>
                     </div>
                     <div className="flex items-center gap-1.5 justify-end min-w-0">
                       <input
@@ -760,12 +801,12 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                           })
                         }
                         placeholder="₹ Committed"
-                        className="w-full min-w-0 bg-[#1a1a1a] border border-[#333333] rounded px-2 py-1 text-white text-xs font-mono"
+                        className="w-full min-w-0 bg-white border border-slate-200 rounded-lg px-2 py-1.5 text-slate-900 text-xs font-mono"
                       />
                       <button
                         type="button"
                         onClick={() => handleRemovePartner(idx)}
-                        className="text-[#71717A] hover:text-rose-400 p-1 transition-all duration-150 flex-shrink-0"
+                        className="text-slate-400 hover:text-rose-600 p-1 transition-colors flex-shrink-0"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -774,28 +815,28 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                 ))}
               </div>
             ) : (
-              <div className="text-xs text-[#A1A1AA] italic">
-                No external JV partners tagged (100% single ownership). Click "Add Partner" to set up equity splits.
+              <div className="text-xs text-slate-400 italic">
+                100% single ownership (no partners added).
               </div>
             )}
           </div>
 
-          {/* Actions (Key Action: Save Property Details with Hover-to-White) */}
-          <div className="flex items-center justify-end gap-2.5 pt-3.5 border-t border-[#262626] mt-2 flex-wrap">
+          {/* Actions */}
+          <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-100 mt-1 flex-wrap">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-lg bg-[#141414] text-white text-xs sm:text-sm font-medium border border-[#282828] hover:bg-[#202020] transition-all duration-150"
+              className="btn-action-secondary px-4 py-2.5 rounded-xl text-xs sm:text-sm"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSaving}
-              className="btn-action-primary px-5 py-2 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 disabled:opacity-50"
+              className="btn-action-brand px-5 py-2.5 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 disabled:opacity-50"
             >
               <Save className="w-4 h-4" />
-              <span>{isSaving ? "Saving Changes..." : "Save Property Details"}</span>
+              <span>{isSaving ? "Saving..." : "Save Changes"}</span>
             </button>
           </div>
         </form>

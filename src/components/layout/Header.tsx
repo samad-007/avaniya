@@ -5,20 +5,25 @@ import Image from "next/image";
 import {
   Building2,
   Home,
-  Plus,
+  ArrowDownRight,
   ArrowUpRight,
+  Plus,
   Download,
   Settings2,
   LogOut,
   User as UserIcon,
   ShieldCheck,
   FolderLock,
+  HandCoins,
+  Wallet,
 } from "lucide-react";
 
 interface HeaderProps {
   currentMode: "commercial" | "personal";
   onModeChange: (mode: "commercial" | "personal") => void;
-  onOpenEntryModal: (type: "outflow" | "inflow" | "transfer" | "withdrawal" | "loan") => void;
+  onOpenEntryModal: (
+    type: "outflow" | "inflow" | "transfer" | "withdrawal" | "loan"
+  ) => void;
   onOpenNewPropertyModal: () => void;
   onOpenNewLoanModal?: () => void;
   onOpenExportModal: () => void;
@@ -49,101 +54,114 @@ export const Header: React.FC<HeaderProps> = ({
   const isSuperAdmin = user?.role === "super_admin";
 
   return (
-    <header className="sticky top-0 z-40 bg-black/95 backdrop-blur-md border-b border-[#262626] px-3 sm:px-4 py-2.5 sm:py-3 w-full max-w-[100vw] overflow-x-hidden">
-      <div className="max-w-[1440px] mx-auto flex flex-col gap-2.5">
-        {/* Row 1: System Identity, Mode Switcher, and Protected User Egress */}
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 px-3 sm:px-5 py-3 w-full max-w-[100vw] overflow-x-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
+      <div className="max-w-[1440px] mx-auto flex flex-col gap-3">
+        {/* Row 1: Brand, Mode Switcher, and User Profile */}
         <div className="flex items-center justify-between gap-3 w-full">
           {/* Brand & Logo */}
           <div className="flex items-center gap-2.5 sm:gap-3 flex-shrink-0 min-w-0">
-            <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-lg overflow-hidden border border-[#383838] bg-[#0c120e] flex items-center justify-center flex-shrink-0 shadow-sm">
+            <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden border border-slate-200 bg-emerald-50 flex items-center justify-center flex-shrink-0 shadow-sm">
               <Image
                 src="/logo.jpg"
                 alt="Avaniya"
-                width={36}
-                height={36}
+                width={40}
+                height={40}
                 className="object-cover w-full h-full"
                 priority
               />
             </div>
             <div className="min-w-0">
-              <div className="text-sm sm:text-base font-bold text-white tracking-tight flex items-center gap-1.5 sm:gap-2">
+              <div className="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
                 <span className="truncate">Avaniya</span>
                 {currentDatasetId === "ds_demo_sandbox" ? (
-                  <span className="text-[10px] sm:text-xs font-mono font-bold px-1.5 sm:px-2 py-0.5 rounded bg-amber-950/50 text-amber-400 border border-amber-800/40 whitespace-nowrap flex-shrink-0">
-                    SANDBOX
+                  <span className="text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 whitespace-nowrap flex-shrink-0">
+                    Demo Mode
                   </span>
                 ) : (
-                  <span className="text-[10px] sm:text-xs font-mono font-semibold px-1.5 sm:px-2 py-0.5 rounded bg-[#161616] text-[#A1A1AA] border border-[#262626] whitespace-nowrap flex-shrink-0">
+                  <span className="text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 whitespace-nowrap flex-shrink-0">
                     Portfolio
                   </span>
                 )}
               </div>
-              <div className="text-[11px] text-[#71717A] font-medium hidden sm:block truncate">
-                Indian Real Estate Liquidity &amp; Deal Tracking Engine
+              <div className="text-xs text-slate-500 font-medium hidden sm:block truncate">
+                Simple Property, Payment &amp; Profit Tracker
               </div>
             </div>
           </div>
 
-          {/* Desktop Inline Mode Switcher (Visible on md and above) */}
-          <div className="hidden md:flex items-center bg-[#111111] p-1 rounded-lg border border-[#262626] shrink-0">
+          {/* Desktop Mode Switcher */}
+          <div className="hidden md:flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200/80 shrink-0">
             <button
               onClick={() => onModeChange("commercial")}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-150 ${
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 ${
                 currentMode === "commercial"
-                  ? "bg-[#262626] text-white shadow-sm font-bold"
-                  : "text-[#A1A1AA] hover:text-white"
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              <Building2 className="w-3.5 h-3.5" />
-              <span>Commercial Land Business</span>
+              <Building2
+                className={`w-3.5 h-3.5 ${
+                  currentMode === "commercial"
+                    ? "text-emerald-600"
+                    : "text-slate-400"
+                }`}
+              />
+              <span>Business Deals</span>
             </button>
             <button
               onClick={() => onModeChange("personal")}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-150 ${
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 ${
                 currentMode === "personal"
-                  ? "bg-[#262626] text-white shadow-sm font-bold"
-                  : "text-[#A1A1AA] hover:text-white"
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              <Home className="w-3.5 h-3.5" />
-              <span>Personal Asset Investment</span>
+              <Home
+                className={`w-3.5 h-3.5 ${
+                  currentMode === "personal"
+                    ? "text-emerald-600"
+                    : "text-slate-400"
+                }`}
+              />
+              <span>Personal Homes</span>
             </button>
           </div>
 
-          {/* Top Right: User Profile & Logout (Permanently Anchored & Completely Unobstructed) */}
-          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 ml-auto">
+          {/* Top Right: User Profile & Logout */}
+          <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
             {user ? (
               <div className="flex items-center gap-1.5 flex-shrink-0">
                 <div
-                  className="flex items-center gap-1.5 bg-[#111111] px-2.5 py-1.5 rounded-lg border border-[#262626] text-xs text-[#E4E4E7] flex-shrink-0"
-                  title={`Signed in as ${user.email} (${user.role})`}
+                  className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-700 flex-shrink-0"
+                  title={`Signed in as ${user.email}`}
                 >
                   <div
                     className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                      isSuperAdmin ? "bg-amber-400" : "bg-[#22C55E]"
+                      isSuperAdmin ? "bg-amber-500" : "bg-emerald-500"
                     }`}
                   />
-                  <span className="font-semibold text-xs whitespace-nowrap">
+                  <span className="font-semibold text-xs whitespace-nowrap text-slate-800">
                     {user.name}
                   </span>
                   {isSuperAdmin && (
-                    <span className="text-[9px] font-mono font-bold text-amber-400 bg-amber-950/70 border border-amber-800/40 px-1 py-0.2 rounded flex-shrink-0">
+                    <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-md flex-shrink-0">
                       ADMIN
                     </span>
                   )}
                 </div>
                 <button
                   onClick={onLogout}
-                  className="p-1.5 sm:p-2 rounded-lg bg-[#111111] text-[#A1A1AA] border border-[#262626] hover:text-rose-400 hover:border-rose-900/50 hover:bg-rose-950/20 transition-all duration-150 flex-shrink-0"
+                  className="p-2 rounded-xl bg-white text-slate-500 border border-slate-200 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 transition-all duration-150 flex-shrink-0"
                   title="Sign Out"
+                  aria-label="Sign Out"
                 >
-                  <LogOut className="w-3.5 h-3.5" />
+                  <LogOut className="w-4 h-4" />
                 </button>
               </div>
             ) : (
               <button
                 onClick={onOpenAuthModal}
-                className="btn-action-primary flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs flex-shrink-0"
+                className="btn-action-brand flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs flex-shrink-0"
               >
                 <UserIcon className="w-3.5 h-3.5" />
                 <span>Sign In</span>
@@ -152,94 +170,100 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Row 2: Desktop Operations & Actions Toolbar (Visible on md and above) */}
-        <div className="hidden md:flex items-center justify-between gap-2 pt-1 border-t border-[#1f1f1f] w-full">
-          {/* Primary Action Buttons */}
-          <div className="flex items-center gap-1.5 flex-wrap">
+        {/* Row 2: Desktop Quick Actions Bar */}
+        <div className="hidden md:flex items-center justify-between gap-3 pt-2.5 border-t border-slate-100 w-full">
+          {/* Primary Everyday Actions (Plain English) */}
+          <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => onOpenEntryModal("outflow")}
-              className="btn-action-primary flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs"
-              title="Log Outflow or Land Expense"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200/80 hover:bg-rose-100/80 hover:border-rose-300 transition-all shadow-soft"
+              title="Record money you paid for land, construction, or expenses"
             >
-              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span>Outflow</span>
+              <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>Record Payment</span>
             </button>
 
             <button
               onClick={() => onOpenEntryModal("inflow")}
-              className="btn-action-primary flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs"
-              title="Log Buyer Receipt or Capital Inflow"
+              className="btn-action-brand flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs"
+              title="Record money received from buyers, savings, or partners"
             >
-              <ArrowUpRight className="w-3.5 h-3.5 text-[#22C55E]" />
-              <span>Inflow</span>
+              <ArrowDownRight className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>Record Receipt</span>
             </button>
 
             <button
-              onClick={() => onOpenEntryModal("withdrawal")}
-              className="btn-action-primary flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs border border-amber-800/40 text-amber-300"
-              title="Log Profit Withdrawal or Capital Refund"
+              onClick={onOpenNewPropertyModal}
+              className="btn-action-primary flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs"
+              title="Add a new land deal or personal property"
             >
+              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>Add Property</span>
+            </button>
+
+            <div className="h-5 w-px bg-slate-200 mx-0.5" />
+
+            <button
+              onClick={() => onOpenEntryModal("withdrawal")}
+              className="btn-action-secondary flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs text-slate-700"
+              title="Record profit taken out or capital returned"
+            >
+              <Wallet className="w-3.5 h-3.5 text-amber-600" />
               <span>Withdraw</span>
             </button>
 
-            {onOpenNewLoanModal && (
+            {onOpenNewLoanModal && currentMode === "commercial" && (
               <button
                 onClick={onOpenNewLoanModal}
-                className="btn-action-primary flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs border border-emerald-800/40 text-emerald-400"
-                title="Create or Track Loan Facility"
+                className="btn-action-secondary flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs text-slate-700"
+                title="Track a bank loan or borrowed funds"
               >
-                <span>+ Loan</span>
+                <HandCoins className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Add Loan</span>
               </button>
             )}
 
             <button
-              onClick={onOpenNewPropertyModal}
-              className="btn-action-primary flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs"
-              title="Create New Real Estate Asset"
-            >
-              <span>+ Property</span>
-            </button>
-
-            <button
               onClick={onOpenExportModal}
-              className="btn-action-primary flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs"
-              title="Export Excel / PDF / CSV"
+              className="btn-action-secondary flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs text-slate-700"
+              title="Download Excel, PDF, or CSV report"
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-3.5 h-3.5 text-blue-600" />
               <span>Export</span>
             </button>
 
             <button
               onClick={onOpenCategoryModal}
-              className="p-1.5 rounded-lg bg-[#111111] text-[#A1A1AA] border border-[#262626] hover:text-white hover:border-[#383838] transition-all duration-150"
-              title="Categories & Formulas"
+              className="p-2 rounded-xl bg-white text-slate-500 border border-slate-200 hover:text-slate-900 hover:border-slate-300 hover:bg-slate-50 transition-all"
+              title="Manage Expense & Income Categories"
+              aria-label="Categories & Settings"
             >
-              <Settings2 className="w-3.5 h-3.5" />
+              <Settings2 className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Right Side of Toolbar: Super Admin Controls or Status Badge */}
+          {/* Right Side of Toolbar: Admin Controls or Live Status */}
           {isSuperAdmin ? (
             <div className="flex items-center gap-2">
               {onSwitchDataset && (
-                <div className="flex items-center gap-1.5 bg-[#111111] px-2.5 py-1 rounded-md border border-emerald-800/40 text-xs">
-                  <FolderLock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span className="text-[11px] text-[#A1A1AA] hidden lg:inline">Workspace:</span>
+                <div className="flex items-center gap-1.5 bg-emerald-50/70 px-3 py-1.5 rounded-xl border border-emerald-200 text-xs">
+                  <FolderLock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span className="text-[11px] text-slate-500 hidden lg:inline font-medium">
+                    Workspace:
+                  </span>
                   <select
                     value={currentDatasetId || "ds_yousuf_portfolio"}
                     onChange={(e) => onSwitchDataset(e.target.value)}
-                    className="bg-transparent text-emerald-300 font-mono text-xs font-semibold outline-none cursor-pointer"
-                    title="Switch Active Tenant / Dataset"
+                    className="bg-transparent text-emerald-800 font-semibold text-xs outline-none cursor-pointer"
+                    title="Switch Active Portfolio"
                   >
-                    <option value="ds_yousuf_portfolio" className="bg-[#111111] text-white">
+                    <option value="ds_yousuf_portfolio">
                       Mohammed Yousuf Portfolio
                     </option>
-                    <option value="ds_demo_sandbox" className="bg-[#111111] text-white">
+                    <option value="ds_demo_sandbox">
                       Sandbox Demo Dataset
                     </option>
-                    <option value="all" className="bg-[#111111] text-white">
-                      [All Datasets Consolidated]
-                    </option>
+                    <option value="all">[All Datasets Consolidated]</option>
                   </select>
                 </div>
               )}
@@ -247,68 +271,66 @@ export const Header: React.FC<HeaderProps> = ({
               {onOpenSuperAdminModal && (
                 <button
                   onClick={onOpenSuperAdminModal}
-                  className="px-2.5 py-1 rounded-md bg-emerald-950/80 text-emerald-300 border border-emerald-700/60 hover:bg-emerald-900 hover:border-emerald-500 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
-                  title="Open Super Admin Management Console"
+                  className="px-3 py-1.5 rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
+                  title="Open Admin Console"
                 >
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Admin Console</span>
+                  <span>Admin</span>
                 </button>
               )}
             </div>
           ) : (
-            <div className="hidden lg:flex items-center gap-2 text-xs text-[#71717A] font-mono">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              <span>Active Deal Ledger</span>
+            <div className="hidden lg:flex items-center gap-2 text-xs text-slate-500 font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span>
+                {currentMode === "commercial"
+                  ? "Commercial Land Portfolio"
+                  : "Personal Property Tracker"}
+              </span>
             </div>
           )}
         </div>
 
-        {/* Mobile Sub-Row: Mode Switcher (< md) */}
-        <div className="flex md:hidden items-center bg-[#111111] p-1 rounded-lg border border-[#262626] w-full">
+        {/* Mobile Mode Switcher (< md) */}
+        <div className="flex md:hidden items-center bg-slate-100 p-1 rounded-xl border border-slate-200/80 w-full">
           <button
             onClick={() => onModeChange("commercial")}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[11px] sm:text-xs font-semibold transition-all duration-150 ${
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-all duration-150 ${
               currentMode === "commercial"
-                ? "bg-[#262626] text-white shadow-sm font-bold"
-                : "text-[#A1A1AA] hover:text-white"
+                ? "bg-white text-slate-900 shadow-sm"
+                : "text-slate-600"
             }`}
           >
-            <Building2 className="w-3.5 h-3.5 flex-shrink-0" />
-            <span className="truncate">Commercial Land</span>
+            <Building2 className="w-3.5 h-3.5 flex-shrink-0 text-emerald-600" />
+            <span className="truncate">Business Deals</span>
           </button>
           <button
             onClick={() => onModeChange("personal")}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[11px] sm:text-xs font-semibold transition-all duration-150 ${
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-all duration-150 ${
               currentMode === "personal"
-                ? "bg-[#262626] text-white shadow-sm font-bold"
-                : "text-[#A1A1AA] hover:text-white"
+                ? "bg-white text-slate-900 shadow-sm"
+                : "text-slate-600"
             }`}
           >
-            <Home className="w-3.5 h-3.5 flex-shrink-0" />
-            <span className="truncate">Personal Assets</span>
+            <Home className="w-3.5 h-3.5 flex-shrink-0 text-emerald-600" />
+            <span className="truncate">Personal Homes</span>
           </button>
         </div>
 
         {/* Mobile Super Admin Controls (< md) */}
         {isSuperAdmin && (
-          <div className="flex md:hidden items-center justify-between bg-[#08100a] border border-emerald-900/50 rounded-lg px-2.5 py-1.5 text-xs text-emerald-300 w-full gap-2">
+          <div className="flex md:hidden items-center justify-between bg-emerald-50/70 border border-emerald-200 rounded-xl px-2.5 py-1.5 text-xs w-full gap-2">
             {onSwitchDataset && (
-              <div className="flex items-center gap-1.5 bg-[#111111] px-2 py-1 rounded border border-emerald-800/40 text-xs flex-1 min-w-0">
-                <FolderLock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                <FolderLock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                 <select
                   value={currentDatasetId || "ds_yousuf_portfolio"}
                   onChange={(e) => onSwitchDataset(e.target.value)}
-                  className="bg-transparent text-emerald-300 font-mono text-xs font-semibold outline-none cursor-pointer w-full"
+                  className="bg-transparent text-emerald-900 text-xs font-semibold outline-none cursor-pointer w-full"
                 >
-                  <option value="ds_yousuf_portfolio" className="bg-[#111111] text-white">
-                    Mohammed Yousuf
-                  </option>
-                  <option value="ds_demo_sandbox" className="bg-[#111111] text-white">
-                    Demo Sandbox
-                  </option>
-                  <option value="all" className="bg-[#111111] text-white">
-                    [All Datasets]
-                  </option>
+                  <option value="ds_yousuf_portfolio">Mohammed Yousuf</option>
+                  <option value="ds_demo_sandbox">Demo Sandbox</option>
+                  <option value="all">[All Datasets]</option>
                 </select>
               </div>
             )}
@@ -316,7 +338,7 @@ export const Header: React.FC<HeaderProps> = ({
             {onOpenSuperAdminModal && (
               <button
                 onClick={onOpenSuperAdminModal}
-                className="px-2.5 py-1 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-700/60 text-xs font-semibold flex items-center gap-1 shrink-0"
+                className="px-2.5 py-1 rounded-lg bg-slate-900 text-white text-xs font-semibold flex items-center gap-1 shrink-0"
               >
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Admin</span>
@@ -325,62 +347,62 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         )}
 
-        {/* Mobile Sub-Row: Action Buttons Row (< md) */}
-        <div className="flex md:hidden items-center justify-between gap-1.5 w-full overflow-x-auto pb-0.5 pt-0.5 scrollbar-none">
+        {/* Mobile Quick Actions Row (< md) */}
+        <div className="flex md:hidden items-center gap-1.5 w-full overflow-x-auto pb-0.5 scrollbar-none">
           <button
             onClick={() => onOpenEntryModal("outflow")}
-            className="btn-action-primary flex-1 min-w-[70px] flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold"
+            className="flex items-center justify-center gap-1 py-2 px-3 rounded-xl text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 whitespace-nowrap flex-shrink-0"
           >
-            <Plus className="w-3 h-3 stroke-[2.5]" />
-            <span>Outflow</span>
+            <ArrowUpRight className="w-3.5 h-3.5" />
+            <span>Payment</span>
           </button>
 
           <button
             onClick={() => onOpenEntryModal("inflow")}
-            className="btn-action-primary flex-1 min-w-[65px] flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold"
+            className="btn-action-brand flex items-center justify-center gap-1 py-2 px-3 rounded-xl text-xs whitespace-nowrap flex-shrink-0"
           >
-            <ArrowUpRight className="w-3 h-3 text-[#22C55E]" />
-            <span>Inflow</span>
+            <ArrowDownRight className="w-3.5 h-3.5" />
+            <span>Receipt</span>
+          </button>
+
+          <button
+            onClick={onOpenNewPropertyModal}
+            className="btn-action-primary flex items-center justify-center gap-1 py-2 px-3 rounded-xl text-xs whitespace-nowrap flex-shrink-0"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Property</span>
           </button>
 
           <button
             onClick={() => onOpenEntryModal("withdrawal")}
-            className="btn-action-primary flex-1 min-w-[70px] flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold text-amber-300 border border-amber-800/40"
+            className="btn-action-secondary flex items-center justify-center gap-1 py-2 px-3 rounded-xl text-xs whitespace-nowrap flex-shrink-0"
           >
             <span>Withdraw</span>
           </button>
 
-          {onOpenNewLoanModal && (
+          {onOpenNewLoanModal && currentMode === "commercial" && (
             <button
               onClick={onOpenNewLoanModal}
-              className="btn-action-primary flex-1 min-w-[65px] flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold text-emerald-400 border border-emerald-800/40"
+              className="btn-action-secondary flex items-center justify-center gap-1 py-2 px-3 rounded-xl text-xs whitespace-nowrap flex-shrink-0"
             >
               <span>+ Loan</span>
             </button>
           )}
 
           <button
-            onClick={onOpenNewPropertyModal}
-            className="btn-action-primary flex-1 min-w-[65px] flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold"
-          >
-            <span>+ Deal</span>
-          </button>
-
-          <button
             onClick={onOpenExportModal}
-            className="btn-action-primary flex items-center justify-center gap-1 py-1.5 px-2.5 rounded-lg text-[11px] font-semibold flex-shrink-0"
-            title="Export Excel / PDF"
+            className="btn-action-secondary flex items-center justify-center gap-1 py-2 px-3 rounded-xl text-xs whitespace-nowrap flex-shrink-0"
           >
-            <Download className="w-3 h-3" />
+            <Download className="w-3.5 h-3.5" />
             <span>Export</span>
           </button>
 
           <button
             onClick={onOpenCategoryModal}
-            className="p-1.5 rounded-lg bg-[#111111] text-[#A1A1AA] border border-[#262626] hover:text-white flex-shrink-0"
+            className="p-2 rounded-xl bg-white text-slate-500 border border-slate-200 flex-shrink-0"
             title="Categories & Settings"
           >
-            <Settings2 className="w-3.5 h-3.5" />
+            <Settings2 className="w-4 h-4" />
           </button>
         </div>
       </div>

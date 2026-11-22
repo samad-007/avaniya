@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { formatINR } from "@/lib/formatters";
 import {
   CommercialDashboardMetrics,
@@ -15,6 +15,7 @@ import {
   Coins,
   TrendingDown,
   Building2,
+  Layers,
 } from "lucide-react";
 import { CyclingKpiCard } from "./CyclingKpiCard";
 import { ProfitKpiCard } from "./ProfitKpiCard";
@@ -30,12 +31,9 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
   commercialMetrics,
   personalMetrics,
 }) => {
-  // Synchronized strip-level state: all cards switch in lockstep
+  // User-controlled Overview vs Breakdown switch (calm, no jarring auto-flip while reading)
   const [activePanel, setActivePanel] = useState<"A" | "B">("A");
   const [isFlipping, setIsFlipping] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-
-  const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const flipTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const triggerSwitch = useCallback((targetPanel?: "A" | "B") => {
@@ -44,54 +42,62 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
     flipTimeoutRef.current = setTimeout(() => {
       setActivePanel((prev) => targetPanel ?? (prev === "A" ? "B" : "A"));
       setIsFlipping(false);
-    }, 200);
-  }, []);
-
-  // Synchronized 7-second auto-cycle interval across all strip cards
-  useEffect(() => {
-    if (isPaused) return;
-
-    const intervalId = setInterval(() => {
-      triggerSwitch();
-    }, 7000);
-
-    return () => {
-      clearInterval(intervalId);
-      if (flipTimeoutRef.current) clearTimeout(flipTimeoutRef.current);
-    };
-  }, [isPaused, triggerSwitch]);
-
-  const handleHoverStart = useCallback(() => {
-    setIsPaused(true);
-    if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
-  }, []);
-
-  const handleHoverEnd = useCallback(() => {
-    if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
-    pauseTimeoutRef.current = setTimeout(() => {
-      setIsPaused(false);
-    }, 4000);
+    }, 140);
   }, []);
 
   const handleCardClick = useCallback(() => {
     triggerSwitch();
-    handleHoverEnd();
-  }, [triggerSwitch, handleHoverEnd]);
+  }, [triggerSwitch]);
 
   const handleSelectPanel = useCallback(
     (panel: "A" | "B") => {
-      triggerSwitch(panel);
-      handleHoverEnd();
+      if (panel !== activePanel) {
+        triggerSwitch(panel);
+      }
     },
-    [triggerSwitch, handleHoverEnd]
+    [activePanel, triggerSwitch]
   );
 
   const handleSwipe = useCallback(
     (direction: "left" | "right") => {
       triggerSwitch(direction === "left" ? "B" : "A");
-      handleHoverEnd();
     },
-    [triggerSwitch, handleHoverEnd]
+    [triggerSwitch]
+  );
+
+  const renderSectionHeader = (label: string) => (
+    <div className="flex items-center justify-between gap-2 mb-2.5">
+      <div className="flex items-center gap-2">
+        <Layers className="w-4 h-4 text-slate-400" />
+        <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+          {label}
+        </span>
+      </div>
+      <div className="flex items-center gap-1 bg-white p-0.5 rounded-lg border border-slate-200 shadow-soft text-[11px] font-semibold">
+        <button
+          type="button"
+          onClick={() => handleSelectPanel("A")}
+          className={`px-2.5 py-1 rounded-md transition-all ${
+            activePanel === "A"
+              ? "bg-slate-900 text-white shadow-sm"
+              : "text-slate-500 hover:text-slate-900"
+          }`}
+        >
+          Overview
+        </button>
+        <button
+          type="button"
+          onClick={() => handleSelectPanel("B")}
+          className={`px-2.5 py-1 rounded-md transition-all ${
+            activePanel === "B"
+              ? "bg-slate-900 text-white shadow-sm"
+              : "text-slate-500 hover:text-slate-900"
+          }`}
+        >
+          More Details
+        </button>
+      </div>
+    </div>
   );
 
   if (mode === "commercial" && commercialMetrics) {
@@ -120,215 +126,178 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
     } = commercialMetrics;
 
     const activeDealsCount = propertyMetrics.filter(
-      (pm) =>
-        pm.property.status !== "sold" && pm.property.status !== "closed"
+      (pm) => pm.property.status !== "sold" && pm.property.status !== "closed"
     ).length;
     const soldDealsCount = propertyMetrics.filter(
-      (pm) =>
-        pm.property.status === "sold" || pm.property.status === "closed"
+      (pm) => pm.property.status === "sold" || pm.property.status === "closed"
     ).length;
 
     const bankInflowsGross =
       dealInflowsBank + capitalInjectedBank + loansBorrowedBank;
 
     return (
-      <div
-        className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3"
-        onMouseEnter={handleHoverStart}
-        onMouseLeave={handleHoverEnd}
-      >
-        {/* Card 1: Bank Position & Inflow Velocity */}
-        <CyclingKpiCard
-          cardAccentColor="blue"
-          activePanel={activePanel}
-          isFlipping={isFlipping}
-          onClick={handleCardClick}
-          onSelectPanel={handleSelectPanel}
-          onSwipe={handleSwipe}
-          onHoverStart={handleHoverStart}
-          onHoverEnd={handleHoverEnd}
-          panelA={{
-            title: "Net Bank Liquidity",
-            badge: "CLEARED",
-            badgeColor: "bg-blue-950/60 text-blue-400 border border-blue-800/40",
-            titleColor: "text-blue-400",
-            value: formatINR(netBankLiquidity),
-            valueColor: "text-blue-400",
-            subtitle: "Bank Reserve",
-            icon: Landmark,
-            iconColor: "text-[#3B82F6]",
-          }}
-          panelB={{
-            title: "Bank Inflow Volume",
-            badge: "INFLOWS",
-            badgeColor: "bg-blue-950/60 text-blue-400 border border-blue-800/40",
-            titleColor: "text-blue-400",
-            value: formatINR(bankInflowsGross),
-            valueColor: "text-blue-400",
-            subtitle: "Gross Bank Credits Received",
-            icon: ArrowDownLeft,
-            iconColor: "text-[#3B82F6]",
-          }}
-        />
+      <section aria-label="Financial Summary">
+        {renderSectionHeader("Money & Profit Summary")}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {/* Card 1: Bank Balance vs Total Bank Credits */}
+          <CyclingKpiCard
+            cardAccentColor="blue"
+            activePanel={activePanel}
+            isFlipping={isFlipping}
+            onClick={handleCardClick}
+            onSelectPanel={handleSelectPanel}
+            onSwipe={handleSwipe}
+            panelA={{
+              title: "Bank Balance",
+              badge: "Bank",
+              value: formatINR(netBankLiquidity),
+              valueColor:
+                netBankLiquidity >= 0 ? "text-slate-900" : "text-rose-600",
+              subtitle: "Available in bank account",
+              icon: Landmark,
+            }}
+            panelB={{
+              title: "Total Bank Receipts",
+              badge: "Inflows",
+              value: formatINR(bankInflowsGross),
+              valueColor: "text-blue-700",
+              subtitle: "All bank credits received",
+              icon: ArrowDownLeft,
+            }}
+          />
 
-        {/* Card 2: Liquid Cash & Site Outflow Burn */}
-        <CyclingKpiCard
-          cardAccentColor="emerald"
-          activePanel={activePanel}
-          isFlipping={isFlipping}
-          onClick={handleCardClick}
-          onSelectPanel={handleSelectPanel}
-          onSwipe={handleSwipe}
-          onHoverStart={handleHoverStart}
-          onHoverEnd={handleHoverEnd}
-          panelA={{
-            title: "Cash in Hand",
-            badge: "IN HAND",
-            badgeColor: "bg-emerald-950/60 text-emerald-400 border border-emerald-800/40",
-            titleColor: "text-emerald-400",
-            value: formatINR(netCashLiquidity),
-            valueColor: "text-emerald-400",
-            subtitle: "Liquid Vault Cash",
-            icon: Banknote,
-            iconColor: "text-[#22C55E]",
-          }}
-          panelB={{
-            title: "Cash Outflow Burn",
-            badge: "CASH BURN",
-            badgeColor: "bg-emerald-950/60 text-emerald-400 border border-emerald-800/40",
-            titleColor: "text-emerald-400",
-            value: formatINR(outflowsCash),
-            valueColor: "text-emerald-400",
-            subtitle: "Site Labor, Legal & Registration",
-            icon: TrendingDown,
-            iconColor: "text-[#22C55E]",
-          }}
-        />
+          {/* Card 2: Cash in Hand vs Cash Spent */}
+          <CyclingKpiCard
+            cardAccentColor="emerald"
+            activePanel={activePanel}
+            isFlipping={isFlipping}
+            onClick={handleCardClick}
+            onSelectPanel={handleSelectPanel}
+            onSwipe={handleSwipe}
+            panelA={{
+              title: "Cash in Hand",
+              badge: "Cash",
+              value: formatINR(netCashLiquidity),
+              valueColor:
+                netCashLiquidity >= 0 ? "text-slate-900" : "text-rose-600",
+              subtitle: "Physical cash available",
+              icon: Banknote,
+            }}
+            panelB={{
+              title: "Total Cash Spent",
+              badge: "Spent",
+              value: formatINR(outflowsCash),
+              valueColor: "text-slate-900",
+              subtitle: "Site, legal & registration cash",
+              icon: TrendingDown,
+            }}
+          />
 
-        {/* Card 3: Combined Liquidity vs Invested Capital */}
-        <CyclingKpiCard
-          cardAccentColor="cyan"
-          activePanel={activePanel}
-          isFlipping={isFlipping}
-          onClick={handleCardClick}
-          onSelectPanel={handleSelectPanel}
-          onSwipe={handleSwipe}
-          onHoverStart={handleHoverStart}
-          onHoverEnd={handleHoverEnd}
-          panelA={{
-            title: "Total Liquidity",
-            badge: "AVAILABLE",
-            badgeColor: "bg-cyan-950/60 text-cyan-400 border border-cyan-800/40",
-            titleColor: "text-cyan-400",
-            value: formatINR(currentNetLiquidity),
-            valueColor: "text-cyan-400",
-            subtitle: `Bank: ${formatINR(netBankLiquidity)} | Cash: ${formatINR(netCashLiquidity)}`,
-            icon: Wallet,
-            iconColor: "text-[#06B6D4]",
-          }}
-          panelB={{
-            title: "Net Retained Capital",
-            badge: "NET EQUITY",
-            badgeColor: "bg-cyan-950/60 text-cyan-400 border border-cyan-800/40",
-            titleColor: "text-cyan-400",
-            value: formatINR(netCapitalInjected),
-            valueColor: "text-cyan-400",
-            subtitle: `Gross Cap: ${formatINR(capitalInjectedTotal)} - Refunds`,
-            icon: Coins,
-            iconColor: "text-[#06B6D4]",
-          }}
-        />
+          {/* Card 3: Total Available Funds vs Your Capital */}
+          <CyclingKpiCard
+            cardAccentColor="cyan"
+            activePanel={activePanel}
+            isFlipping={isFlipping}
+            onClick={handleCardClick}
+            onSelectPanel={handleSelectPanel}
+            onSwipe={handleSwipe}
+            panelA={{
+              title: "Total Available",
+              badge: "Total",
+              value: formatINR(currentNetLiquidity),
+              valueColor:
+                currentNetLiquidity >= 0 ? "text-teal-700" : "text-rose-600",
+              subtitle: "Bank + Cash combined",
+              icon: Wallet,
+            }}
+            panelB={{
+              title: "Your Net Capital",
+              badge: "Capital",
+              value: formatINR(netCapitalInjected),
+              valueColor: "text-teal-700",
+              subtitle: `Put in: ${formatINR(capitalInjectedTotal)}`,
+              icon: Coins,
+            }}
+          />
 
-        {/* Card 4: Seller Liabilities vs Full Outlay */}
-        <CyclingKpiCard
-          cardAccentColor="amber"
-          activePanel={activePanel}
-          isFlipping={isFlipping}
-          onClick={handleCardClick}
-          onSelectPanel={handleSelectPanel}
-          onSwipe={handleSwipe}
-          onHoverStart={handleHoverStart}
-          onHoverEnd={handleHoverEnd}
-          panelA={{
-            title: "Pending to Sellers",
-            badge: "SELLER DUE",
-            badgeColor: "bg-amber-950/60 text-amber-400 border border-amber-800/40",
-            titleColor: "text-[#F59E0B]",
-            value: formatINR(totalPendingPayable),
-            valueColor: "text-[#F59E0B]",
-            subtitle: `${propertyMetrics.length} Land Deals Owed`,
-            icon: Clock,
-            iconColor: "text-[#F59E0B]",
-          }}
-          panelB={{
-            title: "Committed Project Outlay",
-            badge: "FULL OUTLAY",
-            badgeColor: "bg-amber-950/60 text-amber-400 border border-amber-800/40",
-            titleColor: "text-amber-400",
-            value: formatINR(totalProjectOutlay),
-            valueColor: "text-amber-400",
-            subtitle: `Buy: ${formatINR(totalAgreedBuyPrice)} + Exp: ${formatINR(totalPropertyExpenses)}`,
-            icon: Landmark,
-            iconColor: "text-[#F59E0B]",
-          }}
-        />
+          {/* Card 4: Owed to Sellers vs Total Project Cost */}
+          <CyclingKpiCard
+            cardAccentColor="amber"
+            activePanel={activePanel}
+            isFlipping={isFlipping}
+            onClick={handleCardClick}
+            onSelectPanel={handleSelectPanel}
+            onSwipe={handleSwipe}
+            panelA={{
+              title: "Owed to Sellers",
+              badge: "Payable",
+              value: formatINR(totalPendingPayable),
+              valueColor:
+                totalPendingPayable > 0 ? "text-amber-700" : "text-slate-900",
+              subtitle: `Across ${propertyMetrics.length} ${
+                propertyMetrics.length === 1 ? "property" : "properties"
+              }`,
+              icon: Clock,
+            }}
+            panelB={{
+              title: "Total Deal Cost",
+              badge: "Total Cost",
+              value: formatINR(totalProjectOutlay),
+              valueColor: "text-slate-900",
+              subtitle: `Buy ${formatINR(totalAgreedBuyPrice)} + Costs ${formatINR(totalPropertyExpenses)}`,
+              icon: Landmark,
+            }}
+          />
 
-        {/* Card 5: External Debt vs Incoming Buyer Receivables */}
-        <CyclingKpiCard
-          cardAccentColor="rose"
-          activePanel={activePanel}
-          isFlipping={isFlipping}
-          onClick={handleCardClick}
-          onSelectPanel={handleSelectPanel}
-          onSwipe={handleSwipe}
-          onHoverStart={handleHoverStart}
-          onHoverEnd={handleHoverEnd}
-          panelA={{
-            title: "Active Loan Debt",
-            badge: "LOAN DEBT",
-            badgeColor: "bg-rose-950/60 text-rose-400 border border-rose-800/40",
-            titleColor: "text-rose-400",
-            value: formatINR(outstandingLoansPrincipal),
-            valueColor:
-              outstandingLoansPrincipal > 0 ? "text-rose-400" : "text-[#A1A1AA]",
-            subtitle:
-              totalFinanceCosts > 0
-                ? `Finance Cost: ${formatINR(totalFinanceCosts)}`
-                : "Principal Outstanding",
-            icon: Landmark,
-            iconColor: "text-[#F43F5E]",
-          }}
-          panelB={{
-            title: "Buyer Receivables",
-            badge: "RECEIVABLES",
-            badgeColor: "bg-rose-950/60 text-rose-400 border border-rose-800/40",
-            titleColor: "text-rose-400",
-            value: formatINR(totalPendingReceivable),
-            valueColor: "text-rose-400",
-            subtitle: "Agreed Selling Pipeline",
-            icon: ArrowDownLeft,
-            iconColor: "text-[#F43F5E]",
-          }}
-        />
+          {/* Card 5: Loans Owed vs Buyers Owe You */}
+          <CyclingKpiCard
+            cardAccentColor="rose"
+            activePanel={activePanel}
+            isFlipping={isFlipping}
+            onClick={handleCardClick}
+            onSelectPanel={handleSelectPanel}
+            onSwipe={handleSwipe}
+            panelA={{
+              title: "Loans Owed",
+              badge: "Loans",
+              value: formatINR(outstandingLoansPrincipal),
+              valueColor:
+                outstandingLoansPrincipal > 0
+                  ? "text-rose-600"
+                  : "text-slate-500",
+              subtitle:
+                totalFinanceCosts > 0
+                  ? `Interest/share paid: ${formatINR(totalFinanceCosts)}`
+                  : "Remaining loan balance",
+              icon: Landmark,
+            }}
+            panelB={{
+              title: "Buyers Owe You",
+              badge: "Receivable",
+              value: formatINR(totalPendingReceivable),
+              valueColor: "text-emerald-700",
+              subtitle: "Pending from property sales",
+              icon: ArrowDownLeft,
+            }}
+          />
 
-        {/* Card 6: Auto-Switching Actual vs Projected Profit KPI Card (Synchronized 7s Interval + Touch Swipe) */}
-        <ProfitKpiCard
-          cardAccentColor="emerald"
-          totalRealizedProfit={totalRealizedProfit}
-          totalProjectedProfit={totalProjectedProfit}
-          totalPendingProfit={totalPendingProfit}
-          profitWithdrawalsTotal={profitWithdrawalsTotal}
-          activeDealsCount={activeDealsCount}
-          soldDealsCount={soldDealsCount}
-          activePanel={activePanel}
-          isFlipping={isFlipping}
-          onClick={handleCardClick}
-          onSelectPanel={handleSelectPanel}
-          onSwipe={handleSwipe}
-          onHoverStart={handleHoverStart}
-          onHoverEnd={handleHoverEnd}
-        />
-      </div>
+          {/* Card 6: Profit Earned vs Expected Profit */}
+          <ProfitKpiCard
+            cardAccentColor="emerald"
+            totalRealizedProfit={totalRealizedProfit}
+            totalProjectedProfit={totalProjectedProfit}
+            totalPendingProfit={totalPendingProfit}
+            profitWithdrawalsTotal={profitWithdrawalsTotal}
+            activeDealsCount={activeDealsCount}
+            soldDealsCount={soldDealsCount}
+            activePanel={activePanel}
+            isFlipping={isFlipping}
+            onClick={handleCardClick}
+            onSelectPanel={handleSelectPanel}
+            onSwipe={handleSwipe}
+          />
+        </div>
+      </section>
     );
   }
 
@@ -353,146 +322,116 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
     );
 
     return (
-      <div
-        className="grid grid-cols-2 md:grid-cols-4 gap-3"
-        onMouseEnter={handleHoverStart}
-        onMouseLeave={handleHoverEnd}
-      >
-        {/* Card 1: Total Investment Paid vs Committed Value */}
-        <CyclingKpiCard
-          cardAccentColor="blue"
-          activePanel={activePanel}
-          isFlipping={isFlipping}
-          onClick={handleCardClick}
-          onSelectPanel={handleSelectPanel}
-          onSwipe={handleSwipe}
-          onHoverStart={handleHoverStart}
-          onHoverEnd={handleHoverEnd}
-          panelA={{
-            title: "Total Invested",
-            badge: "PAID",
-            badgeColor: "bg-blue-950/60 text-blue-400 border border-blue-800/40",
-            titleColor: "text-blue-400",
-            value: formatINR(totalInvestmentDone),
-            valueColor: "text-blue-400",
-            subtitle: `Across ${properties.length} Personal Properties`,
-            icon: Wallet,
-            iconColor: "text-[#3B82F6]",
-          }}
-          panelB={{
-            title: "Committed Value",
-            badge: "COMMITTED",
-            badgeColor: "bg-blue-950/60 text-blue-400 border border-blue-800/40",
-            titleColor: "text-blue-400",
-            value: formatINR(totalAgreedValue),
-            valueColor: "text-blue-400",
-            subtitle: `Pending: ${formatINR(totalPendingCommitment)}`,
-            icon: Building2,
-            iconColor: "text-[#3B82F6]",
-          }}
-        />
+      <section aria-label="Personal Portfolio Summary">
+        {renderSectionHeader("Personal Portfolio Summary")}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {/* Card 1: Total Paid So Far vs Total Property Value */}
+          <CyclingKpiCard
+            cardAccentColor="blue"
+            activePanel={activePanel}
+            isFlipping={isFlipping}
+            onClick={handleCardClick}
+            onSelectPanel={handleSelectPanel}
+            onSwipe={handleSwipe}
+            panelA={{
+              title: "Paid So Far",
+              badge: "Paid",
+              value: formatINR(totalInvestmentDone),
+              valueColor: "text-slate-900",
+              subtitle: `Across ${properties.length} personal ${
+                properties.length === 1 ? "home" : "properties"
+              }`,
+              icon: Wallet,
+            }}
+            panelB={{
+              title: "Total Property Cost",
+              badge: "Agreed",
+              value: formatINR(totalAgreedValue),
+              valueColor: "text-blue-700",
+              subtitle: `Remaining: ${formatINR(totalPendingCommitment)}`,
+              icon: Building2,
+            }}
+          />
 
-        {/* Card 2: Savings Inflows vs Capital Withdrawn */}
-        <CyclingKpiCard
-          cardAccentColor="purple"
-          activePanel={activePanel}
-          isFlipping={isFlipping}
-          onClick={handleCardClick}
-          onSelectPanel={handleSelectPanel}
-          onSwipe={handleSwipe}
-          onHoverStart={handleHoverStart}
-          onHoverEnd={handleHoverEnd}
-          panelA={{
-            title: "Inflows Allocated",
-            badge: "SAVINGS",
-            badgeColor: "bg-purple-950/60 text-purple-400 border border-purple-800/40",
-            titleColor: "text-purple-400",
-            value: formatINR(inflowsTotal),
-            valueColor: "text-purple-400",
-            subtitle: "Personal Savings & Income",
-            icon: Landmark,
-            iconColor: "text-[#A855F7]",
-          }}
-          panelB={{
-            title: "Funds Withdrawn",
-            badge: "DRAWINGS",
-            badgeColor: "bg-purple-950/60 text-purple-400 border border-purple-800/40",
-            titleColor: "text-purple-400",
-            value: formatINR(withdrawalsTotal),
-            valueColor: "text-purple-400",
-            subtitle: "Personal Refunds & Drawings",
-            icon: Coins,
-            iconColor: "text-[#A855F7]",
-          }}
-        />
+          {/* Card 2: Savings Added vs Funds Withdrawn */}
+          <CyclingKpiCard
+            cardAccentColor="purple"
+            activePanel={activePanel}
+            isFlipping={isFlipping}
+            onClick={handleCardClick}
+            onSelectPanel={handleSelectPanel}
+            onSwipe={handleSwipe}
+            panelA={{
+              title: "Savings Added",
+              badge: "Added",
+              value: formatINR(inflowsTotal),
+              valueColor: "text-slate-900",
+              subtitle: "Personal savings & income",
+              icon: Landmark,
+            }}
+            panelB={{
+              title: "Funds Taken Out",
+              badge: "Withdrawn",
+              value: formatINR(withdrawalsTotal),
+              valueColor: "text-violet-700",
+              subtitle: "Refunds & personal drawings",
+              icon: Coins,
+            }}
+          />
 
-        {/* Card 3: Bank Available vs Combined Liquidity */}
-        <CyclingKpiCard
-          cardAccentColor="emerald"
-          activePanel={activePanel}
-          isFlipping={isFlipping}
-          onClick={handleCardClick}
-          onSelectPanel={handleSelectPanel}
-          onSwipe={handleSwipe}
-          onHoverStart={handleHoverStart}
-          onHoverEnd={handleHoverEnd}
-          panelA={{
-            title: "Bank Available",
-            badge: "BANK BUFFER",
-            badgeColor: "bg-emerald-950/60 text-emerald-400 border border-emerald-800/40",
-            titleColor: "text-[#22C55E]",
-            value: formatINR(currentBankBalance),
-            valueColor: "text-[#22C55E]",
-            subtitle: "Ready for Next Installment",
-            icon: Banknote,
-            iconColor: "text-[#22C55E]",
-          }}
-          panelB={{
-            title: "Total Liquid Buffer",
-            badge: "TOTAL CASH",
-            badgeColor: "bg-emerald-950/60 text-emerald-400 border border-emerald-800/40",
-            titleColor: "text-emerald-400",
-            value: formatINR(netPersonalLiquidity),
-            subtitle: `Cash in Hand: ${formatINR(currentCashBalance)}`,
-            icon: Wallet,
-            iconColor: "text-[#22C55E]",
-          }}
-        />
+          {/* Card 3: Bank Balance vs Combined Funds */}
+          <CyclingKpiCard
+            cardAccentColor="emerald"
+            activePanel={activePanel}
+            isFlipping={isFlipping}
+            onClick={handleCardClick}
+            onSelectPanel={handleSelectPanel}
+            onSwipe={handleSwipe}
+            panelA={{
+              title: "Bank Balance",
+              badge: "Bank",
+              value: formatINR(currentBankBalance),
+              valueColor: "text-emerald-700",
+              subtitle: "Ready for next payment",
+              icon: Banknote,
+            }}
+            panelB={{
+              title: "Total Available",
+              badge: "Combined",
+              value: formatINR(netPersonalLiquidity),
+              valueColor: "text-emerald-700",
+              subtitle: `Cash in hand: ${formatINR(currentCashBalance)}`,
+              icon: Wallet,
+            }}
+          />
 
-        {/* Card 4: Cash in Hand vs Pending Commitments */}
-        <CyclingKpiCard
-          cardAccentColor="amber"
-          activePanel={activePanel}
-          isFlipping={isFlipping}
-          onClick={handleCardClick}
-          onSelectPanel={handleSelectPanel}
-          onSwipe={handleSwipe}
-          onHoverStart={handleHoverStart}
-          onHoverEnd={handleHoverEnd}
-          panelA={{
-            title: "Cash in Hand Balance",
-            badge: "VAULT CASH",
-            badgeColor: "bg-amber-950/60 text-amber-400 border border-amber-800/40",
-            titleColor: "text-amber-400",
-            value: formatINR(currentCashBalance),
-            valueColor: "text-amber-400",
-            subtitle: "For Site Expenses & Labor",
-            icon: Clock,
-            iconColor: "text-[#F59E0B]",
-          }}
-          panelB={{
-            title: "Pending Payments",
-            badge: "NEXT MILESTONES",
-            badgeColor: "bg-amber-950/60 text-amber-400 border border-amber-800/40",
-            titleColor: "text-amber-400",
-            value: formatINR(totalPendingCommitment),
-            valueColor: "text-amber-400",
-            subtitle: "Builder Construction Milestones",
-            icon: Building2,
-            iconColor: "text-[#F59E0B]",
-          }}
-        />
-      </div>
+          {/* Card 4: Cash in Hand vs Remaining to Pay */}
+          <CyclingKpiCard
+            cardAccentColor="amber"
+            activePanel={activePanel}
+            isFlipping={isFlipping}
+            onClick={handleCardClick}
+            onSelectPanel={handleSelectPanel}
+            onSwipe={handleSwipe}
+            panelA={{
+              title: "Cash in Hand",
+              badge: "Cash",
+              value: formatINR(currentCashBalance),
+              valueColor: "text-slate-900",
+              subtitle: "For site visits & small expenses",
+              icon: Clock,
+            }}
+            panelB={{
+              title: "Balance Left to Pay",
+              badge: "Pending",
+              value: formatINR(totalPendingCommitment),
+              valueColor: "text-amber-700",
+              subtitle: "Upcoming builder installments",
+              icon: Building2,
+            }}
+          />
+        </div>
+      </section>
     );
   }
 
