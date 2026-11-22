@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
 
 export const metadata: Metadata = {
   title: {
@@ -7,7 +8,7 @@ export const metadata: Metadata = {
     template: "%s | Avaniya",
   },
   description:
-    "Simple, clear Indian Real Estate, Land Deal & Personal Property Portfolio Tracker",
+    "Simple, expressive Indian Real Estate, Land Deal & Personal Property Portfolio Tracker",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
@@ -25,7 +26,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#F8FAFC",
+  themeColor: "#F5FBF6",
 };
 
 export default function RootLayout({
@@ -34,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="bg-[#F8FAFC]">
+    <html lang="en" className="bg-md-surface">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -47,8 +48,8 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="font-sans bg-[#F8FAFC] text-slate-900 antialiased min-h-screen flex flex-col selection:bg-emerald-100 selection:text-emerald-900">
-        {children}
+      <body className="font-sans bg-md-surface text-md-on-surface antialiased min-h-screen flex flex-col selection:bg-md-primary-container selection:text-md-on-primary-container">
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

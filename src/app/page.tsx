@@ -14,6 +14,7 @@ import { EditTransactionModal } from "@/components/modals/EditTransactionModal";
 import { LoanModal } from "@/components/modals/LoanModal";
 import { CategoryModal } from "@/components/modals/CategoryModal";
 import { ExportModal } from "@/components/modals/ExportModal";
+import { ThemeSettingsModal } from "@/components/modals/ThemeSettingsModal";
 import { AuthModal, AuthUserData } from "@/components/auth/AuthModal";
 import { LogoutConfirmModal } from "@/components/modals/LogoutConfirmModal";
 import { SuperAdminDashboard } from "@/components/admin/SuperAdminDashboard";
@@ -85,6 +86,7 @@ export default function DashboardPage() {
   );
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isThemeSettingsOpen, setIsThemeSettingsOpen] = useState(false);
 
   // Selected Property for Ledger Modal (stored as key identifier, dynamically derived below)
   const [selectedPropertyCode, setSelectedPropertyCode] = useState<string | null>(null);
@@ -688,12 +690,12 @@ export default function DashboardPage() {
   // Initial Session Verification Splash
   if (isAuthChecking) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex items-center justify-center font-sans">
+      <div className="min-h-screen bg-md-surface text-md-on-surface flex items-center justify-center font-sans">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center animate-pulse">
-            <div className="w-4 h-4 rounded-full bg-emerald-500"></div>
+          <div className="w-12 h-12 rounded-[18px] bg-md-primary-container flex items-center justify-center animate-pulse">
+            <div className="w-4 h-4 rounded-full bg-md-primary"></div>
           </div>
-          <span className="text-xs text-slate-500 tracking-wide font-semibold">
+          <span className="text-xs text-md-on-surface-variant tracking-wide font-semibold">
             Loading your portfolio...
           </span>
         </div>
@@ -704,7 +706,7 @@ export default function DashboardPage() {
   // Clean Login Landing Screen (When unauthenticated)
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col justify-between font-sans">
+      <div className="min-h-screen bg-md-surface text-md-on-surface flex flex-col justify-between font-sans">
         <AuthModal
           isOpen={true}
           allowClose={false}
@@ -729,7 +731,7 @@ export default function DashboardPage() {
 
   // Authenticated Main Dashboard
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-md-surface text-md-on-surface flex flex-col font-sans">
       {/* Header Bar with Mode Switcher & Quick Actions */}
       <Header
         currentMode={appMode}
@@ -739,6 +741,7 @@ export default function DashboardPage() {
         onOpenNewLoanModal={handleOpenNewLoanModal}
         onOpenExportModal={() => setIsExportModalOpen(true)}
         onOpenCategoryModal={() => setIsCategoryModalOpen(true)}
+        onOpenThemeSettingsModal={() => setIsThemeSettingsOpen(true)}
         user={user}
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
         onLogout={() => setIsLogoutModalOpen(true)}
@@ -924,6 +927,13 @@ export default function DashboardPage() {
       <ExportModal
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
+      />
+
+      {/* Material 3 Expressive Theme & Settings Modal */}
+      <ThemeSettingsModal
+        isOpen={isThemeSettingsOpen}
+        onClose={() => setIsThemeSettingsOpen(false)}
+        onOpenCategories={() => setIsCategoryModalOpen(true)}
       />
 
       {/* Persistent System Footer */}

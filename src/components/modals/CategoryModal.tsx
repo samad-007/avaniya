@@ -54,25 +54,25 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
           onClose();
         }
       }}
-      className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto overflow-x-hidden animate-backdrop"
+      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-3.5 sm:p-4 overflow-y-auto overflow-x-hidden animate-backdrop"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-white border border-slate-200 rounded-2xl max-w-lg w-full min-w-0 max-h-[92vh] overflow-y-auto overflow-x-hidden p-5 sm:p-6 shadow-modal my-auto flex flex-col gap-5 animate-modal"
+        className="bg-md-surface-lowest border border-md-outline-variant rounded-[28px] max-w-lg w-full min-w-0 max-h-[92vh] overflow-y-auto overflow-x-hidden p-5 sm:p-6 shadow-m3-3 my-auto flex flex-col gap-5 animate-modal"
       >
-        <div className="flex items-start justify-between border-b border-slate-100 pb-4 gap-2">
+        <div className="flex items-start justify-between border-b border-md-outline-variant/60 pb-4 gap-2">
           <div className="min-w-0 flex-1">
-            <h2 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
-              <Tag className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+            <h2 className="font-display text-lg font-bold text-md-on-surface tracking-tight flex items-center gap-2">
+              <Tag className="w-5 h-5 text-md-primary flex-shrink-0" />
               <span>Manage Categories</span>
             </h2>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-md-on-surface-variant mt-1">
               Create your own expense or income labels so your ledger matches how you work.
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex-shrink-0 transition-colors"
+            className="p-2 rounded-full text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high flex-shrink-0 transition-colors"
             aria-label="Close"
           >
             <X className="w-5 h-5" />
@@ -81,7 +81,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-sm">
           <div className="flex flex-col gap-1.5 min-w-0">
-            <label className="text-xs font-semibold text-slate-700">
+            <label className="text-xs font-semibold text-md-on-surface-variant">
               Category Name
             </label>
             <input
@@ -89,14 +89,14 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Panchayat Approval, Borewell Drilling, Brokerage"
-              className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 placeholder:text-slate-400 text-sm outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 transition-all"
+              className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-2xl p-2.5 text-md-on-surface placeholder:text-md-on-surface-variant/60 text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary focus:ring-2 focus:ring-md-primary/20 transition-all"
               required
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div className="flex flex-col gap-1.5 min-w-0">
-              <label className="text-xs font-semibold text-slate-700">
+              <label className="text-xs font-semibold text-md-on-surface-variant">
                 Money Direction
               </label>
               <select
@@ -104,7 +104,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
                 onChange={(e) =>
                   setType(e.target.value as "outflow" | "inflow" | "transfer")
                 }
-                className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500 truncate"
+                className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-2xl p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary truncate"
               >
                 <option value="outflow">Money Paid (Expense)</option>
                 <option value="inflow">Money Received (Income)</option>
@@ -113,7 +113,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
             </div>
 
             <div className="flex flex-col gap-1.5 min-w-0">
-              <label className="text-xs font-semibold text-slate-700">
+              <label className="text-xs font-semibold text-md-on-surface-variant">
                 Where to Use
               </label>
               <select
@@ -121,7 +121,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
                 onChange={(e) =>
                   setScope(e.target.value as "commercial" | "personal" | "both")
                 }
-                className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500 truncate"
+                className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-2xl p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary truncate"
               >
                 <option value="both">Both Business &amp; Personal</option>
                 <option value="commercial">Business Deals Only</option>
@@ -130,19 +130,18 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
             </div>
           </div>
 
-          {/* Calculation Role */}
-          <div className="flex flex-col gap-2 bg-emerald-50/60 p-3.5 rounded-xl border border-emerald-200/80 min-w-0">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+          <div className="flex flex-col gap-2 bg-md-primary-container/40 p-4 rounded-[20px] border border-md-outline-variant/80 min-w-0">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-md-on-primary-container">
+              <ShieldCheck className="w-4 h-4 text-md-primary" />
               <span>How should this affect your totals?</span>
             </div>
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <p className="text-xs text-md-on-surface-variant leading-relaxed">
               Choose what this category counts toward so your balances and profit stay accurate automatically.
             </p>
             <select
               value={financialRole}
               onChange={(e) => setFinancialRole(e.target.value as FinancialRole)}
-              className="w-full min-w-0 bg-white border border-emerald-200 rounded-xl p-2.5 text-slate-900 font-medium text-xs sm:text-sm mt-1 outline-none focus:border-emerald-500 truncate"
+              className="w-full min-w-0 bg-md-surface-lowest border border-md-outline-variant rounded-2xl p-2.5 text-md-on-surface font-medium text-xs sm:text-sm mt-1 outline-none focus:border-md-primary truncate"
             >
               <option value="property_expense">
                 Extra Property Cost (Adds to total cost &amp; reduces profit)
@@ -168,16 +167,15 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
             </select>
           </div>
 
-          {/* Existing Categories List */}
           <div className="flex flex-col gap-2">
-            <div className="text-xs font-semibold text-slate-600">
+            <div className="text-xs font-semibold text-md-on-surface-variant">
               Saved Categories ({categories.length})
             </div>
-            <div className="max-h-36 overflow-y-auto border border-slate-200 rounded-xl p-2.5 bg-slate-50 flex flex-wrap gap-1.5">
+            <div className="max-h-36 overflow-y-auto border border-md-outline-variant/80 rounded-2xl p-2.5 bg-md-surface-low flex flex-wrap gap-1.5">
               {categories.map((c, idx) => (
                 <span
                   key={idx}
-                  className="px-2.5 py-1 rounded-lg bg-white text-xs font-medium text-slate-700 border border-slate-200 shadow-soft"
+                  className="px-3 py-1 rounded-full bg-md-surface-lowest text-xs font-medium text-md-on-surface border border-md-outline-variant/80"
                 >
                   {c.name}
                 </span>
@@ -185,19 +183,18 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2.5 pt-3 border-t border-slate-100 flex-wrap sm:flex-nowrap">
+          <div className="flex items-center gap-2.5 pt-3 border-t border-md-outline-variant/60 flex-wrap sm:flex-nowrap">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="btn-action-brand flex-1 py-2.5 rounded-xl text-sm disabled:opacity-50"
+              className="m3-btn-filled flex-1 py-2.5 text-sm disabled:opacity-50"
             >
               {isSubmitting ? "Saving..." : "Add Category"}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="btn-action-secondary px-4 py-2.5 rounded-xl text-sm"
+              className="m3-btn-outlined px-5 py-2.5 text-sm"
             >
               Cancel
             </button>

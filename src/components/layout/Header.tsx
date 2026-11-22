@@ -9,7 +9,9 @@ import {
   ArrowUpRight,
   Plus,
   Download,
-  Settings2,
+  Palette,
+  Sun,
+  Moon,
   LogOut,
   User as UserIcon,
   ShieldCheck,
@@ -17,6 +19,7 @@ import {
   HandCoins,
   Wallet,
 } from "lucide-react";
+import { useTheme } from "@/components/theme/ThemeProvider";
 
 interface HeaderProps {
   currentMode: "commercial" | "personal";
@@ -28,6 +31,7 @@ interface HeaderProps {
   onOpenNewLoanModal?: () => void;
   onOpenExportModal: () => void;
   onOpenCategoryModal: () => void;
+  onOpenThemeSettingsModal?: () => void;
   user?: { name: string; email: string; role: string; datasetId?: string } | null;
   onOpenAuthModal: () => void;
   onLogout: () => void;
@@ -43,7 +47,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenNewPropertyModal,
   onOpenNewLoanModal,
   onOpenExportModal,
-  onOpenCategoryModal,
+  onOpenThemeSettingsModal,
   user,
   onOpenAuthModal,
   onLogout,
@@ -52,15 +56,16 @@ export const Header: React.FC<HeaderProps> = ({
   onSwitchDataset,
 }) => {
   const isSuperAdmin = user?.role === "super_admin";
+  const { mode, toggleMode, palette } = useTheme();
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 px-3 sm:px-5 py-3 w-full max-w-[100vw] overflow-x-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
+    <header className="sticky top-0 z-40 bg-md-surface-lowest/95 backdrop-blur-md border-b border-md-outline-variant/80 px-3 sm:px-5 py-3 w-full max-w-[100vw] overflow-x-hidden shadow-m3-1 transition-standard">
       <div className="max-w-[1440px] mx-auto flex flex-col gap-3">
-        {/* Row 1: Brand, Mode Switcher, and User Profile */}
+        {/* Row 1: Brand, M3 Connected Mode Switcher, Theme & User Controls */}
         <div className="flex items-center justify-between gap-3 w-full">
           {/* Brand & Logo */}
           <div className="flex items-center gap-2.5 sm:gap-3 flex-shrink-0 min-w-0">
-            <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden border border-slate-200 bg-emerald-50 flex items-center justify-center flex-shrink-0 shadow-sm">
+            <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-[14px] overflow-hidden border border-md-outline-variant bg-md-primary-container flex items-center justify-center flex-shrink-0 shadow-sm">
               <Image
                 src="/logo.jpg"
                 alt="Avaniya"
@@ -71,87 +76,107 @@ export const Header: React.FC<HeaderProps> = ({
               />
             </div>
             <div className="min-w-0">
-              <div className="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+              <div className="font-display text-base sm:text-lg font-extrabold text-md-on-surface tracking-tight flex items-center gap-2">
                 <span className="truncate">Avaniya</span>
                 {currentDatasetId === "ds_demo_sandbox" ? (
-                  <span className="text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 whitespace-nowrap flex-shrink-0">
+                  <span className="text-[10px] sm:text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-md-warning-container text-md-on-warning-container whitespace-nowrap flex-shrink-0">
                     Demo Mode
                   </span>
                 ) : (
-                  <span className="text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 whitespace-nowrap flex-shrink-0">
+                  <span className="text-[10px] sm:text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-md-primary-container text-md-on-primary-container whitespace-nowrap flex-shrink-0">
                     Portfolio
                   </span>
                 )}
               </div>
-              <div className="text-xs text-slate-500 font-medium hidden sm:block truncate">
+              <div className="text-xs text-md-on-surface-variant font-medium hidden sm:block truncate">
                 Simple Property, Payment &amp; Profit Tracker
               </div>
             </div>
           </div>
 
-          {/* Desktop Mode Switcher */}
-          <div className="hidden md:flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200/80 shrink-0">
+          {/* Desktop M3 Expressive Connected Mode Switcher */}
+          <div className="hidden md:flex items-center bg-md-surface-container p-1 rounded-full shrink-0 gap-1">
             <button
               onClick={() => onModeChange("commercial")}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 ${
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
                 currentMode === "commercial"
-                  ? "bg-white text-slate-900 shadow-sm"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-md-primary text-md-on-primary shadow-m3-1"
+                  : "text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high"
               }`}
             >
-              <Building2
-                className={`w-3.5 h-3.5 ${
-                  currentMode === "commercial"
-                    ? "text-emerald-600"
-                    : "text-slate-400"
-                }`}
-              />
+              <Building2 className="w-3.5 h-3.5" />
               <span>Business Deals</span>
             </button>
             <button
               onClick={() => onModeChange("personal")}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 ${
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
                 currentMode === "personal"
-                  ? "bg-white text-slate-900 shadow-sm"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-md-primary text-md-on-primary shadow-m3-1"
+                  : "text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high"
               }`}
             >
-              <Home
-                className={`w-3.5 h-3.5 ${
-                  currentMode === "personal"
-                    ? "text-emerald-600"
-                    : "text-slate-400"
-                }`}
-              />
+              <Home className="w-3.5 h-3.5" />
               <span>Personal Homes</span>
             </button>
           </div>
 
-          {/* Top Right: User Profile & Logout */}
-          <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
+          {/* Top Right: Quick Light/Dark Toggle, Settings/Themes & User Profile */}
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 ml-auto">
+            {/* Quick Light/Dark Mode Toggle */}
+            <button
+              type="button"
+              onClick={toggleMode}
+              className="p-2 rounded-full bg-md-surface-container text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high transition-all flex-shrink-0"
+              title={
+                mode === "light"
+                  ? "Switch to Dark Mode"
+                  : "Switch to Light Mode"
+              }
+              aria-label="Toggle light or dark theme"
+            >
+              {mode === "light" ? (
+                <Moon className="w-4 h-4" />
+              ) : (
+                <Sun className="w-4 h-4" />
+              )}
+            </button>
+
+            {/* Theme & Settings Button */}
+            {onOpenThemeSettingsModal && (
+              <button
+                type="button"
+                onClick={onOpenThemeSettingsModal}
+                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-md-secondary-container text-md-on-secondary-container hover:brightness-95 dark:hover:brightness-110 transition-all text-xs font-semibold flex-shrink-0"
+                title={`Theme & Settings (${palette.name})`}
+              >
+                <Palette className="w-3.5 h-3.5" />
+                <span className="hidden lg:inline">Themes</span>
+              </button>
+            )}
+
             {user ? (
               <div className="flex items-center gap-1.5 flex-shrink-0">
                 <div
-                  className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-700 flex-shrink-0"
+                  className="flex items-center gap-2 bg-md-surface-low px-3 py-1.5 rounded-full border border-md-outline-variant/80 text-xs text-md-on-surface flex-shrink-0"
                   title={`Signed in as ${user.email}`}
                 >
                   <div
                     className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                      isSuperAdmin ? "bg-amber-500" : "bg-emerald-500"
+                      isSuperAdmin ? "bg-md-warning" : "bg-md-primary"
                     }`}
                   />
-                  <span className="font-semibold text-xs whitespace-nowrap text-slate-800">
+                  <span className="font-semibold text-xs whitespace-nowrap">
                     {user.name}
                   </span>
                   {isSuperAdmin && (
-                    <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-md flex-shrink-0">
+                    <span className="text-[10px] font-bold bg-md-tertiary-container text-md-on-tertiary-container px-1.5 py-0.5 rounded-full flex-shrink-0">
                       ADMIN
                     </span>
                   )}
                 </div>
                 <button
                   onClick={onLogout}
-                  className="p-2 rounded-xl bg-white text-slate-500 border border-slate-200 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 transition-all duration-150 flex-shrink-0"
+                  className="p-2 rounded-full bg-md-surface-low text-md-on-surface-variant border border-md-outline-variant/80 hover:text-md-on-error-container hover:border-md-error hover:bg-md-error-container transition-all flex-shrink-0"
                   title="Sign Out"
                   aria-label="Sign Out"
                 >
@@ -161,7 +186,7 @@ export const Header: React.FC<HeaderProps> = ({
             ) : (
               <button
                 onClick={onOpenAuthModal}
-                className="btn-action-brand flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs flex-shrink-0"
+                className="m3-btn-filled flex items-center gap-1.5 px-4 py-2 text-xs flex-shrink-0"
               >
                 <UserIcon className="w-3.5 h-3.5" />
                 <span>Sign In</span>
@@ -170,13 +195,12 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Row 2: Desktop Quick Actions Bar */}
-        <div className="hidden md:flex items-center justify-between gap-3 pt-2.5 border-t border-slate-100 w-full">
-          {/* Primary Everyday Actions (Plain English) */}
+        {/* Row 2: Desktop M3 Expressive Action Toolbar */}
+        <div className="hidden md:flex items-center justify-between gap-3 pt-2.5 border-t border-md-outline-variant/50 w-full">
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => onOpenEntryModal("outflow")}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200/80 hover:bg-rose-100/80 hover:border-rose-300 transition-all shadow-soft"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold bg-md-error-container text-md-on-error-container hover:brightness-95 dark:hover:brightness-110 active:rounded-[14px] transition-all"
               title="Record money you paid for land, construction, or expenses"
             >
               <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -185,7 +209,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={() => onOpenEntryModal("inflow")}
-              className="btn-action-brand flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs"
+              className="m3-btn-filled flex items-center gap-1.5 px-4 py-2 text-xs"
               title="Record money received from buyers, savings, or partners"
             >
               <ArrowDownRight className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -194,76 +218,75 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={onOpenNewPropertyModal}
-              className="btn-action-primary flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs"
+              className="m3-btn-primary-tonal flex items-center gap-1.5 px-4 py-2 text-xs"
               title="Add a new land deal or personal property"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Add Property</span>
             </button>
 
-            <div className="h-5 w-px bg-slate-200 mx-0.5" />
+            <div className="h-5 w-px bg-md-outline-variant/70 mx-0.5" />
 
             <button
               onClick={() => onOpenEntryModal("withdrawal")}
-              className="btn-action-secondary flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs text-slate-700"
+              className="m3-btn-outlined flex items-center gap-1.5 px-3.5 py-2 text-xs"
               title="Record profit taken out or capital returned"
             >
-              <Wallet className="w-3.5 h-3.5 text-amber-600" />
+              <Wallet className="w-3.5 h-3.5 text-md-tertiary" />
               <span>Withdraw</span>
             </button>
 
             {onOpenNewLoanModal && currentMode === "commercial" && (
               <button
                 onClick={onOpenNewLoanModal}
-                className="btn-action-secondary flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs text-slate-700"
+                className="m3-btn-outlined flex items-center gap-1.5 px-3.5 py-2 text-xs"
                 title="Track a bank loan or borrowed funds"
               >
-                <HandCoins className="w-3.5 h-3.5 text-emerald-600" />
+                <HandCoins className="w-3.5 h-3.5 text-md-primary" />
                 <span>Add Loan</span>
               </button>
             )}
 
             <button
               onClick={onOpenExportModal}
-              className="btn-action-secondary flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs text-slate-700"
+              className="m3-btn-outlined flex items-center gap-1.5 px-3.5 py-2 text-xs"
               title="Download Excel, PDF, or CSV report"
             >
-              <Download className="w-3.5 h-3.5 text-blue-600" />
+              <Download className="w-3.5 h-3.5 text-md-secondary" />
               <span>Export</span>
-            </button>
-
-            <button
-              onClick={onOpenCategoryModal}
-              className="p-2 rounded-xl bg-white text-slate-500 border border-slate-200 hover:text-slate-900 hover:border-slate-300 hover:bg-slate-50 transition-all"
-              title="Manage Expense & Income Categories"
-              aria-label="Categories & Settings"
-            >
-              <Settings2 className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Right Side of Toolbar: Admin Controls or Live Status */}
+          {/* Right Side of Toolbar: Admin Controls or Status */}
           {isSuperAdmin ? (
             <div className="flex items-center gap-2">
               {onSwitchDataset && (
-                <div className="flex items-center gap-1.5 bg-emerald-50/70 px-3 py-1.5 rounded-xl border border-emerald-200 text-xs">
-                  <FolderLock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span className="text-[11px] text-slate-500 hidden lg:inline font-medium">
-                    Workspace:
-                  </span>
+                <div className="flex items-center gap-1.5 bg-md-primary-container/60 px-3 py-1.5 rounded-full border border-md-outline-variant text-xs">
+                  <FolderLock className="w-3.5 h-3.5 text-md-on-primary-container shrink-0" />
                   <select
                     value={currentDatasetId || "ds_yousuf_portfolio"}
                     onChange={(e) => onSwitchDataset(e.target.value)}
-                    className="bg-transparent text-emerald-800 font-semibold text-xs outline-none cursor-pointer"
+                    className="bg-transparent text-md-on-primary-container font-semibold text-xs outline-none cursor-pointer"
                     title="Switch Active Portfolio"
                   >
-                    <option value="ds_yousuf_portfolio">
+                    <option
+                      value="ds_yousuf_portfolio"
+                      className="bg-md-surface-lowest text-md-on-surface"
+                    >
                       Mohammed Yousuf Portfolio
                     </option>
-                    <option value="ds_demo_sandbox">
+                    <option
+                      value="ds_demo_sandbox"
+                      className="bg-md-surface-lowest text-md-on-surface"
+                    >
                       Sandbox Demo Dataset
                     </option>
-                    <option value="all">[All Datasets Consolidated]</option>
+                    <option
+                      value="all"
+                      className="bg-md-surface-lowest text-md-on-surface"
+                    >
+                      [All Datasets Consolidated]
+                    </option>
                   </select>
                 </div>
               )}
@@ -271,17 +294,17 @@ export const Header: React.FC<HeaderProps> = ({
               {onOpenSuperAdminModal && (
                 <button
                   onClick={onOpenSuperAdminModal}
-                  className="px-3 py-1.5 rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
+                  className="m3-btn-tonal px-3.5 py-1.5 text-xs flex items-center gap-1.5"
                   title="Open Admin Console"
                 >
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                  <ShieldCheck className="w-3.5 h-3.5" />
                   <span>Admin</span>
                 </button>
               )}
             </div>
           ) : (
-            <div className="hidden lg:flex items-center gap-2 text-xs text-slate-500 font-medium">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <div className="hidden lg:flex items-center gap-2 text-xs text-md-on-surface-variant font-medium">
+              <span className="w-2 h-2 rounded-full bg-md-primary" />
               <span>
                 {currentMode === "commercial"
                   ? "Commercial Land Portfolio"
@@ -292,45 +315,60 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Mobile Mode Switcher (< md) */}
-        <div className="flex md:hidden items-center bg-slate-100 p-1 rounded-xl border border-slate-200/80 w-full">
+        <div className="flex md:hidden items-center bg-md-surface-container p-1 rounded-full w-full gap-1">
           <button
             onClick={() => onModeChange("commercial")}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-all duration-150 ${
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-full text-xs font-semibold transition-all ${
               currentMode === "commercial"
-                ? "bg-white text-slate-900 shadow-sm"
-                : "text-slate-600"
+                ? "bg-md-primary text-md-on-primary shadow-m3-1"
+                : "text-md-on-surface-variant"
             }`}
           >
-            <Building2 className="w-3.5 h-3.5 flex-shrink-0 text-emerald-600" />
+            <Building2 className="w-3.5 h-3.5 flex-shrink-0" />
             <span className="truncate">Business Deals</span>
           </button>
           <button
             onClick={() => onModeChange("personal")}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-all duration-150 ${
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-full text-xs font-semibold transition-all ${
               currentMode === "personal"
-                ? "bg-white text-slate-900 shadow-sm"
-                : "text-slate-600"
+                ? "bg-md-primary text-md-on-primary shadow-m3-1"
+                : "text-md-on-surface-variant"
             }`}
           >
-            <Home className="w-3.5 h-3.5 flex-shrink-0 text-emerald-600" />
+            <Home className="w-3.5 h-3.5 flex-shrink-0" />
             <span className="truncate">Personal Homes</span>
           </button>
         </div>
 
         {/* Mobile Super Admin Controls (< md) */}
         {isSuperAdmin && (
-          <div className="flex md:hidden items-center justify-between bg-emerald-50/70 border border-emerald-200 rounded-xl px-2.5 py-1.5 text-xs w-full gap-2">
+          <div className="flex md:hidden items-center justify-between bg-md-primary-container/50 border border-md-outline-variant rounded-full px-3 py-1.5 text-xs w-full gap-2">
             {onSwitchDataset && (
               <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                <FolderLock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <FolderLock className="w-3.5 h-3.5 text-md-on-primary-container shrink-0" />
                 <select
                   value={currentDatasetId || "ds_yousuf_portfolio"}
                   onChange={(e) => onSwitchDataset(e.target.value)}
-                  className="bg-transparent text-emerald-900 text-xs font-semibold outline-none cursor-pointer w-full"
+                  className="bg-transparent text-md-on-primary-container text-xs font-semibold outline-none cursor-pointer w-full"
                 >
-                  <option value="ds_yousuf_portfolio">Mohammed Yousuf</option>
-                  <option value="ds_demo_sandbox">Demo Sandbox</option>
-                  <option value="all">[All Datasets]</option>
+                  <option
+                    value="ds_yousuf_portfolio"
+                    className="bg-md-surface-lowest text-md-on-surface"
+                  >
+                    Mohammed Yousuf
+                  </option>
+                  <option
+                    value="ds_demo_sandbox"
+                    className="bg-md-surface-lowest text-md-on-surface"
+                  >
+                    Demo Sandbox
+                  </option>
+                  <option
+                    value="all"
+                    className="bg-md-surface-lowest text-md-on-surface"
+                  >
+                    [All Datasets]
+                  </option>
                 </select>
               </div>
             )}
@@ -338,9 +376,9 @@ export const Header: React.FC<HeaderProps> = ({
             {onOpenSuperAdminModal && (
               <button
                 onClick={onOpenSuperAdminModal}
-                className="px-2.5 py-1 rounded-lg bg-slate-900 text-white text-xs font-semibold flex items-center gap-1 shrink-0"
+                className="m3-btn-filled px-3 py-1 text-xs flex items-center gap-1 shrink-0"
               >
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <ShieldCheck className="w-3.5 h-3.5" />
                 <span>Admin</span>
               </button>
             )}
@@ -351,7 +389,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex md:hidden items-center gap-1.5 w-full overflow-x-auto pb-0.5 scrollbar-none">
           <button
             onClick={() => onOpenEntryModal("outflow")}
-            className="flex items-center justify-center gap-1 py-2 px-3 rounded-xl text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 whitespace-nowrap flex-shrink-0"
+            className="flex items-center justify-center gap-1 py-2 px-3.5 rounded-full text-xs font-semibold bg-md-error-container text-md-on-error-container whitespace-nowrap flex-shrink-0"
           >
             <ArrowUpRight className="w-3.5 h-3.5" />
             <span>Payment</span>
@@ -359,7 +397,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => onOpenEntryModal("inflow")}
-            className="btn-action-brand flex items-center justify-center gap-1 py-2 px-3 rounded-xl text-xs whitespace-nowrap flex-shrink-0"
+            className="m3-btn-filled flex items-center justify-center gap-1 py-2 px-3.5 text-xs whitespace-nowrap flex-shrink-0"
           >
             <ArrowDownRight className="w-3.5 h-3.5" />
             <span>Receipt</span>
@@ -367,7 +405,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={onOpenNewPropertyModal}
-            className="btn-action-primary flex items-center justify-center gap-1 py-2 px-3 rounded-xl text-xs whitespace-nowrap flex-shrink-0"
+            className="m3-btn-primary-tonal flex items-center justify-center gap-1 py-2 px-3.5 text-xs whitespace-nowrap flex-shrink-0"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Property</span>
@@ -375,7 +413,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => onOpenEntryModal("withdrawal")}
-            className="btn-action-secondary flex items-center justify-center gap-1 py-2 px-3 rounded-xl text-xs whitespace-nowrap flex-shrink-0"
+            className="m3-btn-outlined flex items-center justify-center gap-1 py-2 px-3 text-xs whitespace-nowrap flex-shrink-0"
           >
             <span>Withdraw</span>
           </button>
@@ -383,7 +421,7 @@ export const Header: React.FC<HeaderProps> = ({
           {onOpenNewLoanModal && currentMode === "commercial" && (
             <button
               onClick={onOpenNewLoanModal}
-              className="btn-action-secondary flex items-center justify-center gap-1 py-2 px-3 rounded-xl text-xs whitespace-nowrap flex-shrink-0"
+              className="m3-btn-outlined flex items-center justify-center gap-1 py-2 px-3 text-xs whitespace-nowrap flex-shrink-0"
             >
               <span>+ Loan</span>
             </button>
@@ -391,18 +429,10 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={onOpenExportModal}
-            className="btn-action-secondary flex items-center justify-center gap-1 py-2 px-3 rounded-xl text-xs whitespace-nowrap flex-shrink-0"
+            className="m3-btn-outlined flex items-center justify-center gap-1 py-2 px-3 text-xs whitespace-nowrap flex-shrink-0"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Export</span>
-          </button>
-
-          <button
-            onClick={onOpenCategoryModal}
-            className="p-2 rounded-xl bg-white text-slate-500 border border-slate-200 flex-shrink-0"
-            title="Categories & Settings"
-          >
-            <Settings2 className="w-4 h-4" />
           </button>
         </div>
       </div>

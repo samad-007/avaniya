@@ -26,16 +26,16 @@ export const ProfitKpiCard: React.FC<ProfitKpiCardProps> = ({
 }) => {
   return (
     <CyclingKpiCard
-      cardAccentColor="emerald"
+      cardAccentColor="positive"
       panelA={{
         title: "Profit Earned",
         badge: "Earned",
         value: formatINR(totalRealizedProfit),
         valueColor:
-          totalRealizedProfit >= 0 ? "text-emerald-700" : "text-rose-600",
+          totalRealizedProfit >= 0 ? "text-md-positive" : "text-md-error",
         subtitle:
           totalPendingProfit > 0 ? (
-            <span className="text-amber-700 font-medium">
+            <span className="text-md-warning font-semibold">
               {formatINR(totalPendingProfit)} still to collect
             </span>
           ) : profitWithdrawalsTotal > 0 ? (
@@ -52,7 +52,7 @@ export const ProfitKpiCard: React.FC<ProfitKpiCardProps> = ({
         title: "Expected Profit",
         badge: "Projected",
         value: formatINR(totalProjectedProfit),
-        valueColor: "text-emerald-700",
+        valueColor: "text-md-positive",
         subtitle: (
           <span>
             Est. gain on {activeDealsCount} active{" "}

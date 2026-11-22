@@ -601,16 +601,16 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           onClose();
         }
       }}
-      className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto overflow-x-hidden animate-backdrop"
+      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto overflow-x-hidden animate-backdrop"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-white border border-slate-200 rounded-2xl max-w-lg w-full min-w-0 max-h-[92vh] overflow-y-auto overflow-x-hidden p-5 sm:p-6 shadow-modal my-auto flex flex-col gap-4 sm:gap-5 animate-modal"
+        className="bg-md-surface-lowest border border-md-outline-variant rounded-[24px] max-w-lg w-full min-w-0 max-h-[92vh] overflow-y-auto overflow-x-hidden p-5 sm:p-6 shadow-m3-3 my-auto flex flex-col gap-4 sm:gap-5 animate-modal"
       >
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-slate-100 pb-3.5 gap-2">
+        <div className="flex items-start justify-between border-b border-md-outline-variant/60 pb-3.5 gap-2">
           <div className="min-w-0 flex-1">
-            <div className="text-base sm:text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2 flex-wrap">
+            <div className="text-base sm:text-lg font-bold text-md-on-surface tracking-tight flex items-center gap-2 flex-wrap">
               <span>
                 {activeType === "outflow"
                   ? "Record a Payment"
@@ -622,11 +622,11 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   ? "Record Loan Activity"
                   : "Move Money (Bank ↔ Cash)"}
               </span>
-              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-md-surface-container text-md-on-surface-variant border border-md-outline-variant">
                 {currentScope === "commercial" ? "Business" : "Personal"}
               </span>
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-md-on-surface-variant mt-0.5">
               {activeType === "outflow"
                 ? "Money you paid for a property, registration, or expense."
                 : activeType === "inflow"
@@ -640,7 +640,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors flex-shrink-0"
+            className="p-1.5 rounded-lg text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container transition-colors flex-shrink-0"
             aria-label="Close"
           >
             <X className="w-5 h-5" />
@@ -648,14 +648,14 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
         </div>
 
         {/* Entry Type Selector Tabs */}
-        <div className="grid grid-cols-5 gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200/80 min-w-0">
+        <div className="grid grid-cols-5 gap-1 bg-md-surface-container p-1 rounded-[18px] border border-md-outline-variant min-w-0">
           {(
             [
-              { id: "outflow", label: "Payment", activeClass: "text-rose-700" },
-              { id: "inflow", label: "Receipt", activeClass: "text-emerald-700" },
-              { id: "withdrawal", label: "Withdraw", activeClass: "text-amber-700" },
+              { id: "outflow", label: "Payment", activeClass: "text-md-error" },
+              { id: "inflow", label: "Receipt", activeClass: "text-md-positive" },
+              { id: "withdrawal", label: "Withdraw", activeClass: "text-md-warning" },
               { id: "loan", label: "Loan", activeClass: "text-teal-700" },
-              { id: "transfer", label: "Transfer", activeClass: "text-blue-700" },
+              { id: "transfer", label: "Transfer", activeClass: "text-md-tertiary" },
             ] as const
           ).map((tab) => (
             <button
@@ -664,8 +664,8 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
               onClick={() => setActiveType(tab.id)}
               className={`py-1.5 px-1 rounded-lg text-[11px] sm:text-xs font-semibold transition-all truncate min-w-0 ${
                 activeType === tab.id
-                  ? `bg-white shadow-sm font-bold ${tab.activeClass}`
-                  : "text-slate-500 hover:text-slate-900"
+                  ? `bg-md-surface-lowest shadow-sm font-bold ${tab.activeClass}`
+                  : "text-md-on-surface-variant hover:text-md-on-surface"
               }`}
             >
               {tab.label}
@@ -675,8 +675,8 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
 
         {/* Loan Flow Selector */}
         {activeType === "loan" && (
-          <div className="flex flex-col gap-2.5 bg-emerald-50/60 p-3.5 rounded-xl border border-emerald-200/80">
-            <label className="text-xs font-bold text-emerald-800">
+          <div className="flex flex-col gap-2.5 bg-md-primary-container/45 p-3.5 rounded-[18px] border border-md-outline-variant">
+            <label className="text-xs font-bold text-md-on-primary-container">
               What kind of loan entry is this?
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -708,22 +708,22 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   key={opt.id}
                   type="button"
                   onClick={() => setLoanSubtype(opt.id)}
-                  className={`p-2.5 rounded-xl text-left text-xs transition-all border ${
+                  className={`p-2.5 rounded-[18px] text-left text-xs transition-all border ${
                     loanSubtype === opt.id
-                      ? "bg-white border-emerald-500 text-slate-900 shadow-sm ring-2 ring-emerald-500/15"
-                      : "bg-white/60 border-slate-200 text-slate-600 hover:bg-white"
+                      ? "bg-md-surface-lowest border-md-primary text-md-on-surface shadow-sm ring-2 ring-md-primary/20"
+                      : "bg-md-surface-lowest/70 border-md-outline-variant text-md-on-surface-variant hover:bg-md-surface-lowest"
                   }`}
                 >
-                  <div className="font-bold text-emerald-800">{opt.title}</div>
-                  <div className="text-[11px] text-slate-500 mt-0.5">
+                  <div className="font-bold text-md-on-primary-container">{opt.title}</div>
+                  <div className="text-[11px] text-md-on-surface-variant mt-0.5">
                     {opt.desc}
                   </div>
                 </button>
               ))}
             </div>
 
-            <div className="flex flex-col gap-1 pt-2 border-t border-emerald-200/60">
-              <label className="text-xs font-semibold text-slate-700">
+            <div className="flex flex-col gap-1 pt-2 border-t border-md-outline-variant/70">
+              <label className="text-xs font-semibold text-md-on-surface">
                 Which Loan?
               </label>
               <select
@@ -737,7 +737,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                     setRecipient(selLoan.lenderName);
                   }
                 }}
-                className="w-full min-w-0 bg-white border border-slate-200 rounded-xl p-2 text-slate-900 text-xs outline-none focus:border-emerald-500 cursor-pointer truncate"
+                className="w-full min-w-0 bg-md-surface-lowest border border-md-outline-variant rounded-[18px] p-2 text-md-on-surface text-xs outline-none focus:border-md-primary cursor-pointer truncate"
               >
                 <option value="">-- General Unlinked Loan --</option>
                 {loans.map((l) => (
@@ -753,36 +753,36 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
 
         {/* Withdrawal Purpose Selector */}
         {activeType === "withdrawal" && (
-          <div className="flex flex-col gap-2 bg-amber-50/60 p-3.5 rounded-xl border border-amber-200/80">
-            <label className="text-xs font-bold text-amber-800">
+          <div className="flex flex-col gap-2 bg-md-warning-container/50 p-3.5 rounded-[18px] border border-md-outline-variant">
+            <label className="text-xs font-bold text-md-on-warning-container">
               What are you withdrawing?
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setWithdrawalSubtype("profit_withdrawal")}
-                className={`p-2.5 rounded-xl text-left text-xs transition-all border ${
+                className={`p-2.5 rounded-[18px] text-left text-xs transition-all border ${
                   withdrawalSubtype === "profit_withdrawal"
-                    ? "bg-white border-amber-500 text-slate-900 shadow-sm ring-2 ring-amber-500/15"
-                    : "bg-white/60 border-slate-200 text-slate-600 hover:bg-white"
+                    ? "bg-md-surface-lowest border-md-warning text-md-on-surface shadow-sm ring-2 ring-md-warning/20"
+                    : "bg-md-surface-lowest/70 border-md-outline-variant text-md-on-surface-variant hover:bg-md-surface-lowest"
                 }`}
               >
-                <div className="font-bold text-amber-800">Profit Drawing</div>
-                <div className="text-[11px] text-slate-500 mt-0.5">
+                <div className="font-bold text-md-on-warning-container">Profit Drawing</div>
+                <div className="text-[11px] text-md-on-surface-variant mt-0.5">
                   Take out earned profit for personal use
                 </div>
               </button>
               <button
                 type="button"
                 onClick={() => setWithdrawalSubtype("capital_withdrawal")}
-                className={`p-2.5 rounded-xl text-left text-xs transition-all border ${
+                className={`p-2.5 rounded-[18px] text-left text-xs transition-all border ${
                   withdrawalSubtype === "capital_withdrawal"
-                    ? "bg-white border-amber-500 text-slate-900 shadow-sm ring-2 ring-amber-500/15"
-                    : "bg-white/60 border-slate-200 text-slate-600 hover:bg-white"
+                    ? "bg-md-surface-lowest border-md-warning text-md-on-surface shadow-sm ring-2 ring-md-warning/20"
+                    : "bg-md-surface-lowest/70 border-md-outline-variant text-md-on-surface-variant hover:bg-md-surface-lowest"
                 }`}
               >
-                <div className="font-bold text-amber-800">Capital Refund</div>
-                <div className="text-[11px] text-slate-500 mt-0.5">
+                <div className="font-bold text-md-on-warning-container">Capital Refund</div>
+                <div className="text-[11px] text-md-on-surface-variant mt-0.5">
                   Return original invested money
                 </div>
               </button>
@@ -793,7 +793,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-sm">
           {/* Amount Input */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-slate-700">
+            <label className="text-xs font-semibold text-md-on-surface">
               Amount (₹ INR)
             </label>
             <input
@@ -801,10 +801,10 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
               value={amount || ""}
               onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
               placeholder="0"
-              className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xl sm:text-2xl font-mono font-bold text-slate-900 outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 transition-all"
+              className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-[18px] p-3 text-xl sm:text-2xl font-mono font-bold text-md-on-surface outline-none focus:bg-md-surface-lowest focus:border-md-primary focus:ring-2 focus:ring-md-primary/20 transition-all"
               required
             />
-            <div className="bg-amber-50 border border-amber-200/70 rounded-lg px-3 py-1.5 text-xs font-mono font-semibold text-amber-800">
+            <div className="bg-md-warning-container border border-md-outline-variant rounded-lg px-3 py-1.5 text-xs font-mono font-semibold text-md-on-warning-container">
               {amountToVerbalSummary(amount)}
             </div>
 
@@ -817,13 +817,13 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                     setRemarks(suggestedFill.remarks);
                   }
                 }}
-                className="flex items-center justify-between px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold hover:bg-emerald-100/80 transition-colors text-left"
+                className="flex items-center justify-between px-3 py-2 rounded-[18px] bg-md-primary-container border border-md-outline-variant text-md-on-primary-container text-xs font-semibold hover:bg-md-primary-container transition-colors text-left"
               >
                 <div className="flex items-center gap-1.5">
-                  <Zap className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
+                  <Zap className="w-3.5 h-3.5 text-md-primary flex-shrink-0" />
                   <span>{suggestedFill.label}</span>
                 </div>
-                <span className="font-mono font-bold text-emerald-900 whitespace-nowrap ml-2">
+                <span className="font-mono font-bold text-md-on-primary-container whitespace-nowrap ml-2">
                   ₹{suggestedFill.amount.toLocaleString("en-IN")}
                 </span>
               </button>
@@ -843,7 +843,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   type="button"
                   key={idx}
                   onClick={() => handleAddPreset(chip.val)}
-                  className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-xs font-mono font-semibold text-slate-700 transition-colors"
+                  className="px-2.5 py-1 rounded-lg bg-md-surface-container hover:bg-md-surface-high border border-md-outline-variant text-xs font-mono font-semibold text-md-on-surface transition-colors"
                 >
                   {chip.label}
                 </button>
@@ -853,20 +853,20 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
 
           {/* Payment Mode */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-slate-700">
+            <label className="text-xs font-semibold text-md-on-surface">
               Payment Mode
             </label>
-            <div className="grid grid-cols-2 gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200/80">
+            <div className="grid grid-cols-2 gap-1.5 bg-md-surface-container p-1 rounded-[18px] border border-md-outline-variant">
               <button
                 type="button"
                 onClick={() => setMode("Bank")}
                 className={`py-2 rounded-lg flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-all ${
                   mode === "Bank"
-                    ? "bg-white text-slate-900 shadow-sm"
-                    : "text-slate-500 hover:text-slate-900"
+                    ? "bg-md-surface-lowest text-md-on-surface shadow-sm"
+                    : "text-md-on-surface-variant hover:text-md-on-surface"
                 }`}
               >
-                <Landmark className="w-4 h-4 text-blue-600" />
+                <Landmark className="w-4 h-4 text-md-tertiary" />
                 <span>Bank / UPI / Cheque</span>
               </button>
               <button
@@ -874,11 +874,11 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                 onClick={() => setMode("Cash")}
                 className={`py-2 rounded-lg flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-all ${
                   mode === "Cash"
-                    ? "bg-white text-slate-900 shadow-sm"
-                    : "text-slate-500 hover:text-slate-900"
+                    ? "bg-md-surface-lowest text-md-on-surface shadow-sm"
+                    : "text-md-on-surface-variant hover:text-md-on-surface"
                 }`}
               >
-                <Banknote className="w-4 h-4 text-emerald-600" />
+                <Banknote className="w-4 h-4 text-md-primary" />
                 <span>Cash</span>
               </button>
             </div>
@@ -887,7 +887,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           {/* Transfer Direction */}
           {activeType === "transfer" && (
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-slate-700">
+              <label className="text-xs font-semibold text-md-on-surface">
                 Transfer Direction
               </label>
               <select
@@ -901,7 +901,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                       | "Bank to Cash"
                   )
                 }
-                className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500 truncate"
+                className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-[18px] p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary truncate"
               >
                 <option value="Bank Withdrawal to Cash">
                   Bank → Cash (Withdrew cash from bank)
@@ -916,13 +916,13 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           {/* Link to Property */}
           {activeType !== "transfer" && activeType !== "withdrawal" && (
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-slate-700">
+              <label className="text-xs font-semibold text-md-on-surface">
                 Which Property?
               </label>
               <select
                 value={propertyCode}
                 onChange={(e) => setPropertyCode(e.target.value)}
-                className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500 truncate"
+                className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-[18px] p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary truncate"
               >
                 <option value="">-- General Portfolio (Not linked to one property) --</option>
                 {properties
@@ -939,14 +939,14 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
 
               {selectedProperty?.subPlots &&
                 selectedProperty.subPlots.length > 0 && (
-                  <div className="flex flex-col gap-1.5 mt-1 bg-emerald-50/50 p-2.5 rounded-xl border border-emerald-200/70">
-                    <label className="text-[11px] font-bold text-emerald-800">
+                  <div className="flex flex-col gap-1.5 mt-1 bg-md-primary-container/40 p-2.5 rounded-[18px] border border-md-outline-variant">
+                    <label className="text-[11px] font-bold text-md-on-primary-container">
                       Specific Sub-Plot (Optional)
                     </label>
                     <select
                       value={subPlotNumber}
                       onChange={(e) => setSubPlotNumber(e.target.value)}
-                      className="w-full min-w-0 bg-white border border-slate-200 rounded-lg p-2 text-slate-900 text-xs outline-none focus:border-emerald-500 cursor-pointer truncate"
+                      className="w-full min-w-0 bg-md-surface-lowest border border-md-outline-variant rounded-lg p-2 text-md-on-surface text-xs outline-none focus:border-md-primary cursor-pointer truncate"
                     >
                       <option value="">-- Whole Property --</option>
                       {selectedProperty.subPlots.map((sp) => (
@@ -967,7 +967,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           {activeType !== "transfer" && (
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between flex-wrap gap-1">
-                <label className="text-xs font-semibold text-slate-700">
+                <label className="text-xs font-semibold text-md-on-surface">
                   Category
                 </label>
                 <div className="flex items-center gap-2.5">
@@ -979,7 +979,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                         setCustomCategoryInput(category);
                       }
                     }}
-                    className="text-xs text-emerald-700 hover:underline flex items-center gap-1 font-semibold"
+                    className="text-xs text-md-positive hover:underline flex items-center gap-1 font-semibold"
                   >
                     <Edit3 className="w-3 h-3" />
                     <span>
@@ -989,7 +989,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   <button
                     type="button"
                     onClick={onOpenCategoryModal}
-                    className="text-xs text-blue-600 hover:underline flex items-center gap-1 font-semibold"
+                    className="text-xs text-md-tertiary hover:underline flex items-center gap-1 font-semibold"
                   >
                     <Plus className="w-3 h-3" />
                     <span>Manage</span>
@@ -1005,7 +1005,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                     onChange={(e) => setCustomCategoryInput(e.target.value)}
                     placeholder="Type category name..."
                     list="custom-inflow-suggestions"
-                    className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500"
+                    className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-[18px] p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary"
                     required
                     autoFocus
                   />
@@ -1019,7 +1019,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500 cursor-pointer truncate"
+                  className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-[18px] p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary cursor-pointer truncate"
                 >
                   {availableCategories.map((c, idx) => (
                     <option key={idx} value={c.name}>
@@ -1033,12 +1033,12 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
 
           {/* Who Pays / Bears This Cost (Outflows only) */}
           {activeType === "outflow" && (
-            <div className="flex flex-col gap-2 bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
+            <div className="flex flex-col gap-2 bg-md-surface-low p-3.5 rounded-[18px] border border-md-outline-variant">
               <div className="flex items-center justify-between flex-wrap gap-1">
-                <label className="text-xs font-semibold text-slate-700">
+                <label className="text-xs font-semibold text-md-on-surface">
                   Who bears this cost?
                 </label>
-                <span className="text-[11px] text-slate-500">
+                <span className="text-[11px] text-md-on-surface-variant">
                   {borneBy === "self"
                     ? "Your own project expense"
                     : borneBy === "seller"
@@ -1049,7 +1049,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200/70">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-md-surface-container p-1 rounded-[18px] border border-md-outline-variant/80">
                 <button
                   type="button"
                   onClick={() => {
@@ -1060,8 +1060,8 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   }}
                   className={`py-1.5 px-2 rounded-lg text-xs font-semibold transition-all ${
                     borneBy === "self"
-                      ? "bg-white text-slate-900 shadow-sm"
-                      : "text-slate-500 hover:text-slate-900"
+                      ? "bg-md-surface-lowest text-md-on-surface shadow-sm"
+                      : "text-md-on-surface-variant hover:text-md-on-surface"
                   }`}
                 >
                   Myself
@@ -1076,8 +1076,8 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   }}
                   className={`py-1.5 px-2 rounded-lg text-xs font-semibold transition-all ${
                     borneBy === "seller"
-                      ? "bg-amber-100 text-amber-900 shadow-sm"
-                      : "text-slate-500 hover:text-slate-900"
+                      ? "bg-md-warning-container text-md-on-warning-container shadow-sm"
+                      : "text-md-on-surface-variant hover:text-md-on-surface"
                   }`}
                 >
                   For Seller
@@ -1092,8 +1092,8 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   }}
                   className={`py-1.5 px-2 rounded-lg text-xs font-semibold transition-all ${
                     borneBy === "buyer"
-                      ? "bg-blue-100 text-blue-900 shadow-sm"
-                      : "text-slate-500 hover:text-slate-900"
+                      ? "bg-md-tertiary-container text-md-on-tertiary-container shadow-sm"
+                      : "text-md-on-surface-variant hover:text-md-on-surface"
                   }`}
                 >
                   For Buyer
@@ -1110,8 +1110,8 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   }}
                   className={`py-1.5 px-2 rounded-lg text-xs font-semibold transition-all ${
                     borneBy === "split"
-                      ? "bg-violet-100 text-violet-900 shadow-sm"
-                      : "text-slate-500 hover:text-slate-900"
+                      ? "bg-md-secondary-container text-md-on-secondary-container shadow-sm"
+                      : "text-md-on-surface-variant hover:text-md-on-surface"
                   }`}
                 >
                   Split Cost
@@ -1119,9 +1119,9 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
               </div>
 
               {borneBy === "split" && (
-                <div className="flex flex-col gap-2.5 pt-2 border-t border-slate-200/70">
+                <div className="flex flex-col gap-2.5 pt-2 border-t border-md-outline-variant/80">
                   <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="text-[11px] text-slate-500 font-semibold mr-1">
+                    <span className="text-[11px] text-md-on-surface-variant font-semibold mr-1">
                       Quick split:
                     </span>
                     <button
@@ -1132,7 +1132,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                         setAmountSeller(amount - half);
                         setAmountBuyer(0);
                       }}
-                      className="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-[11px] text-slate-700 hover:bg-slate-100"
+                      className="px-2 py-0.5 rounded-md bg-md-surface-lowest border border-md-outline-variant text-[11px] text-md-on-surface hover:bg-md-surface-container"
                     >
                       50/50 Self &amp; Seller
                     </button>
@@ -1144,7 +1144,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                         setAmountSeller(amount - half);
                         setAmountSelf(0);
                       }}
-                      className="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-[11px] text-slate-700 hover:bg-slate-100"
+                      className="px-2 py-0.5 rounded-md bg-md-surface-lowest border border-md-outline-variant text-[11px] text-md-on-surface hover:bg-md-surface-container"
                     >
                       50/50 Buyer &amp; Seller
                     </button>
@@ -1156,7 +1156,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                         setAmountSeller(third);
                         setAmountBuyer(amount - third * 2);
                       }}
-                      className="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-[11px] text-slate-700 hover:bg-slate-100"
+                      className="px-2 py-0.5 rounded-md bg-md-surface-lowest border border-md-outline-variant text-[11px] text-md-on-surface hover:bg-md-surface-container"
                     >
                       Equal 3-Way
                     </button>
@@ -1164,7 +1164,7 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div className="flex flex-col gap-1">
-                      <label className="text-[11px] font-semibold text-slate-700">
+                      <label className="text-[11px] font-semibold text-md-on-surface">
                         My Share (₹)
                       </label>
                       <input
@@ -1174,11 +1174,11 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                           setAmountSelf(parseFloat(e.target.value) || 0)
                         }
                         placeholder="0"
-                        className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 font-mono focus:border-violet-500 outline-none"
+                        className="bg-md-surface-lowest border border-md-outline-variant rounded-lg px-2.5 py-1.5 text-xs text-md-on-surface font-mono focus:border-md-secondary outline-none"
                       />
                     </div>
                     <div className="flex flex-col gap-1">
-                      <label className="text-[11px] font-semibold text-amber-700">
+                      <label className="text-[11px] font-semibold text-md-warning">
                         Seller Share (₹)
                       </label>
                       <input
@@ -1188,11 +1188,11 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                           setAmountSeller(parseFloat(e.target.value) || 0)
                         }
                         placeholder="0"
-                        className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-amber-800 font-mono focus:border-amber-500 outline-none"
+                        className="bg-md-surface-lowest border border-md-outline-variant rounded-lg px-2.5 py-1.5 text-xs text-md-on-warning-container font-mono focus:border-md-warning outline-none"
                       />
                     </div>
                     <div className="flex flex-col gap-1">
-                      <label className="text-[11px] font-semibold text-blue-700">
+                      <label className="text-[11px] font-semibold text-md-tertiary">
                         Buyer Share (₹)
                       </label>
                       <input
@@ -1202,15 +1202,15 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                           setAmountBuyer(parseFloat(e.target.value) || 0)
                         }
                         placeholder="0"
-                        className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-blue-800 font-mono focus:border-blue-500 outline-none"
+                        className="bg-md-surface-lowest border border-md-outline-variant rounded-lg px-2.5 py-1.5 text-xs text-md-on-tertiary-container font-mono focus:border-md-tertiary outline-none"
                       />
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between text-xs pt-1">
-                    <span className="text-slate-600">
+                    <span className="text-md-on-surface-variant">
                       Split Total:{" "}
-                      <span className="font-mono font-bold text-slate-900">
+                      <span className="font-mono font-bold text-md-on-surface">
                         ₹
                         {(
                           (amountSelf || 0) +
@@ -1225,11 +1225,11 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                         (amountSeller || 0) +
                         (amountBuyer || 0)) ===
                     0 ? (
-                      <span className="text-emerald-700 font-semibold">
+                      <span className="text-md-positive font-semibold">
                         Matches 100%
                       </span>
                     ) : (
-                      <span className="text-amber-700 font-semibold">
+                      <span className="text-md-warning font-semibold">
                         ₹
                         {Math.abs(
                           amount -
@@ -1249,19 +1249,19 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
           {/* Date & Person */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div className="flex flex-col gap-1.5 min-w-0">
-              <label className="text-xs font-semibold text-slate-700">
+              <label className="text-xs font-semibold text-md-on-surface">
                 Date
               </label>
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 text-sm outline-none focus:bg-white focus:border-emerald-500"
+                className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-[18px] p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary"
                 required
               />
             </div>
             <div className="flex flex-col gap-1.5 min-w-0">
-              <label className="text-xs font-semibold text-slate-700">
+              <label className="text-xs font-semibold text-md-on-surface">
                 {activeType === "inflow"
                   ? "Received From"
                   : activeType === "withdrawal"
@@ -1279,14 +1279,14 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                     ? "e.g. Personal account, Partner..."
                     : "e.g. Seller, Lawyer, Broker..."
                 }
-                className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 placeholder:text-slate-400 text-sm outline-none focus:bg-white focus:border-emerald-500"
+                className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-[18px] p-2.5 text-md-on-surface placeholder:text-md-on-surface-variant text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary"
               />
             </div>
           </div>
 
           {/* Notes */}
           <div className="flex flex-col gap-1.5 min-w-0">
-            <label className="text-xs font-semibold text-slate-700">
+            <label className="text-xs font-semibold text-md-on-surface">
               Notes (Optional)
             </label>
             <input
@@ -1294,14 +1294,14 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
               placeholder="e.g. Token advance paid, Cheque #004521"
-              className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 placeholder:text-slate-400 text-sm outline-none focus:bg-white focus:border-emerald-500"
+              className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-[18px] p-2.5 text-md-on-surface placeholder:text-md-on-surface-variant text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary"
             />
           </div>
 
           {/* Receipt Link */}
           <div className="flex flex-col gap-1.5 min-w-0">
-            <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
-              <Link2 className="w-3.5 h-3.5 text-slate-400" />
+            <label className="text-xs font-semibold text-md-on-surface flex items-center gap-1.5">
+              <Link2 className="w-3.5 h-3.5 text-md-on-surface-variant" />
               <span>Receipt / Document Link (Optional)</span>
             </label>
             <input
@@ -1309,12 +1309,12 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
               value={attachmentUrl}
               onChange={(e) => setAttachmentUrl(e.target.value)}
               placeholder="https://drive.google.com/..."
-              className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 placeholder:text-slate-400 text-sm outline-none focus:bg-white focus:border-emerald-500"
+              className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-[18px] p-2.5 text-md-on-surface placeholder:text-md-on-surface-variant text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary"
             />
           </div>
 
           {/* Submit */}
-          <div className="flex items-center gap-2.5 pt-3 border-t border-slate-100 flex-wrap sm:flex-nowrap">
+          <div className="flex items-center gap-2.5 pt-3 border-t border-md-outline-variant/60 flex-wrap sm:flex-nowrap">
             <button
               type="submit"
               disabled={
@@ -1324,14 +1324,14 @@ export const QuickEntryModal: React.FC<QuickEntryModalProps> = ({
                   (amountSelf || 0) + (amountSeller || 0) + (amountBuyer || 0) !==
                     amount)
               }
-              className="btn-action-brand flex-1 py-2.5 rounded-xl text-sm disabled:opacity-50"
+              className="btn-action-brand flex-1 py-2.5 rounded-[18px] text-sm disabled:opacity-50"
             >
               {isSubmitting ? "Saving..." : "Save Entry"}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="btn-action-secondary px-4 py-2.5 rounded-xl text-sm"
+              className="btn-action-secondary px-4 py-2.5 rounded-[18px] text-sm"
             >
               Cancel
             </button>

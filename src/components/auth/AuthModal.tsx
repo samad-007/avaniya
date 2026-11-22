@@ -12,7 +12,10 @@ import {
   EyeOff,
   CheckCircle2,
   X,
+  Sun,
+  Moon,
 } from "lucide-react";
+import { useTheme } from "@/components/theme/ThemeProvider";
 
 export interface AuthUserData {
   name: string;
@@ -41,6 +44,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const { mode, toggleMode } = useTheme();
 
   if (!isOpen) return null;
 
@@ -66,7 +70,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Sign in failed. Please check your details.");
+        throw new Error(
+          data.error || "Sign in failed. Please check your details."
+        );
       }
 
       onSuccess(data.data);
@@ -99,59 +105,74 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       }}
       className={`fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto overflow-x-hidden animate-backdrop ${
         allowClose
-          ? "bg-slate-900/50 backdrop-blur-sm"
-          : "bg-[#F8FAFC] bg-grid-subtle"
+          ? "bg-black/50 backdrop-blur-sm"
+          : "bg-md-surface bg-grid-subtle"
       }`}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative bg-white border border-slate-200/90 rounded-2xl max-w-md w-full min-w-0 p-6 sm:p-8 shadow-modal flex flex-col gap-5 my-auto overflow-y-auto overflow-x-hidden animate-modal"
+        className="relative bg-md-surface-lowest border border-md-outline-variant rounded-[32px] max-w-md w-full min-w-0 p-6 sm:p-8 shadow-m3-3 flex flex-col gap-5 my-auto overflow-y-auto overflow-x-hidden animate-modal"
       >
-        {allowClose && onClose && (
+        <div className="absolute right-4 top-4 flex items-center gap-1.5">
           <button
             type="button"
-            onClick={onClose}
-            className="absolute right-4 top-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
-            aria-label="Close"
+            onClick={toggleMode}
+            className="p-2 rounded-full bg-md-surface-container text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high transition-colors"
+            aria-label="Toggle light or dark mode"
+            title={mode === "light" ? "Dark Mode" : "Light Mode"}
           >
-            <X className="w-5 h-5" />
+            {mode === "light" ? (
+              <Moon className="w-4 h-4" />
+            ) : (
+              <Sun className="w-4 h-4" />
+            )}
           </button>
-        )}
+          {allowClose && onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-2 rounded-full text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high transition-colors"
+              aria-label="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
+        </div>
 
         {/* Brand Header */}
-        <div className="flex flex-col items-center text-center gap-2.5 min-w-0">
-          <div className="relative w-14 h-14 rounded-2xl overflow-hidden border border-slate-200 bg-emerald-50 p-0.5 shadow-sm flex-shrink-0">
+        <div className="flex flex-col items-center text-center gap-2.5 min-w-0 pt-1">
+          <div className="relative w-16 h-16 rounded-[22px] overflow-hidden border border-md-outline-variant bg-md-primary-container p-0.5 shadow-m3-1 flex-shrink-0">
             <Image
               src="/logo.jpg"
               alt="Avaniya"
-              width={56}
-              height={56}
-              className="object-cover w-full h-full rounded-[13px]"
+              width={64}
+              height={64}
+              className="object-cover w-full h-full rounded-[19px]"
               priority
             />
           </div>
           <div className="mt-0.5 min-w-0">
-            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight break-words">
+            <h1 className="font-display text-2xl font-extrabold text-md-on-surface tracking-tight break-words">
               Avaniya
             </h1>
-            <p className="text-sm text-slate-500 mt-1 leading-relaxed break-words">
+            <p className="text-sm text-md-on-surface-variant mt-1 leading-relaxed break-words">
               Track your properties, payments, loans, and profits — all in one clear place.
             </p>
           </div>
         </div>
 
-        {/* Auth Tab Switcher */}
-        <div className="grid grid-cols-2 gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200/80 min-w-0">
+        {/* M3 Connected Tab Switcher */}
+        <div className="grid grid-cols-2 gap-1 bg-md-surface-container p-1 rounded-full min-w-0">
           <button
             type="button"
             onClick={() => {
               setTab("login");
               setErrorMsg("");
             }}
-            className={`py-2 rounded-lg text-sm font-semibold transition-all duration-150 truncate ${
+            className={`py-2 rounded-full text-sm font-semibold transition-all duration-200 truncate ${
               tab === "login"
-                ? "bg-white text-slate-900 shadow-sm"
-                : "text-slate-500 hover:text-slate-800"
+                ? "bg-md-primary text-md-on-primary shadow-m3-1"
+                : "text-md-on-surface-variant hover:text-md-on-surface"
             }`}
           >
             Sign In
@@ -162,10 +183,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               setTab("signup");
               setErrorMsg("");
             }}
-            className={`py-2 rounded-lg text-sm font-semibold transition-all duration-150 truncate ${
+            className={`py-2 rounded-full text-sm font-semibold transition-all duration-200 truncate ${
               tab === "signup"
-                ? "bg-white text-slate-900 shadow-sm"
-                : "text-slate-500 hover:text-slate-800"
+                ? "bg-md-primary text-md-on-primary shadow-m3-1"
+                : "text-md-on-surface-variant hover:text-md-on-surface"
             }`}
           >
             Create Account
@@ -174,26 +195,29 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Error Banner */}
         {errorMsg && (
-          <div className="bg-rose-50 border border-rose-200 text-rose-700 text-sm px-3.5 py-2.5 rounded-xl font-medium break-words">
+          <div className="bg-md-error-container text-md-on-error-container text-sm px-4 py-2.5 rounded-2xl font-medium break-words">
             {errorMsg}
           </div>
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-sm min-w-0">
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-4 text-sm min-w-0"
+        >
           {tab === "signup" && (
             <div className="flex flex-col gap-1.5 min-w-0">
-              <label className="text-xs font-semibold text-slate-700">
+              <label className="text-xs font-semibold text-md-on-surface-variant">
                 Your Name or Business Name
               </label>
               <div className="relative min-w-0">
-                <UserIcon className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 flex-shrink-0" />
+                <UserIcon className="w-4 h-4 text-md-on-surface-variant absolute left-3.5 top-1/2 -translate-y-1/2 flex-shrink-0" />
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Rajesh Properties"
-                  className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-slate-900 placeholder:text-slate-400 text-sm outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 transition-all"
+                  className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-2xl pl-10 pr-3.5 py-2.5 text-md-on-surface placeholder:text-md-on-surface-variant/60 text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary focus:ring-2 focus:ring-md-primary/20 transition-all"
                   required={tab === "signup"}
                 />
               </div>
@@ -201,40 +225,40 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           )}
 
           <div className="flex flex-col gap-1.5 min-w-0">
-            <label className="text-xs font-semibold text-slate-700">
+            <label className="text-xs font-semibold text-md-on-surface-variant">
               Email Address
             </label>
             <div className="relative min-w-0">
-              <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 flex-shrink-0" />
+              <Mail className="w-4 h-4 text-md-on-surface-variant absolute left-3.5 top-1/2 -translate-y-1/2 flex-shrink-0" />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
-                className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-slate-900 placeholder:text-slate-400 text-sm outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 transition-all"
+                className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-2xl pl-10 pr-3.5 py-2.5 text-md-on-surface placeholder:text-md-on-surface-variant/60 text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary focus:ring-2 focus:ring-md-primary/20 transition-all"
                 required
               />
             </div>
           </div>
 
           <div className="flex flex-col gap-1.5 min-w-0">
-            <label className="text-xs font-semibold text-slate-700">
+            <label className="text-xs font-semibold text-md-on-surface-variant">
               Password
             </label>
             <div className="relative min-w-0">
-              <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 flex-shrink-0" />
+              <Lock className="w-4 h-4 text-md-on-surface-variant absolute left-3.5 top-1/2 -translate-y-1/2 flex-shrink-0" />
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                className="w-full min-w-0 bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-10 py-2.5 text-slate-900 placeholder:text-slate-400 text-sm outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 transition-all"
+                className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-2xl pl-10 pr-10 py-2.5 text-md-on-surface placeholder:text-md-on-surface-variant/60 text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary focus:ring-2 focus:ring-md-primary/20 transition-all"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 p-1"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-md-on-surface-variant hover:text-md-on-surface p-1"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
@@ -249,7 +273,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <button
             type="submit"
             disabled={isLoading}
-            className="btn-action-brand w-full mt-1 py-3 rounded-xl text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+            className="m3-btn-filled w-full mt-1 py-3 text-sm flex items-center justify-center gap-2 disabled:opacity-50"
           >
             <span>
               {isLoading
@@ -263,24 +287,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </form>
 
         {/* Demo Fast Track */}
-        <div className="pt-4 border-t border-slate-100 flex flex-col gap-2.5">
+        <div className="pt-4 border-t border-md-outline-variant/60 flex flex-col gap-2.5">
           <button
             type="button"
             onClick={handleDemoLogin}
-            className="w-full py-2.5 px-4 rounded-xl bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/80 text-emerald-800 text-sm font-semibold flex items-center justify-center gap-2 transition-all"
+            className="m3-btn-primary-tonal w-full py-2.5 px-4 text-sm flex items-center justify-center gap-2"
           >
-            <Sparkles className="w-4 h-4 text-emerald-600" />
+            <Sparkles className="w-4 h-4" />
             <span>Try Interactive Demo (Sample Data)</span>
           </button>
 
-          <div className="flex items-center justify-center gap-3 text-[11px] text-slate-500 pt-0.5">
+          <div className="flex items-center justify-center gap-3 text-[11px] text-md-on-surface-variant pt-0.5">
             <span className="inline-flex items-center gap-1">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-md-primary" />
               No account needed
             </span>
             <span>•</span>
             <span className="inline-flex items-center gap-1">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-md-primary" />
               Safe sample portfolio
             </span>
           </div>

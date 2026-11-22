@@ -31,7 +31,6 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
   commercialMetrics,
   personalMetrics,
 }) => {
-  // User-controlled Overview vs Breakdown switch (calm, no jarring auto-flip while reading)
   const [activePanel, setActivePanel] = useState<"A" | "B">("A");
   const [isFlipping, setIsFlipping] = useState(false);
   const flipTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -66,21 +65,23 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
   );
 
   const renderSectionHeader = (label: string) => (
-    <div className="flex items-center justify-between gap-2 mb-2.5">
+    <div className="flex items-center justify-between gap-2 mb-3">
       <div className="flex items-center gap-2">
-        <Layers className="w-4 h-4 text-slate-400" />
-        <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+        <div className="w-7 h-7 rounded-full bg-md-primary-container text-md-on-primary-container flex items-center justify-center">
+          <Layers className="w-3.5 h-3.5" />
+        </div>
+        <span className="font-display text-sm font-bold text-md-on-surface tracking-tight">
           {label}
         </span>
       </div>
-      <div className="flex items-center gap-1 bg-white p-0.5 rounded-lg border border-slate-200 shadow-soft text-[11px] font-semibold">
+      <div className="flex items-center gap-1 bg-md-surface-container p-1 rounded-full text-[11px] font-semibold">
         <button
           type="button"
           onClick={() => handleSelectPanel("A")}
-          className={`px-2.5 py-1 rounded-md transition-all ${
+          className={`px-3 py-1 rounded-full transition-all ${
             activePanel === "A"
-              ? "bg-slate-900 text-white shadow-sm"
-              : "text-slate-500 hover:text-slate-900"
+              ? "bg-md-primary text-md-on-primary shadow-m3-1"
+              : "text-md-on-surface-variant hover:text-md-on-surface"
           }`}
         >
           Overview
@@ -88,10 +89,10 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
         <button
           type="button"
           onClick={() => handleSelectPanel("B")}
-          className={`px-2.5 py-1 rounded-md transition-all ${
+          className={`px-3 py-1 rounded-full transition-all ${
             activePanel === "B"
-              ? "bg-slate-900 text-white shadow-sm"
-              : "text-slate-500 hover:text-slate-900"
+              ? "bg-md-primary text-md-on-primary shadow-m3-1"
+              : "text-md-on-surface-variant hover:text-md-on-surface"
           }`}
         >
           More Details
@@ -138,10 +139,9 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
     return (
       <section aria-label="Financial Summary">
         {renderSectionHeader("Money & Profit Summary")}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          {/* Card 1: Bank Balance vs Total Bank Credits */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
           <CyclingKpiCard
-            cardAccentColor="blue"
+            cardAccentColor="tertiary"
             activePanel={activePanel}
             isFlipping={isFlipping}
             onClick={handleCardClick}
@@ -152,7 +152,9 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
               badge: "Bank",
               value: formatINR(netBankLiquidity),
               valueColor:
-                netBankLiquidity >= 0 ? "text-slate-900" : "text-rose-600",
+                netBankLiquidity >= 0
+                  ? "text-md-on-surface"
+                  : "text-md-error",
               subtitle: "Available in bank account",
               icon: Landmark,
             }}
@@ -160,15 +162,14 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
               title: "Total Bank Receipts",
               badge: "Inflows",
               value: formatINR(bankInflowsGross),
-              valueColor: "text-blue-700",
+              valueColor: "text-md-tertiary",
               subtitle: "All bank credits received",
               icon: ArrowDownLeft,
             }}
           />
 
-          {/* Card 2: Cash in Hand vs Cash Spent */}
           <CyclingKpiCard
-            cardAccentColor="emerald"
+            cardAccentColor="primary"
             activePanel={activePanel}
             isFlipping={isFlipping}
             onClick={handleCardClick}
@@ -179,7 +180,9 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
               badge: "Cash",
               value: formatINR(netCashLiquidity),
               valueColor:
-                netCashLiquidity >= 0 ? "text-slate-900" : "text-rose-600",
+                netCashLiquidity >= 0
+                  ? "text-md-on-surface"
+                  : "text-md-error",
               subtitle: "Physical cash available",
               icon: Banknote,
             }}
@@ -187,15 +190,14 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
               title: "Total Cash Spent",
               badge: "Spent",
               value: formatINR(outflowsCash),
-              valueColor: "text-slate-900",
+              valueColor: "text-md-on-surface",
               subtitle: "Site, legal & registration cash",
               icon: TrendingDown,
             }}
           />
 
-          {/* Card 3: Total Available Funds vs Your Capital */}
           <CyclingKpiCard
-            cardAccentColor="cyan"
+            cardAccentColor="secondary"
             activePanel={activePanel}
             isFlipping={isFlipping}
             onClick={handleCardClick}
@@ -206,7 +208,9 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
               badge: "Total",
               value: formatINR(currentNetLiquidity),
               valueColor:
-                currentNetLiquidity >= 0 ? "text-teal-700" : "text-rose-600",
+                currentNetLiquidity >= 0
+                  ? "text-md-primary"
+                  : "text-md-error",
               subtitle: "Bank + Cash combined",
               icon: Wallet,
             }}
@@ -214,15 +218,14 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
               title: "Your Net Capital",
               badge: "Capital",
               value: formatINR(netCapitalInjected),
-              valueColor: "text-teal-700",
+              valueColor: "text-md-primary",
               subtitle: `Put in: ${formatINR(capitalInjectedTotal)}`,
               icon: Coins,
             }}
           />
 
-          {/* Card 4: Owed to Sellers vs Total Project Cost */}
           <CyclingKpiCard
-            cardAccentColor="amber"
+            cardAccentColor="warning"
             activePanel={activePanel}
             isFlipping={isFlipping}
             onClick={handleCardClick}
@@ -233,7 +236,9 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
               badge: "Payable",
               value: formatINR(totalPendingPayable),
               valueColor:
-                totalPendingPayable > 0 ? "text-amber-700" : "text-slate-900",
+                totalPendingPayable > 0
+                  ? "text-md-warning"
+                  : "text-md-on-surface",
               subtitle: `Across ${propertyMetrics.length} ${
                 propertyMetrics.length === 1 ? "property" : "properties"
               }`,
@@ -243,15 +248,14 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
               title: "Total Deal Cost",
               badge: "Total Cost",
               value: formatINR(totalProjectOutlay),
-              valueColor: "text-slate-900",
+              valueColor: "text-md-on-surface",
               subtitle: `Buy ${formatINR(totalAgreedBuyPrice)} + Costs ${formatINR(totalPropertyExpenses)}`,
               icon: Landmark,
             }}
           />
 
-          {/* Card 5: Loans Owed vs Buyers Owe You */}
           <CyclingKpiCard
-            cardAccentColor="rose"
+            cardAccentColor="error"
             activePanel={activePanel}
             isFlipping={isFlipping}
             onClick={handleCardClick}
@@ -263,8 +267,8 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
               value: formatINR(outstandingLoansPrincipal),
               valueColor:
                 outstandingLoansPrincipal > 0
-                  ? "text-rose-600"
-                  : "text-slate-500",
+                  ? "text-md-error"
+                  : "text-md-on-surface-variant",
               subtitle:
                 totalFinanceCosts > 0
                   ? `Interest/share paid: ${formatINR(totalFinanceCosts)}`
@@ -275,15 +279,14 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
               title: "Buyers Owe You",
               badge: "Receivable",
               value: formatINR(totalPendingReceivable),
-              valueColor: "text-emerald-700",
+              valueColor: "text-md-positive",
               subtitle: "Pending from property sales",
               icon: ArrowDownLeft,
             }}
           />
 
-          {/* Card 6: Profit Earned vs Expected Profit */}
           <ProfitKpiCard
-            cardAccentColor="emerald"
+            cardAccentColor="positive"
             totalRealizedProfit={totalRealizedProfit}
             totalProjectedProfit={totalProjectedProfit}
             totalPendingProfit={totalPendingProfit}
@@ -324,10 +327,9 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
     return (
       <section aria-label="Personal Portfolio Summary">
         {renderSectionHeader("Personal Portfolio Summary")}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {/* Card 1: Total Paid So Far vs Total Property Value */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
           <CyclingKpiCard
-            cardAccentColor="blue"
+            cardAccentColor="tertiary"
             activePanel={activePanel}
             isFlipping={isFlipping}
             onClick={handleCardClick}
@@ -337,7 +339,7 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
               title: "Paid So Far",
               badge: "Paid",
               value: formatINR(totalInvestmentDone),
-              valueColor: "text-slate-900",
+              valueColor: "text-md-on-surface",
               subtitle: `Across ${properties.length} personal ${
                 properties.length === 1 ? "home" : "properties"
               }`,
@@ -347,15 +349,14 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
               title: "Total Property Cost",
               badge: "Agreed",
               value: formatINR(totalAgreedValue),
-              valueColor: "text-blue-700",
+              valueColor: "text-md-tertiary",
               subtitle: `Remaining: ${formatINR(totalPendingCommitment)}`,
               icon: Building2,
             }}
           />
 
-          {/* Card 2: Savings Added vs Funds Withdrawn */}
           <CyclingKpiCard
-            cardAccentColor="purple"
+            cardAccentColor="secondary"
             activePanel={activePanel}
             isFlipping={isFlipping}
             onClick={handleCardClick}
@@ -365,7 +366,7 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
               title: "Savings Added",
               badge: "Added",
               value: formatINR(inflowsTotal),
-              valueColor: "text-slate-900",
+              valueColor: "text-md-on-surface",
               subtitle: "Personal savings & income",
               icon: Landmark,
             }}
@@ -373,15 +374,14 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
               title: "Funds Taken Out",
               badge: "Withdrawn",
               value: formatINR(withdrawalsTotal),
-              valueColor: "text-violet-700",
+              valueColor: "text-md-secondary",
               subtitle: "Refunds & personal drawings",
               icon: Coins,
             }}
           />
 
-          {/* Card 3: Bank Balance vs Combined Funds */}
           <CyclingKpiCard
-            cardAccentColor="emerald"
+            cardAccentColor="positive"
             activePanel={activePanel}
             isFlipping={isFlipping}
             onClick={handleCardClick}
@@ -391,7 +391,7 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
               title: "Bank Balance",
               badge: "Bank",
               value: formatINR(currentBankBalance),
-              valueColor: "text-emerald-700",
+              valueColor: "text-md-positive",
               subtitle: "Ready for next payment",
               icon: Banknote,
             }}
@@ -399,15 +399,14 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
               title: "Total Available",
               badge: "Combined",
               value: formatINR(netPersonalLiquidity),
-              valueColor: "text-emerald-700",
+              valueColor: "text-md-positive",
               subtitle: `Cash in hand: ${formatINR(currentCashBalance)}`,
               icon: Wallet,
             }}
           />
 
-          {/* Card 4: Cash in Hand vs Remaining to Pay */}
           <CyclingKpiCard
-            cardAccentColor="amber"
+            cardAccentColor="warning"
             activePanel={activePanel}
             isFlipping={isFlipping}
             onClick={handleCardClick}
@@ -417,7 +416,7 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
               title: "Cash in Hand",
               badge: "Cash",
               value: formatINR(currentCashBalance),
-              valueColor: "text-slate-900",
+              valueColor: "text-md-on-surface",
               subtitle: "For site visits & small expenses",
               icon: Clock,
             }}
@@ -425,7 +424,7 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
               title: "Balance Left to Pay",
               badge: "Pending",
               value: formatINR(totalPendingCommitment),
-              valueColor: "text-amber-700",
+              valueColor: "text-md-warning",
               subtitle: "Upcoming builder installments",
               icon: Building2,
             }}
