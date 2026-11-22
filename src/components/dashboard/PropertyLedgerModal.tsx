@@ -374,41 +374,77 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
           {/* Personal Mode Milestones */}
           {!isCommercial && prop.milestones && prop.milestones.length > 0 && (
             <div className="flex flex-col gap-2.5">
-              <div className="text-xs sm:text-sm font-bold text-md-on-surface flex items-center justify-between">
+              <div className="text-xs sm:text-sm font-bold text-md-on-surface flex items-center justify-between gap-2 flex-wrap">
                 <span>Payment Milestones</span>
-                <span className="text-xs text-md-on-surface-variant font-medium">
-                  {prop.milestones.filter((m) => m.status === "completed").length}{" "}
-                  of {prop.milestones.length} completed
-                </span>
+                <div className="flex items-center gap-2 text-xs font-medium">
+                  {prop.agreedPurchasePrice > 0 && (
+                    <span className="font-mono text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-md-secondary-container text-md-on-secondary-container">
+                      {parseFloat(
+                        (
+                          (prop.milestones.reduce(
+                            (s, m) => s + (m.targetAmount || 0),
+                            0
+                          ) /
+                            prop.agreedPurchasePrice) *
+                          100
+                        ).toFixed(1)
+                      )}
+                      % scheduled
+                    </span>
+                  )}
+                  <span className="text-md-on-surface-variant">
+                    {prop.milestones.filter((m) => m.status === "completed").length}{" "}
+                    of {prop.milestones.length} completed
+                  </span>
+                </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                {prop.milestones.map((m, idx) => (
-                  <div
-                    key={idx}
-                    className={`p-3.5 rounded-[18px] flex flex-col justify-between gap-2 ${ m.status === "completed" ? "bg-md-primary-container/50 text-md-on-surface" : "bg-md-surface-low text-md-on-surface-variant" }`}
-                  >
-                    <div className="flex items-center justify-between text-xs sm:text-sm">
-                      <span className="font-semibold text-md-on-surface">
-                        {m.name}
-                      </span>
-                      {m.status === "completed" ? (
-                        <CheckCircle2 className="w-4 h-4 text-md-primary flex-shrink-0" />
-                      ) : (
-                        <Clock className="w-4 h-4 text-md-on-surface-variant flex-shrink-0" />
-                      )}
+                {prop.milestones.map((m, idx) => {
+                  const pct =
+                    prop.agreedPurchasePrice > 0 && (m.targetAmount || 0) > 0
+                      ? parseFloat(
+                          (
+                            ((m.targetAmount || 0) / prop.agreedPurchasePrice) *
+                            100
+                          ).toFixed(2)
+                        )
+                      : null;
+
+                  return (
+                    <div
+                      key={idx}
+                      className={`p-3.5 rounded-[18px] flex flex-col justify-between gap-2 ${ m.status === "completed" ? "bg-md-primary-container/50 text-md-on-surface" : "bg-md-surface-low text-md-on-surface-variant" }`}
+                    >
+                      <div className="flex items-center justify-between gap-2 text-xs sm:text-sm">
+                        <span className="font-semibold text-md-on-surface">
+                          {m.name}
+                        </span>
+                        {m.status === "completed" ? (
+                          <CheckCircle2 className="w-4 h-4 text-md-primary flex-shrink-0" />
+                        ) : (
+                          <Clock className="w-4 h-4 text-md-on-surface-variant flex-shrink-0" />
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between gap-2 text-xs sm:text-sm font-mono flex-wrap">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-bold text-md-on-surface">
+                            {formatINR(m.targetAmount)}
+                          </span>
+                          {pct !== null && (
+                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-md-secondary-container text-md-on-secondary-container">
+                              {pct}%
+                            </span>
+                          )}
+                        </div>
+                        <span
+                          className={`text-[11px] font-semibold uppercase ${ m.status === "completed" ? "text-md-positive" : "text-md-on-surface-variant" }`}
+                        >
+                          {m.status}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between text-xs sm:text-sm font-mono">
-                      <span className="font-bold text-md-on-surface">
-                        {formatINR(m.targetAmount)}
-                      </span>
-                      <span
-                        className={`text-[11px] font-semibold uppercase ${ m.status === "completed" ? "text-md-positive" : "text-md-on-surface-variant" }`}
-                      >
-                        {m.status}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}

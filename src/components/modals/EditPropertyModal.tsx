@@ -545,72 +545,149 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
 
           {/* Section 5: Milestones */}
           <div className="pt-3 flex flex-col gap-2.5">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-md-on-surface">
-                Payment Milestones
-              </label>
-              <button
-                type="button"
-                onClick={handleAddMilestone}
-                className="btn-action-secondary px-3 py-1.5 rounded-lg text-xs flex items-center gap-1"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Add Milestone</span>
-              </button>
-            </div>
+            {(() => {
+              const basePrice = formData.agreedPurchasePrice || 0;
+              const milestonesList = formData.milestones || [];
+              const totalMilestoneAmt = milestonesList.reduce(
+                (sum, m) => sum + (m.targetAmount || 0),
+                0
+              );
+              const totalMilestonePct =
+                basePrice > 0
+                  ? parseFloat(((totalMilestoneAmt / basePrice) * 100).toFixed(2))
+                  : 0;
 
-            {formData.milestones && formData.milestones.length > 0 ? (
-              <div className="flex flex-col gap-2">
-                {formData.milestones.map((m, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center gap-2 bg-md-surface-container dark:bg-md-surface-high p-2.5 rounded-[18px] min-w-0"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={m.status === "completed"}
-                      onChange={(e) =>
-                        handleUpdateMilestone(idx, {
-                          status: e.target.checked ? "completed" : "pending",
-                        })
-                      }
-                      className="rounded border-md-outline text-md-primary cursor-pointer w-4 h-4 flex-shrink-0"
-                    />
-                    <input
-                      type="text"
-                      value={m.name}
-                      onChange={(e) =>
-                        handleUpdateMilestone(idx, { name: e.target.value })
-                      }
-                      placeholder="Milestone title"
-                      className="flex-1 min-w-0 bg-transparent text-sm text-md-on-surface outline-none rounded-lg px-2 py-0.5 focus:ring-2 focus:ring-md-primary"
-                    />
-                    <input
-                      type="number"
-                      value={m.targetAmount ?? ""}
-                      onChange={(e) =>
-                        handleUpdateMilestone(idx, {
-                          targetAmount: parseFloat(e.target.value) || 0,
-                        })
-                      }
-                      placeholder="₹ Due"
-                      className="w-24 sm:w-28 bg-md-surface-container dark:bg-md-surface-high rounded-lg px-2 py-1 text-sm font-mono text-right text-md-on-surface font-bold flex-shrink-0"
-                    />
+              return (
+                <>
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <label className="text-xs font-bold text-md-on-surface">
+                        Payment Milestones
+                      </label>
+                      {basePrice > 0 && milestonesList.length > 0 && (
+                        <span
+                          className={`text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full ${
+                            Math.abs(totalMilestonePct - 100) < 0.05
+                              ? "bg-md-positive-container text-md-on-positive-container"
+                              : "bg-md-warning-container text-md-on-warning-container"
+                          }`}
+                        >
+                          {totalMilestonePct}% ({formatINRCompact(totalMilestoneAmt)} /{" "}
+                          {formatINRCompact(basePrice)})
+                        </span>
+                      )}
+                    </div>
                     <button
                       type="button"
-                      onClick={() => handleRemoveMilestone(idx)}
-                      className="text-md-on-surface-variant hover:text-md-error p-1.5 transition-colors flex-shrink-0"
+                      onClick={handleAddMilestone}
+                      className="btn-action-secondary px-3 py-1.5 rounded-full text-xs flex items-center gap-1"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add Milestone</span>
                     </button>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-xs text-md-on-surface-variant italic">
-                No payment milestones yet.
-              </div>
-            )}
+
+                  {milestonesList.length > 0 ? (
+                    <div className="flex flex-col gap-2">
+                      {milestonesList.map((m, idx) => {
+                        const pctVal =
+                          basePrice > 0 && (m.targetAmount || 0) > 0
+                            ? parseFloat(
+                                (((m.targetAmount || 0) / basePrice) * 100).toFixed(2)
+                              ).toString()
+                            : "";
+
+                        return (
+                          <div
+                            key={idx}
+                            className="flex flex-wrap sm:flex-nowrap items-center gap-2 bg-md-surface-container dark:bg-md-surface-high p-2.5 rounded-[18px] min-w-0"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={m.status === "completed"}
+                              onChange={(e) =>
+                                handleUpdateMilestone(idx, {
+                                  status: e.target.checked
+                                    ? "completed"
+                                    : "pending",
+                                })
+                              }
+                              className="rounded border-md-outline text-md-primary cursor-pointer w-4 h-4 flex-shrink-0"
+                            />
+                            <input
+                              type="text"
+                              value={m.name}
+                              onChange={(e) =>
+                                handleUpdateMilestone(idx, {
+                                  name: e.target.value,
+                                })
+                              }
+                              placeholder="Milestone title"
+                              className="flex-1 min-w-[140px] bg-transparent text-sm text-md-on-surface outline-none rounded-lg px-2 py-0.5 focus:ring-2 focus:ring-md-primary"
+                            />
+                            <div className="flex items-center gap-1.5 ml-auto flex-shrink-0">
+                              {basePrice > 0 && (
+                                <div className="relative w-20 flex-shrink-0">
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={pctVal}
+                                    onChange={(e) => {
+                                      const raw = e.target.value;
+                                      const parsed = parseFloat(raw);
+                                      if (!isNaN(parsed) && parsed >= 0) {
+                                        handleUpdateMilestone(idx, {
+                                          targetAmount: Math.round(
+                                            (parsed / 100) * basePrice
+                                          ),
+                                        });
+                                      } else if (raw === "") {
+                                        handleUpdateMilestone(idx, {
+                                          targetAmount: 0,
+                                        });
+                                      }
+                                    }}
+                                    placeholder="%"
+                                    title="Percentage of property buy price"
+                                    className="w-full bg-md-surface-lowest dark:bg-md-surface-low rounded-full pl-2.5 pr-5 py-1 text-xs font-mono font-bold text-right text-md-primary outline-none focus:ring-2 focus:ring-md-primary"
+                                  />
+                                  <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] font-bold text-md-on-surface-variant">
+                                    %
+                                  </span>
+                                </div>
+                              )}
+                              <input
+                                type="number"
+                                value={m.targetAmount ?? ""}
+                                onChange={(e) =>
+                                  handleUpdateMilestone(idx, {
+                                    targetAmount: parseFloat(e.target.value) || 0,
+                                  })
+                                }
+                                placeholder="₹ Due"
+                                className="w-24 sm:w-28 bg-md-surface-lowest dark:bg-md-surface-low rounded-full px-3 py-1 text-xs sm:text-sm font-mono text-right text-md-on-surface font-bold outline-none focus:ring-2 focus:ring-md-primary flex-shrink-0"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveMilestone(idx)}
+                                className="text-md-on-surface-variant hover:text-md-error p-1.5 rounded-full hover:bg-md-error-container/50 transition-colors flex-shrink-0"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-xs text-md-on-surface-variant italic">
+                      No payment milestones yet.
+                    </div>
+                  )}
+                </>
+              );
+            })()}
           </div>
 
           {/* Section 6: Sub-Plots */}
