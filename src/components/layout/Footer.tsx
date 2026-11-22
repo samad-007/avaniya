@@ -19,7 +19,7 @@ export const Footer: React.FC<FooterProps> = ({
   });
 
   return (
-    <footer className="border-t border-md-outline-variant/70 bg-md-surface-low px-4 py-3.5 text-xs text-md-on-surface-variant mt-auto transition-standard">
+    <footer className="bg-md-surface-low px-4 py-3.5 text-xs text-md-on-surface-variant mt-auto transition-standard">
       <div className="max-w-[1440px] mx-auto flex flex-wrap items-center justify-between gap-3">
         {/* Left: Live Sync Indicator */}
         <div className="flex items-center gap-2.5">

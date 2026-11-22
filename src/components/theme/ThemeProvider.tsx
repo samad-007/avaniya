@@ -33,6 +33,25 @@ const ThemeContext = createContext<ThemeContextValue>({
 const STORAGE_MODE_KEY = "avaniya_m3_mode";
 const STORAGE_PALETTE_KEY = "avaniya_m3_palette";
 
+function hexToRgb(hex: string): string {
+  const clean = hex.replace("#", "").trim();
+  const full =
+    clean.length === 3
+      ? clean
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : clean;
+  const num = parseInt(full, 16);
+  if (Number.isNaN(num)) return "0 0 0";
+  return `${(num >> 16) & 255} ${(num >> 8) & 255} ${num & 255}`;
+}
+
+function setColorToken(root: HTMLElement, name: string, hex: string) {
+  root.style.setProperty(`--md-sys-color-${name}`, hex);
+  root.style.setProperty(`--md-sys-color-${name}-rgb`, hexToRgb(hex));
+}
+
 function applyThemeToDocument(palette: MaterialPalette, mode: ThemeMode) {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
@@ -46,92 +65,38 @@ function applyThemeToDocument(palette: MaterialPalette, mode: ThemeMode) {
     root.classList.remove("dark");
   }
 
-  root.style.setProperty("--md-sys-color-primary", tokens.primary);
-  root.style.setProperty("--md-sys-color-on-primary", tokens.onPrimary);
-  root.style.setProperty(
-    "--md-sys-color-primary-container",
-    tokens.primaryContainer
-  );
-  root.style.setProperty(
-    "--md-sys-color-on-primary-container",
-    tokens.onPrimaryContainer
-  );
-  root.style.setProperty("--md-sys-color-secondary", tokens.secondary);
-  root.style.setProperty("--md-sys-color-on-secondary", tokens.onSecondary);
-  root.style.setProperty(
-    "--md-sys-color-secondary-container",
-    tokens.secondaryContainer
-  );
-  root.style.setProperty(
-    "--md-sys-color-on-secondary-container",
-    tokens.onSecondaryContainer
-  );
-  root.style.setProperty("--md-sys-color-tertiary", tokens.tertiary);
-  root.style.setProperty("--md-sys-color-on-tertiary", tokens.onTertiary);
-  root.style.setProperty(
-    "--md-sys-color-tertiary-container",
-    tokens.tertiaryContainer
-  );
-  root.style.setProperty(
-    "--md-sys-color-on-tertiary-container",
-    tokens.onTertiaryContainer
-  );
-  root.style.setProperty("--md-sys-color-surface", tokens.surface);
-  root.style.setProperty(
-    "--md-sys-color-surface-container-lowest",
-    tokens.surfaceLowest
-  );
-  root.style.setProperty(
-    "--md-sys-color-surface-container-low",
-    tokens.surfaceLow
-  );
-  root.style.setProperty(
-    "--md-sys-color-surface-container",
-    tokens.surfaceContainer
-  );
-  root.style.setProperty(
-    "--md-sys-color-surface-container-high",
-    tokens.surfaceHigh
-  );
-  root.style.setProperty(
-    "--md-sys-color-surface-container-highest",
-    tokens.surfaceHighest
-  );
-  root.style.setProperty("--md-sys-color-on-surface", tokens.onSurface);
-  root.style.setProperty(
-    "--md-sys-color-on-surface-variant",
-    tokens.onSurfaceVariant
-  );
-  root.style.setProperty("--md-sys-color-outline", tokens.outline);
-  root.style.setProperty("--md-sys-color-outline-variant", tokens.outlineVariant);
-  root.style.setProperty("--md-sys-color-error", tokens.error);
-  root.style.setProperty("--md-sys-color-on-error", tokens.onError);
-  root.style.setProperty(
-    "--md-sys-color-error-container",
-    tokens.errorContainer
-  );
-  root.style.setProperty(
-    "--md-sys-color-on-error-container",
-    tokens.onErrorContainer
-  );
-  root.style.setProperty("--md-sys-color-positive", tokens.positive);
-  root.style.setProperty(
-    "--md-sys-color-positive-container",
-    tokens.positiveContainer
-  );
-  root.style.setProperty(
-    "--md-sys-color-on-positive-container",
-    tokens.onPositiveContainer
-  );
-  root.style.setProperty("--md-sys-color-warning", tokens.warning);
-  root.style.setProperty(
-    "--md-sys-color-warning-container",
-    tokens.warningContainer
-  );
-  root.style.setProperty(
-    "--md-sys-color-on-warning-container",
-    tokens.onWarningContainer
-  );
+  setColorToken(root, "primary", tokens.primary);
+  setColorToken(root, "on-primary", tokens.onPrimary);
+  setColorToken(root, "primary-container", tokens.primaryContainer);
+  setColorToken(root, "on-primary-container", tokens.onPrimaryContainer);
+  setColorToken(root, "secondary", tokens.secondary);
+  setColorToken(root, "on-secondary", tokens.onSecondary);
+  setColorToken(root, "secondary-container", tokens.secondaryContainer);
+  setColorToken(root, "on-secondary-container", tokens.onSecondaryContainer);
+  setColorToken(root, "tertiary", tokens.tertiary);
+  setColorToken(root, "on-tertiary", tokens.onTertiary);
+  setColorToken(root, "tertiary-container", tokens.tertiaryContainer);
+  setColorToken(root, "on-tertiary-container", tokens.onTertiaryContainer);
+  setColorToken(root, "surface", tokens.surface);
+  setColorToken(root, "surface-container-lowest", tokens.surfaceLowest);
+  setColorToken(root, "surface-container-low", tokens.surfaceLow);
+  setColorToken(root, "surface-container", tokens.surfaceContainer);
+  setColorToken(root, "surface-container-high", tokens.surfaceHigh);
+  setColorToken(root, "surface-container-highest", tokens.surfaceHighest);
+  setColorToken(root, "on-surface", tokens.onSurface);
+  setColorToken(root, "on-surface-variant", tokens.onSurfaceVariant);
+  setColorToken(root, "outline", tokens.outline);
+  setColorToken(root, "outline-variant", tokens.outlineVariant);
+  setColorToken(root, "error", tokens.error);
+  setColorToken(root, "on-error", tokens.onError);
+  setColorToken(root, "error-container", tokens.errorContainer);
+  setColorToken(root, "on-error-container", tokens.onErrorContainer);
+  setColorToken(root, "positive", tokens.positive);
+  setColorToken(root, "positive-container", tokens.positiveContainer);
+  setColorToken(root, "on-positive-container", tokens.onPositiveContainer);
+  setColorToken(root, "warning", tokens.warning);
+  setColorToken(root, "warning-container", tokens.warningContainer);
+  setColorToken(root, "on-warning-container", tokens.onWarningContainer);
 }
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({

@@ -221,7 +221,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
   );
 
   const renderLedgerFilterBar = () => (
-    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 bg-md-surface-lowest p-3 rounded-[24px] border border-md-outline-variant shadow-m3-1">
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 bg-md-surface-lowest dark:bg-md-surface-container p-3 rounded-[24px] shadow-m3-1">
       <div className="relative flex-1">
         <Search className="w-4 h-4 text-md-on-surface-variant absolute left-3.5 top-1/2 -translate-y-1/2" />
         <input
@@ -229,12 +229,12 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
           value={ledgerSearchQuery}
           onChange={(e) => setLedgerSearchQuery(e.target.value)}
           placeholder="Search by property, category, person, or notes..."
-          className="w-full bg-md-surface-low border border-md-outline-variant rounded-[18px] pl-10 pr-3.5 py-2 text-xs text-md-on-surface placeholder:text-md-on-surface-variant outline-none focus:bg-md-surface-lowest focus:border-md-primary focus:ring-2 focus:ring-md-primary/20 transition-all"
+          className="w-full bg-md-surface-low dark:bg-md-surface-high rounded-full pl-10 pr-4 py-2 text-xs text-md-on-surface placeholder:text-md-on-surface-variant outline-none focus:ring-2 focus:ring-md-primary transition-all"
         />
       </div>
 
       <div className="flex items-center gap-2 overflow-x-auto pb-0.5 scrollbar-none">
-        <div className="flex items-center gap-0.5 bg-md-surface-container p-1 rounded-[18px] border border-md-outline-variant/80">
+        <div className="flex items-center gap-0.5 bg-md-surface-container dark:bg-md-surface-high p-1 rounded-full">
           {(
             [
               { id: "all", label: "All Time" },
@@ -247,18 +247,14 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
               key={chip.id}
               type="button"
               onClick={() => setDateFilter(chip.id)}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all whitespace-nowrap ${
-                dateFilter === chip.id
-                  ? "bg-md-surface-lowest text-md-on-surface shadow-sm"
-                  : "text-md-on-surface-variant hover:text-md-on-surface"
-              }`}
+              className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-all whitespace-nowrap ${ dateFilter === chip.id ? "bg-md-primary text-md-on-primary shadow-sm" : "text-md-on-surface-variant hover:text-md-on-surface" }`}
             >
               {chip.label}
             </button>
           ))}
         </div>
 
-        <div className="flex items-center gap-0.5 bg-md-surface-container p-1 rounded-[18px] border border-md-outline-variant/80">
+        <div className="flex items-center gap-0.5 bg-md-surface-container dark:bg-md-surface-high p-1 rounded-full">
           {(
             [
               { id: "all", label: "All" },
@@ -270,11 +266,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
               key={m.id}
               type="button"
               onClick={() => setModeFilter(m.id)}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all whitespace-nowrap ${
-                modeFilter === m.id
-                  ? "bg-md-surface-lowest text-md-on-surface shadow-sm"
-                  : "text-md-on-surface-variant hover:text-md-on-surface"
-              }`}
+              className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-all whitespace-nowrap ${ modeFilter === m.id ? "bg-md-primary text-md-on-primary shadow-sm" : "text-md-on-surface-variant hover:text-md-on-surface" }`}
             >
               {m.label}
             </button>
@@ -288,10 +280,10 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
     <div className="flex flex-col gap-5">
       {/* Upcoming Payment Deadlines Banner */}
       {metrics.deadlineAlerts && metrics.deadlineAlerts.length > 0 && (
-        <div className="flex flex-col gap-3 bg-md-warning-container/60 border border-md-outline-variant rounded-[24px] p-4 shadow-m3-1">
+        <div className="flex flex-col gap-3 bg-md-warning-container/60 rounded-[24px] p-4 shadow-m3-1">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-md-warning-container border border-md-outline-variant flex items-center justify-center text-md-warning flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-md-warning-container flex items-center justify-center text-md-on-warning-container flex-shrink-0">
                 <AlertTriangle className="w-4 h-4" />
               </div>
               <h4 className="text-xs sm:text-sm font-bold text-md-on-surface">
@@ -300,12 +292,12 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
             </div>
             <div className="flex items-center gap-2 text-xs">
               {metrics.overdueDeadlinesCount > 0 && (
-                <span className="px-2.5 py-0.5 rounded-full bg-md-error-container text-md-error border border-md-outline-variant font-semibold font-mono">
+                <span className="px-2.5 py-0.5 rounded-full bg-md-error-container text-md-on-error-container font-semibold font-mono">
                   {metrics.overdueDeadlinesCount} Overdue
                 </span>
               )}
               {metrics.upcomingDeadlinesCount > 0 && (
-                <span className="px-2.5 py-0.5 rounded-full bg-md-warning-container text-md-on-warning-container border border-md-outline-variant font-semibold font-mono">
+                <span className="px-2.5 py-0.5 rounded-full bg-md-warning-container text-md-on-warning-container font-semibold font-mono">
                   {metrics.upcomingDeadlinesCount} Due Soon
                 </span>
               )}
@@ -323,26 +315,14 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                   onClick={() =>
                     matchedPropMetric && onSelectProperty(matchedPropMetric)
                   }
-                  className={`p-3 rounded-[18px] border text-xs flex flex-col justify-between gap-1.5 cursor-pointer transition-all bg-md-surface-lowest shadow-m3-1 ${
-                    alert.status === "overdue"
-                      ? "border-md-outline-variant hover:border-md-error"
-                      : alert.status === "urgent"
-                      ? "border-md-outline-variant hover:border-md-warning"
-                      : "border-md-outline-variant hover:border-md-outline"
-                  }`}
+                  className="p-3.5 rounded-[18px] text-xs flex flex-col justify-between gap-1.5 cursor-pointer transition-all bg-md-surface-lowest dark:bg-md-surface-container hover:bg-md-surface-low dark:hover:bg-md-surface-high shadow-m3-1"
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span className="font-bold text-md-on-surface truncate">
                       {alert.propertyName}
                     </span>
                     <span
-                      className={`font-mono text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shrink-0 ${
-                        alert.status === "overdue"
-                          ? "bg-md-error-container text-md-error"
-                          : alert.status === "urgent"
-                          ? "bg-md-warning-container text-md-on-warning-container"
-                          : "bg-md-surface-container text-md-on-surface-variant"
-                      }`}
+                      className={`font-mono text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shrink-0 ${ alert.status === "overdue" ? "bg-md-error-container text-md-error" : alert.status === "urgent" ? "bg-md-warning-container text-md-on-warning-container" : "bg-md-surface-container text-md-on-surface-variant" }`}
                     >
                       {alert.daysLeft < 0
                         ? `${Math.abs(alert.daysLeft)}d Overdue`
@@ -364,86 +344,62 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
         </div>
       )}
 
-      {/* Clean Navigation Tabs */}
-      <div className="flex items-center justify-between border-b border-md-outline-variant overflow-x-auto pb-0.5 gap-3 scrollbar-none">
-        <div className="flex items-center gap-1">
+      {/* M3 Expressive Pill Navigation Tabs */}
+      <div className="flex items-center justify-between overflow-x-auto gap-3 scrollbar-none">
+        <div className="flex items-center gap-1 bg-md-surface-container p-1.5 rounded-full">
           <button
             onClick={() => setActiveTab("deals")}
-            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all flex items-center gap-1.5 ${
-              activeTab === "deals"
-                ? "border-md-primary text-md-on-surface"
-                : "border-transparent text-md-on-surface-variant hover:text-md-on-surface"
-            }`}
+            className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-full whitespace-nowrap transition-all flex items-center gap-1.5 ${ activeTab === "deals" ? "bg-md-primary text-md-on-primary shadow-m3-1" : "text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high" }`}
           >
             <Building2 className="w-3.5 h-3.5" />
             <span>Properties</span>
-            <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-md-surface-container text-md-on-surface-variant font-mono">
+            <span className={`text-[11px] px-1.5 py-0.5 rounded-full font-mono ${ activeTab === "deals" ? "bg-md-on-primary/20 text-md-on-primary" : "bg-md-surface-high text-md-on-surface-variant" }`}>
               {metrics.propertyMetrics.length}
             </span>
           </button>
           <button
             onClick={() => setActiveTab("outflows")}
-            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all flex items-center gap-1.5 ${
-              activeTab === "outflows"
-                ? "border-md-primary text-md-on-surface"
-                : "border-transparent text-md-on-surface-variant hover:text-md-on-surface"
-            }`}
+            className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-full whitespace-nowrap transition-all flex items-center gap-1.5 ${ activeTab === "outflows" ? "bg-md-primary text-md-on-primary shadow-m3-1" : "text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high" }`}
           >
             <Receipt className="w-3.5 h-3.5" />
             <span>Payments Made</span>
-            <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-md-surface-container text-md-on-surface-variant font-mono">
+            <span className={`text-[11px] px-1.5 py-0.5 rounded-full font-mono ${ activeTab === "outflows" ? "bg-md-on-primary/20 text-md-on-primary" : "bg-md-surface-high text-md-on-surface-variant" }`}>
               {formatINRCompact(metrics.outflowsTotal)}
             </span>
           </button>
           <button
             onClick={() => setActiveTab("inflows")}
-            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all flex items-center gap-1.5 ${
-              activeTab === "inflows"
-                ? "border-md-primary text-md-on-surface"
-                : "border-transparent text-md-on-surface-variant hover:text-md-on-surface"
-            }`}
+            className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-full whitespace-nowrap transition-all flex items-center gap-1.5 ${ activeTab === "inflows" ? "bg-md-primary text-md-on-primary shadow-m3-1" : "text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high" }`}
           >
             <ArrowDownRight className="w-3.5 h-3.5" />
             <span>Buyer Receipts</span>
-            <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-md-primary-container text-md-positive font-mono">
+            <span className={`text-[11px] px-1.5 py-0.5 rounded-full font-mono ${ activeTab === "inflows" ? "bg-md-on-primary/20 text-md-on-primary" : "bg-md-positive-container text-md-on-positive-container" }`}>
               {formatINRCompact(metrics.dealInflowsTotal)}
             </span>
           </button>
           <button
             onClick={() => setActiveTab("capital")}
-            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all flex items-center gap-1.5 ${
-              activeTab === "capital"
-                ? "border-md-primary text-md-on-surface"
-                : "border-transparent text-md-on-surface-variant hover:text-md-on-surface"
-            }`}
+            className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-full whitespace-nowrap transition-all flex items-center gap-1.5 ${ activeTab === "capital" ? "bg-md-primary text-md-on-primary shadow-m3-1" : "text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high" }`}
           >
             <Wallet className="w-3.5 h-3.5" />
             <span>Capital &amp; Drawings</span>
-            <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-md-surface-container text-md-on-surface-variant font-mono">
+            <span className={`text-[11px] px-1.5 py-0.5 rounded-full font-mono ${ activeTab === "capital" ? "bg-md-on-primary/20 text-md-on-primary" : "bg-md-surface-high text-md-on-surface-variant" }`}>
               {formatINRCompact(metrics.netCapitalInjected)}
             </span>
           </button>
           <button
             onClick={() => setActiveTab("loans")}
-            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all flex items-center gap-1.5 ${
-              activeTab === "loans"
-                ? "border-md-primary text-md-on-surface"
-                : "border-transparent text-md-on-surface-variant hover:text-md-on-surface"
-            }`}
+            className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-full whitespace-nowrap transition-all flex items-center gap-1.5 ${ activeTab === "loans" ? "bg-md-primary text-md-on-primary shadow-m3-1" : "text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high" }`}
           >
             <HandCoins className="w-3.5 h-3.5" />
             <span>Loans</span>
-            <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-md-surface-container text-md-on-surface-variant font-mono">
+            <span className={`text-[11px] px-1.5 py-0.5 rounded-full font-mono ${ activeTab === "loans" ? "bg-md-on-primary/20 text-md-on-primary" : "bg-md-surface-high text-md-on-surface-variant" }`}>
               {loans.length}
             </span>
           </button>
           <button
             onClick={() => setActiveTab("transfers")}
-            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all flex items-center gap-1.5 ${
-              activeTab === "transfers"
-                ? "border-md-primary text-md-on-surface"
-                : "border-transparent text-md-on-surface-variant hover:text-md-on-surface"
-            }`}
+            className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-full whitespace-nowrap transition-all flex items-center gap-1.5 ${ activeTab === "transfers" ? "bg-md-primary text-md-on-primary shadow-m3-1" : "text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high" }`}
           >
             <ArrowLeftRight className="w-3.5 h-3.5" />
             <span>Bank ↔ Cash</span>
@@ -451,13 +407,13 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
         </div>
 
         {/* Right Controls */}
-        <div className="flex items-center gap-2 flex-shrink-0 pb-1.5">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <button
             type="button"
             onClick={() =>
               openWhatsAppShare(formatPortfolioWhatsApp(metrics, "commercial"))
             }
-            className="p-1.5 sm:px-3 sm:py-1.5 rounded-[18px] bg-md-primary-container border border-md-outline-variant text-md-positive hover:bg-md-primary-container transition-colors flex items-center gap-1.5 text-xs font-semibold"
+            className="m3-btn-primary-tonal p-2 sm:px-3.5 sm:py-2 flex items-center gap-1.5 text-xs"
             title="Share portfolio summary on WhatsApp"
           >
             <Share2 className="w-3.5 h-3.5" />
@@ -536,25 +492,17 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
           )}
 
           {activeTab === "deals" && (
-            <div className="flex items-center gap-0.5 bg-md-surface-container p-1 rounded-[18px] border border-md-outline-variant">
+            <div className="flex items-center gap-0.5 bg-md-surface-container p-1 rounded-full">
               <button
                 onClick={() => setLayoutVariant("cards")}
-                className={`p-1.5 rounded-lg text-xs transition-all ${
-                  layoutVariant === "cards"
-                    ? "bg-md-surface-lowest text-md-on-surface shadow-sm"
-                    : "text-md-on-surface-variant hover:text-md-on-surface"
-                }`}
+                className={`p-1.5 rounded-full text-xs transition-all ${ layoutVariant === "cards" ? "bg-md-primary text-md-on-primary shadow-sm" : "text-md-on-surface-variant hover:text-md-on-surface" }`}
                 title="Card View"
               >
                 <LayoutGrid className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setLayoutVariant("table")}
-                className={`p-1.5 rounded-lg text-xs transition-all ${
-                  layoutVariant === "table"
-                    ? "bg-md-surface-lowest text-md-on-surface shadow-sm"
-                    : "text-md-on-surface-variant hover:text-md-on-surface"
-                }`}
+                className={`p-1.5 rounded-full text-xs transition-all ${ layoutVariant === "table" ? "bg-md-primary text-md-on-primary shadow-sm" : "text-md-on-surface-variant hover:text-md-on-surface" }`}
                 title="Table View"
               >
                 <TableIcon className="w-4 h-4" />
@@ -576,7 +524,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search properties by name or area..."
-                className="w-full pl-10 pr-3.5 py-2.5 rounded-[18px] bg-md-surface-lowest border border-md-outline-variant text-sm text-md-on-surface placeholder:text-md-on-surface-variant outline-none focus:border-md-primary focus:ring-2 focus:ring-md-primary/20 shadow-m3-1 transition-all"
+                className="w-full pl-10 pr-3.5 py-2.5 rounded-[18px] bg-md-surface-container dark:bg-md-surface-high text-sm text-md-on-surface placeholder:text-md-on-surface-variant outline-none focus:ring-2 focus:ring-md-primary focus:ring-2 focus:ring-md-primary/20 shadow-m3-1 transition-all"
               />
             </div>
             <button
@@ -589,8 +537,8 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
           </div>
 
           {filteredMetrics.length === 0 ? (
-            <div className="bg-md-surface-lowest border border-dashed border-md-outline rounded-[24px] p-10 text-center flex flex-col items-center gap-3 shadow-m3-1">
-              <div className="w-12 h-12 rounded-[24px] bg-md-primary-container border border-md-outline-variant flex items-center justify-center text-md-primary">
+            <div className="bg-md-surface-container/70 rounded-[24px] p-10 text-center flex flex-col items-center gap-3 shadow-m3-1">
+              <div className="w-12 h-12 rounded-[24px] bg-md-primary-container flex items-center justify-center text-md-primary">
                 <Building2 className="w-6 h-6" />
               </div>
               <h3 className="text-base font-bold text-md-on-surface">
@@ -638,7 +586,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                       <div
                         key={pm.property.id}
                         onClick={() => onSelectProperty(pm)}
-                        className="bg-md-surface-lowest border border-md-outline-variant rounded-[24px] p-5 flex flex-col justify-between gap-4 cursor-pointer hover:border-md-primary shadow-m3-1 hover:shadow-m3-2 transition-standard group"
+                        className="bg-md-surface-lowest dark:bg-md-surface-container rounded-[24px] p-5 flex flex-col justify-between gap-4 cursor-pointer shadow-m3-1 hover:shadow-m3-2 transition-standard group"
                       >
                         {/* Card Header */}
                         <div className="flex items-start justify-between gap-2.5">
@@ -647,7 +595,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                               <span className="text-base sm:text-lg font-bold text-md-on-surface group-hover:text-md-positive transition-colors">
                                 {pm.property.name}
                               </span>
-                              <span className="font-mono text-[11px] font-semibold px-2 py-0.5 rounded-md bg-md-surface-container text-md-on-surface-variant border border-md-outline-variant">
+                              <span className="font-mono text-[11px] font-semibold px-2 py-0.5 rounded-md bg-md-surface-container text-md-on-surface-variant">
                                 {pm.property.propertyCode}
                               </span>
                             </div>
@@ -668,7 +616,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                                 </span>
                               ) : null}
                               {pm.subPlotStats && (
-                                <span className="font-mono text-[11px] text-md-positive font-semibold bg-md-primary-container border border-md-outline-variant px-2 py-0.5 rounded-full">
+                                <span className="font-mono text-[11px] text-md-positive font-semibold bg-md-primary-container px-2 py-0.5 rounded-full">
                                   {pm.subPlotStats.sold}/
                                   {pm.subPlotStats.totalPlots} Plots Sold
                                 </span>
@@ -678,13 +626,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                                 pm.deadlineStatus !== "none" &&
                                 pm.daysToDeadline !== undefined && (
                                   <span
-                                    className={`font-mono text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 border ${
-                                      pm.deadlineStatus === "overdue"
-                                        ? "bg-md-error-container text-md-error border-md-outline-variant"
-                                        : pm.deadlineStatus === "urgent"
-                                        ? "bg-md-warning-container text-md-warning border-md-outline-variant"
-                                        : "bg-md-warning-container/80 text-md-warning border-md-outline-variant"
-                                    }`}
+                                    className={`font-mono text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${ pm.deadlineStatus === "overdue" ? "bg-md-error-container text-md-error " : pm.deadlineStatus === "urgent" ? "bg-md-warning-container text-md-warning " : "bg-md-warning-container/80 text-md-warning " }`}
                                   >
                                     <Clock className="w-3 h-3" />
                                     <span>
@@ -719,7 +661,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                                 e.stopPropagation();
                                 openWhatsAppShare(formatPropertyWhatsApp(pm));
                               }}
-                              className="p-2 rounded-[18px] bg-md-primary-container border border-md-outline-variant text-md-positive hover:bg-md-primary-container transition-colors"
+                              className="p-2 rounded-[18px] bg-md-primary-container text-md-positive hover:bg-md-primary-container transition-colors"
                               title="Share on WhatsApp"
                             >
                               <Share2 className="w-3.5 h-3.5" />
@@ -731,7 +673,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                                   e.stopPropagation();
                                   onEditProperty(pm.property);
                                 }}
-                                className="p-2 rounded-[18px] bg-md-surface-low border border-md-outline-variant text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container transition-colors"
+                                className="p-2 rounded-[18px] bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container transition-colors"
                                 title="Edit property"
                               >
                                 <Pencil className="w-3.5 h-3.5" />
@@ -741,7 +683,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                         </div>
 
                         {/* 2x2 Plain-English Financial Grid */}
-                        <div className="grid grid-cols-2 gap-2.5 bg-md-surface-low p-3.5 rounded-[18px] border border-md-outline-variant/80">
+                        <div className="grid grid-cols-2 gap-2.5 bg-md-surface-low dark:bg-md-surface-high/60 p-3.5 rounded-[18px]">
                           <div>
                             <div className="text-[11px] font-semibold text-md-on-surface-variant">
                               Buy Price
@@ -824,35 +766,19 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                           </div>
                           <div className="w-full h-2 bg-md-surface-container rounded-full overflow-hidden">
                             <div
-                              className={`h-full rounded-full transition-all duration-300 ${
-                                fundedPct >= 100
-                                  ? "bg-md-primary-container0"
-                                  : "bg-md-primary"
-                              }`}
+                              className={`h-full rounded-full transition-all duration-300 ${ fundedPct >= 100 ? "bg-md-primary" : "bg-md-primary" }`}
                               style={{ width: `${fundedPct}%` }}
                             ></div>
                           </div>
                         </div>
 
                         {/* Card Footer */}
-                        <div className="flex items-center justify-between pt-2 border-t border-md-outline-variant/60 text-xs">
+                        <div className="flex items-center justify-between pt-2 text-xs">
                           <span
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-semibold border ${
-                              pm.property.status === "sold"
-                                ? "bg-md-primary-container text-md-positive border-md-outline-variant"
-                                : pm.property.status === "in_progress"
-                                ? "bg-md-warning-container text-md-warning border-md-outline-variant"
-                                : "bg-md-surface-container text-md-on-surface border-md-outline-variant"
-                            }`}
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-semibold ${ pm.property.status === "sold" ? "bg-md-primary-container text-md-positive " : pm.property.status === "in_progress" ? "bg-md-warning-container text-md-warning " : "bg-md-surface-container text-md-on-surface " }`}
                           >
                             <span
-                              className={`w-1.5 h-1.5 rounded-full ${
-                                pm.property.status === "sold"
-                                  ? "bg-md-primary-container0"
-                                  : pm.property.status === "in_progress"
-                                  ? "bg-md-warning-container0"
-                                  : "bg-slate-400"
-                              }`}
+                              className={`w-1.5 h-1.5 rounded-full ${ pm.property.status === "sold" ? "bg-md-primary" : pm.property.status === "in_progress" ? "bg-md-warning" : "bg-slate-400" }`}
                             />
                             {formatStatusLabel(pm.property.status)}
                           </span>
@@ -868,10 +794,10 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
 
               {/* Table View */}
               {layoutVariant === "table" && (
-                <div className="border border-md-outline-variant rounded-[24px] overflow-x-auto bg-md-surface-lowest shadow-m3-1">
+                <div className="rounded-[24px] overflow-x-auto bg-md-surface-lowest dark:bg-md-surface-container shadow-m3-1">
                   <table className="w-full text-left text-sm border-collapse">
                     <thead>
-                      <tr className="bg-md-surface-low border-b border-md-outline-variant text-md-on-surface-variant uppercase text-[11px] font-bold tracking-wider">
+                      <tr className="bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant uppercase text-[11px] font-bold tracking-wider">
                         <th className="py-3.5 px-4">Code</th>
                         <th className="py-3.5 px-4">Property</th>
                         <th className="py-3.5 px-4">Date</th>
@@ -896,12 +822,12 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                         <th className="py-3.5 px-4">Status</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-md-outline-variant/50">
+                    <tbody className="">
                       {filteredMetrics.map((pm) => (
                         <tr
                           key={pm.property.id}
                           onClick={() => onSelectProperty(pm)}
-                          className="hover:bg-md-surface-low cursor-pointer transition-colors"
+                          className="even:bg-md-surface-low/50 dark:even:bg-md-surface-low/40 hover:bg-md-surface-high/60 cursor-pointer transition-colors"
                         >
                           <td className="py-3.5 px-4 font-mono text-md-on-surface-variant text-xs font-semibold">
                             {pm.property.propertyCode}
@@ -941,7 +867,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                               : "-"}
                           </td>
                           <td className="py-3.5 px-4">
-                            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-md-surface-container text-md-on-surface border border-md-outline-variant whitespace-nowrap">
+                            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-md-surface-container text-md-on-surface whitespace-nowrap">
                               {formatStatusLabel(pm.property.status)}
                             </span>
                           </td>
@@ -949,7 +875,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                       ))}
                     </tbody>
                     <tfoot>
-                      <tr className="bg-md-surface-low border-t border-md-outline-variant font-bold text-md-on-surface text-sm">
+                      <tr className="bg-md-surface-container dark:bg-md-surface-high font-bold text-md-on-surface text-sm">
                         <td colSpan={3} className="py-3.5 px-4">
                           Total Across All Properties
                         </td>
@@ -992,10 +918,10 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
       {activeTab === "outflows" && (
         <div className="flex flex-col gap-3">
           {renderLedgerFilterBar()}
-          <div className="border border-md-outline-variant rounded-[24px] overflow-x-auto bg-md-surface-lowest shadow-m3-1">
+          <div className="rounded-[24px] overflow-x-auto bg-md-surface-lowest dark:bg-md-surface-container shadow-m3-1">
             <table className="w-full text-left text-sm border-collapse">
               <thead>
-                <tr className="bg-md-surface-low border-b border-md-outline-variant text-md-on-surface-variant uppercase text-[11px] font-bold tracking-wider">
+                <tr className="bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant uppercase text-[11px] font-bold tracking-wider">
                   <th className="py-3.5 px-4">ID</th>
                   <th className="py-3.5 px-4">Date</th>
                   <th className="py-3.5 px-4">Property</th>
@@ -1006,7 +932,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                   <th className="py-3.5 px-4 text-right">Edit</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-md-outline-variant/50">
+              <tbody className="">
                 {filteredOutflows.length === 0 ? (
                   <tr>
                     <td
@@ -1020,7 +946,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                   filteredOutflows.map((t) => (
                     <tr
                       key={t.id}
-                      className="hover:bg-md-surface-low transition-colors"
+                      className="even:bg-md-surface-low/50 dark:even:bg-md-surface-low/40 hover:bg-md-surface-high/60 transition-colors"
                     >
                       <td className="py-3.5 px-4 font-mono text-md-on-surface-variant text-xs font-semibold">
                         {t.transCode || "-"}
@@ -1032,7 +958,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <span>{t.propertyCode || "-"}</span>
                           {t.subPlotNumber && (
-                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-md-primary-container text-md-positive border border-md-outline-variant">
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-md-primary-container text-md-positive">
                               Plot #{t.subPlotNumber}
                             </span>
                           )}
@@ -1042,18 +968,18 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <span>{t.category}</span>
                           {t.borneBy === "seller" && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-md-warning-container text-md-warning border border-md-outline-variant font-bold">
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-md-warning-container text-md-warning font-bold">
                               For Seller
                             </span>
                           )}
                           {t.borneBy === "buyer" && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-md-tertiary-container text-md-tertiary border border-md-outline-variant font-bold">
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-md-tertiary-container text-md-tertiary font-bold">
                               For Buyer
                             </span>
                           )}
                           {t.borneBy === "split" && (
                             <span
-                              className="text-[10px] px-1.5 py-0.5 rounded-full bg-md-secondary-container text-md-secondary border border-md-outline-variant font-bold"
+                              className="text-[10px] px-1.5 py-0.5 rounded-full bg-md-secondary-container text-md-secondary font-bold"
                               title={`Self: ₹${(t.amountSelf || 0).toLocaleString("en-IN")} | Seller: ₹${(t.amountSeller || 0).toLocaleString("en-IN")} | Buyer: ₹${(t.amountBuyer || 0).toLocaleString("en-IN")}`}
                             >
                               Split
@@ -1063,11 +989,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                       </td>
                       <td className="py-3.5 px-4">
                         <span
-                          className={`inline-flex items-center gap-1 font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
-                            t.mode === "Cash"
-                              ? "bg-md-warning-container text-md-warning border-md-outline-variant"
-                              : "bg-md-tertiary-container text-md-tertiary border-md-outline-variant"
-                          }`}
+                          className={`inline-flex items-center gap-1 font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full ${ t.mode === "Cash" ? "bg-md-warning-container text-md-warning " : "bg-md-tertiary-container text-md-tertiary " }`}
                         >
                           {t.mode}
                         </span>
@@ -1097,7 +1019,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                         {onEditTransaction && (
                           <button
                             onClick={() => onEditTransaction(t)}
-                            className="p-1.5 rounded-lg bg-md-surface-low border border-md-outline-variant text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container inline-flex items-center justify-center transition-colors"
+                            className="p-1.5 rounded-lg bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container inline-flex items-center justify-center transition-colors"
                             title="Edit entry"
                           >
                             <Pencil className="w-3.5 h-3.5" />
@@ -1109,7 +1031,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                 )}
               </tbody>
               <tfoot>
-                <tr className="bg-md-surface-low border-t border-md-outline-variant font-bold text-md-on-surface text-sm">
+                <tr className="bg-md-surface-container dark:bg-md-surface-high font-bold text-md-on-surface text-sm">
                   <td colSpan={5} className="py-3.5 px-4">
                     Total Payments (Filtered)
                   </td>
@@ -1130,10 +1052,10 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
       {activeTab === "inflows" && (
         <div className="flex flex-col gap-3">
           {renderLedgerFilterBar()}
-          <div className="border border-md-outline-variant rounded-[24px] overflow-x-auto bg-md-surface-lowest shadow-m3-1">
+          <div className="rounded-[24px] overflow-x-auto bg-md-surface-lowest dark:bg-md-surface-container shadow-m3-1">
             <table className="w-full text-left text-sm border-collapse">
               <thead>
-                <tr className="bg-md-surface-low border-b border-md-outline-variant text-md-on-surface-variant uppercase text-[11px] font-bold tracking-wider">
+                <tr className="bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant uppercase text-[11px] font-bold tracking-wider">
                   <th className="py-3.5 px-4">ID</th>
                   <th className="py-3.5 px-4">Date</th>
                   <th className="py-3.5 px-4">Property</th>
@@ -1144,7 +1066,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                   <th className="py-3.5 px-4 text-right">Edit</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-md-outline-variant/50">
+              <tbody className="">
                 {filteredDealInflows.length === 0 ? (
                   <tr>
                     <td
@@ -1158,7 +1080,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                   filteredDealInflows.map((t) => (
                     <tr
                       key={t.id}
-                      className="hover:bg-md-surface-low transition-colors"
+                      className="even:bg-md-surface-low/50 dark:even:bg-md-surface-low/40 hover:bg-md-surface-high/60 transition-colors"
                     >
                       <td className="py-3.5 px-4 font-mono text-md-on-surface-variant text-xs font-semibold">
                         {t.transCode || "-"}
@@ -1170,7 +1092,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <span>{t.propertyCode || "-"}</span>
                           {t.subPlotNumber && (
-                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-md-primary-container text-md-positive border border-md-outline-variant">
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-md-primary-container text-md-positive">
                               Plot #{t.subPlotNumber}
                             </span>
                           )}
@@ -1180,7 +1102,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                         {t.category}
                       </td>
                       <td className="py-3.5 px-4">
-                        <span className="font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full border bg-md-tertiary-container text-md-tertiary border-md-outline-variant">
+                        <span className="font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full bg-md-tertiary-container text-md-tertiary">
                           {t.mode}
                         </span>
                       </td>
@@ -1209,7 +1131,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                         {onEditTransaction && (
                           <button
                             onClick={() => onEditTransaction(t)}
-                            className="p-1.5 rounded-lg bg-md-surface-low border border-md-outline-variant text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container inline-flex items-center justify-center transition-colors"
+                            className="p-1.5 rounded-lg bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container inline-flex items-center justify-center transition-colors"
                             title="Edit entry"
                           >
                             <Pencil className="w-3.5 h-3.5" />
@@ -1221,7 +1143,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                 )}
               </tbody>
               <tfoot>
-                <tr className="bg-md-surface-low border-t border-md-outline-variant font-bold text-md-on-surface text-sm">
+                <tr className="bg-md-surface-container dark:bg-md-surface-high font-bold text-md-on-surface text-sm">
                   <td colSpan={5} className="py-3.5 px-4">
                     Total Buyer Receipts (Filtered)
                   </td>
@@ -1242,7 +1164,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
       {activeTab === "capital" && (
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="bg-md-surface-lowest border border-md-outline-variant rounded-[24px] p-4 shadow-m3-1 flex flex-col gap-1">
+            <div className="bg-md-surface-lowest dark:bg-md-surface-container rounded-[24px] p-4 shadow-m3-1 flex flex-col gap-1">
               <span className="text-xs font-semibold text-md-on-surface-variant">
                 Total Capital Put In
               </span>
@@ -1255,7 +1177,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
               </span>
             </div>
 
-            <div className="bg-md-surface-lowest border border-md-outline-variant rounded-[24px] p-4 shadow-m3-1 flex flex-col gap-1">
+            <div className="bg-md-surface-lowest dark:bg-md-surface-container rounded-[24px] p-4 shadow-m3-1 flex flex-col gap-1">
               <span className="text-xs font-semibold text-md-warning">
                 Capital Returned
               </span>
@@ -1267,7 +1189,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
               </span>
             </div>
 
-            <div className="bg-md-surface-lowest border border-md-outline-variant rounded-[24px] p-4 shadow-m3-1 flex flex-col gap-1">
+            <div className="bg-md-surface-lowest dark:bg-md-surface-container rounded-[24px] p-4 shadow-m3-1 flex flex-col gap-1">
               <span className="text-xs font-semibold text-md-error">
                 Profits Taken Out
               </span>
@@ -1279,7 +1201,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
               </span>
             </div>
 
-            <div className="bg-md-primary-container/50 border border-md-outline-variant rounded-[24px] p-4 shadow-m3-1 flex flex-col gap-1">
+            <div className="bg-md-primary-container/50 rounded-[24px] p-4 shadow-m3-1 flex flex-col gap-1">
               <span className="text-xs font-semibold text-md-on-primary-container">
                 Net Capital Remaining
               </span>
@@ -1296,10 +1218,10 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
 
           {renderLedgerFilterBar()}
 
-          <div className="border border-md-outline-variant rounded-[24px] overflow-x-auto bg-md-surface-lowest shadow-m3-1">
+          <div className="rounded-[24px] overflow-x-auto bg-md-surface-lowest dark:bg-md-surface-container shadow-m3-1">
             <table className="w-full text-left text-sm border-collapse">
               <thead>
-                <tr className="bg-md-surface-low border-b border-md-outline-variant text-md-on-surface-variant uppercase text-[11px] font-bold tracking-wider">
+                <tr className="bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant uppercase text-[11px] font-bold tracking-wider">
                   <th className="py-3.5 px-4">ID</th>
                   <th className="py-3.5 px-4">Date</th>
                   <th className="py-3.5 px-4">Type</th>
@@ -1310,7 +1232,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                   <th className="py-3.5 px-4 text-right">Edit</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-md-outline-variant/50">
+              <tbody className="">
                 {filteredCapitalAndWithdrawals.length === 0 ? (
                   <tr>
                     <td
@@ -1332,7 +1254,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                     return (
                       <tr
                         key={t.id}
-                        className="hover:bg-md-surface-low transition-colors"
+                        className="even:bg-md-surface-low/50 dark:even:bg-md-surface-low/40 hover:bg-md-surface-high/60 transition-colors"
                       >
                         <td className="py-3.5 px-4 font-mono text-md-on-surface-variant text-xs font-semibold">
                           {t.transCode || "-"}
@@ -1342,17 +1264,17 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                         </td>
                         <td className="py-3.5 px-4">
                           {isCapitalInflow && (
-                            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-md-primary-container text-md-positive border border-md-outline-variant">
+                            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-md-primary-container text-md-positive">
                               Capital Added
                             </span>
                           )}
                           {isCapitalWithdrawal && (
-                            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-md-warning-container text-md-warning border border-md-outline-variant">
+                            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-md-warning-container text-md-warning">
                               Capital Refund
                             </span>
                           )}
                           {isProfitWithdrawal && (
-                            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-md-error-container text-md-error border border-md-outline-variant">
+                            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-md-error-container text-md-error">
                               Profit Taken
                             </span>
                           )}
@@ -1362,23 +1284,13 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                         </td>
                         <td className="py-3.5 px-4">
                           <span
-                            className={`inline-flex items-center gap-1 font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
-                              t.mode === "Cash"
-                                ? "bg-md-warning-container text-md-warning border-md-outline-variant"
-                                : "bg-md-tertiary-container text-md-tertiary border-md-outline-variant"
-                            }`}
+                            className={`inline-flex items-center gap-1 font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full ${ t.mode === "Cash" ? "bg-md-warning-container text-md-warning " : "bg-md-tertiary-container text-md-tertiary " }`}
                           >
                             {t.mode}
                           </span>
                         </td>
                         <td
-                          className={`py-3.5 px-4 text-right font-mono font-bold ${
-                            isCapitalInflow
-                              ? "text-md-positive"
-                              : isCapitalWithdrawal
-                              ? "text-md-warning"
-                              : "text-md-error"
-                          }`}
+                          className={`py-3.5 px-4 text-right font-mono font-bold ${ isCapitalInflow ? "text-md-positive" : isCapitalWithdrawal ? "text-md-warning" : "text-md-error" }`}
                         >
                           {isCapitalInflow ? "+" : "-"}
                           {formatINR(t.amount)}
@@ -1403,7 +1315,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                           {onEditTransaction && (
                             <button
                               onClick={() => onEditTransaction(t)}
-                              className="p-1.5 rounded-lg bg-md-surface-low border border-md-outline-variant text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container inline-flex items-center justify-center transition-colors"
+                              className="p-1.5 rounded-lg bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container inline-flex items-center justify-center transition-colors"
                               title="Edit entry"
                             >
                               <Pencil className="w-3.5 h-3.5" />
@@ -1416,7 +1328,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                 )}
               </tbody>
               <tfoot>
-                <tr className="bg-md-surface-low border-t border-md-outline-variant font-bold text-md-on-surface text-sm">
+                <tr className="bg-md-surface-container dark:bg-md-surface-high font-bold text-md-on-surface text-sm">
                   <td colSpan={5} className="py-3.5 px-4">
                     Net Capital Flow (Filtered)
                   </td>
@@ -1441,7 +1353,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
       {activeTab === "loans" && (
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="bg-md-error-container/60 border border-md-outline-variant rounded-[24px] p-4 shadow-m3-1 flex flex-col gap-1">
+            <div className="bg-md-error-container/60 rounded-[24px] p-4 shadow-m3-1 flex flex-col gap-1">
               <span className="text-xs font-semibold text-md-error">
                 Remaining Loan Balance
               </span>
@@ -1453,7 +1365,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
               </span>
             </div>
 
-            <div className="bg-md-surface-lowest border border-md-outline-variant rounded-[24px] p-4 shadow-m3-1 flex flex-col gap-1">
+            <div className="bg-md-surface-lowest dark:bg-md-surface-container rounded-[24px] p-4 shadow-m3-1 flex flex-col gap-1">
               <span className="text-xs font-semibold text-md-on-surface-variant">
                 Total Borrowed
               </span>
@@ -1466,7 +1378,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
               </span>
             </div>
 
-            <div className="bg-md-surface-lowest border border-md-outline-variant rounded-[24px] p-4 shadow-m3-1 flex flex-col gap-1">
+            <div className="bg-md-surface-lowest dark:bg-md-surface-container rounded-[24px] p-4 shadow-m3-1 flex flex-col gap-1">
               <span className="text-xs font-semibold text-md-positive">
                 Principal Repaid
               </span>
@@ -1479,7 +1391,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
               </span>
             </div>
 
-            <div className="bg-md-surface-lowest border border-md-outline-variant rounded-[24px] p-4 shadow-m3-1 flex flex-col gap-1">
+            <div className="bg-md-surface-lowest dark:bg-md-surface-container rounded-[24px] p-4 shadow-m3-1 flex flex-col gap-1">
               <span className="text-xs font-semibold text-md-warning">
                 Interest &amp; Profit Share Paid
               </span>
@@ -1511,8 +1423,8 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
             </div>
 
             {loans.length === 0 ? (
-              <div className="bg-md-surface-lowest border border-dashed border-md-outline rounded-[24px] p-8 text-center flex flex-col items-center gap-3 shadow-m3-1">
-                <div className="w-11 h-11 rounded-[24px] bg-md-primary-container border border-md-outline-variant flex items-center justify-center text-md-primary">
+              <div className="bg-md-surface-container/70 rounded-[24px] p-8 text-center flex flex-col items-center gap-3 shadow-m3-1">
+                <div className="w-11 h-11 rounded-[24px] bg-md-primary-container flex items-center justify-center text-md-primary">
                   <HandCoins className="w-5 h-5" />
                 </div>
                 <div className="text-sm font-bold text-md-on-surface">
@@ -1553,7 +1465,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                   return (
                     <div
                       key={l.id}
-                      className="bg-md-surface-lowest border border-md-outline-variant rounded-[24px] p-5 flex flex-col justify-between gap-4 shadow-m3-1 hover:shadow-m3-2 transition-standard"
+                      className="bg-md-surface-lowest dark:bg-md-surface-container rounded-[24px] p-5 flex flex-col justify-between gap-4 shadow-m3-1 hover:shadow-m3-2 transition-standard"
                     >
                       <div className="flex items-start justify-between gap-2.5">
                         <div>
@@ -1561,7 +1473,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                             <span className="text-base font-bold text-md-on-surface">
                               {l.lenderName}
                             </span>
-                            <span className="font-mono text-[11px] font-semibold px-2 py-0.5 rounded-md bg-md-surface-container text-md-on-surface-variant border border-md-outline-variant">
+                            <span className="font-mono text-[11px] font-semibold px-2 py-0.5 rounded-md bg-md-surface-container text-md-on-surface-variant">
                               {l.loanCode}
                             </span>
                           </div>
@@ -1588,7 +1500,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                                 formatLoanWhatsApp(l, loanMetric)
                               );
                             }}
-                            className="p-2 rounded-[18px] bg-md-primary-container border border-md-outline-variant text-md-positive hover:bg-md-primary-container transition-colors"
+                            className="p-2 rounded-[18px] bg-md-primary-container text-md-positive hover:bg-md-primary-container transition-colors"
                             title="Share on WhatsApp"
                           >
                             <Share2 className="w-3.5 h-3.5" />
@@ -1597,27 +1509,21 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                             <button
                               type="button"
                               onClick={() => onEditLoan(l)}
-                              className="p-2 rounded-[18px] bg-md-surface-low border border-md-outline-variant text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container transition-colors"
+                              className="p-2 rounded-[18px] bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container transition-colors"
                               title="Edit loan"
                             >
                               <Pencil className="w-3.5 h-3.5" />
                             </button>
                           )}
                           <span
-                            className={`text-xs px-2.5 py-0.5 rounded-full font-semibold capitalize border ${
-                              l.status === "closed"
-                                ? "bg-md-primary-container text-md-positive border-md-outline-variant"
-                                : l.status === "active"
-                                ? "bg-md-tertiary-container text-md-tertiary border-md-outline-variant"
-                                : "bg-md-error-container text-md-error border-md-outline-variant"
-                            }`}
+                            className={`text-xs px-2.5 py-0.5 rounded-full font-semibold capitalize ${ l.status === "closed" ? "bg-md-primary-container text-md-positive " : l.status === "active" ? "bg-md-tertiary-container text-md-tertiary " : "bg-md-error-container text-md-error " }`}
                           >
                             {l.status}
                           </span>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-md-surface-low p-3 rounded-[18px] border border-md-outline-variant/80">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-md-surface-low dark:bg-md-surface-high/60 p-3 rounded-[18px]">
                         <div>
                           <div className="text-[11px] font-semibold text-md-on-surface-variant">
                             Loan Amount
@@ -1655,7 +1561,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                       {((l.interestRatePct || 0) > 0 ||
                         (l.profitSharePct || 0) > 0 ||
                         l.notes) && (
-                        <div className="text-xs text-md-on-surface-variant flex flex-col gap-1 bg-md-surface-low p-2.5 rounded-[18px] border border-md-outline-variant/60">
+                        <div className="text-xs text-md-on-surface-variant flex flex-col gap-1 bg-md-surface-low dark:bg-md-surface-high/60 p-2.5 rounded-[18px]">
                           <div className="flex items-center justify-between flex-wrap gap-1">
                             {(l.interestRatePct || 0) > 0 && (
                               <span>
@@ -1691,20 +1597,20 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                         </div>
                         <div className="w-full h-2 bg-md-surface-container rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-md-primary-container0 rounded-full transition-all duration-300"
+                            className="h-full bg-md-primary rounded-full transition-all duration-300"
                             style={{ width: `${progressPct}%` }}
                           ></div>
                         </div>
                       </div>
 
                       {onOpenEntryModal && (
-                        <div className="flex items-center gap-2 pt-2 border-t border-md-outline-variant/60">
+                        <div className="flex items-center gap-2 pt-2">
                           <button
                             type="button"
                             onClick={() =>
                               onOpenEntryModal("loan", undefined, l.loanCode)
                             }
-                            className="btn-action-secondary px-3 py-1.5 rounded-[18px] text-xs flex items-center gap-1 text-md-positive border-md-outline-variant hover:bg-md-primary-container"
+                            className="btn-action-secondary px-3 py-1.5 rounded-[18px] text-xs flex items-center gap-1 text-md-positive hover:bg-md-primary-container"
                           >
                             <Plus className="w-3.5 h-3.5" />
                             <span>Record Borrow / Repayment</span>
@@ -1724,10 +1630,10 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
               Loan History ({loanTransactions.length})
             </h3>
             {renderLedgerFilterBar()}
-            <div className="border border-md-outline-variant rounded-[24px] overflow-x-auto bg-md-surface-lowest shadow-m3-1">
+            <div className="rounded-[24px] overflow-x-auto bg-md-surface-lowest dark:bg-md-surface-container shadow-m3-1">
               <table className="w-full text-left text-sm border-collapse">
                 <thead>
-                  <tr className="bg-md-surface-low border-b border-md-outline-variant text-md-on-surface-variant uppercase text-[11px] font-bold tracking-wider">
+                  <tr className="bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant uppercase text-[11px] font-bold tracking-wider">
                     <th className="py-3.5 px-4">ID</th>
                     <th className="py-3.5 px-4">Date</th>
                     <th className="py-3.5 px-4">Loan</th>
@@ -1738,7 +1644,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                     <th className="py-3.5 px-4 text-right">Edit</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-md-outline-variant/50">
+                <tbody className="">
                   {filteredLoanTransactions.length === 0 ? (
                     <tr>
                       <td
@@ -1759,7 +1665,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                       return (
                         <tr
                           key={t.id}
-                          className="hover:bg-md-surface-low transition-colors"
+                          className="even:bg-md-surface-low/50 dark:even:bg-md-surface-low/40 hover:bg-md-surface-high/60 transition-colors"
                         >
                           <td className="py-3.5 px-4 font-mono text-md-on-surface-variant text-xs font-semibold">
                             {t.transCode || "-"}
@@ -1772,45 +1678,35 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                           </td>
                           <td className="py-3.5 px-4">
                             {isBorrow && (
-                              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-md-primary-container text-md-positive border border-md-outline-variant">
+                              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-md-primary-container text-md-positive">
                                 Borrowed
                               </span>
                             )}
                             {isRepay && (
-                              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-md-tertiary-container text-md-tertiary border border-md-outline-variant">
+                              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-md-tertiary-container text-md-tertiary">
                                 Principal Repaid
                               </span>
                             )}
                             {isInterest && (
-                              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-md-warning-container text-md-warning border border-md-outline-variant">
+                              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-md-warning-container text-md-warning">
                                 Interest Paid
                               </span>
                             )}
                             {isProfitShare && (
-                              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-md-secondary-container text-md-secondary border border-md-outline-variant">
+                              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-md-secondary-container text-md-secondary">
                                 Profit Share
                               </span>
                             )}
                           </td>
                           <td className="py-3.5 px-4">
                             <span
-                              className={`inline-flex items-center gap-1 font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
-                                t.mode === "Cash"
-                                  ? "bg-md-warning-container text-md-warning border-md-outline-variant"
-                                  : "bg-md-tertiary-container text-md-tertiary border-md-outline-variant"
-                              }`}
+                              className={`inline-flex items-center gap-1 font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full ${ t.mode === "Cash" ? "bg-md-warning-container text-md-warning " : "bg-md-tertiary-container text-md-tertiary " }`}
                             >
                               {t.mode}
                             </span>
                           </td>
                           <td
-                            className={`py-3.5 px-4 text-right font-mono font-bold ${
-                              isBorrow
-                                ? "text-md-positive"
-                                : isRepay
-                                ? "text-md-tertiary"
-                                : "text-md-warning"
-                            }`}
+                            className={`py-3.5 px-4 text-right font-mono font-bold ${ isBorrow ? "text-md-positive" : isRepay ? "text-md-tertiary" : "text-md-warning" }`}
                           >
                             {isBorrow ? "+" : "-"}
                             {formatINR(t.amount)}
@@ -1837,7 +1733,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                             {onEditTransaction && (
                               <button
                                 onClick={() => onEditTransaction(t)}
-                                className="p-1.5 rounded-lg bg-md-surface-low border border-md-outline-variant text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container inline-flex items-center justify-center transition-colors"
+                                className="p-1.5 rounded-lg bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container inline-flex items-center justify-center transition-colors"
                                 title="Edit entry"
                               >
                                 <Pencil className="w-3.5 h-3.5" />
@@ -1850,7 +1746,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                   )}
                 </tbody>
                 <tfoot>
-                  <tr className="bg-md-surface-low border-t border-md-outline-variant font-bold text-md-on-surface text-sm">
+                  <tr className="bg-md-surface-container dark:bg-md-surface-high font-bold text-md-on-surface text-sm">
                     <td colSpan={5} className="py-3.5 px-4">
                       Remaining Loan Principal
                     </td>
@@ -1870,10 +1766,10 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
       {activeTab === "transfers" && (
         <div className="flex flex-col gap-3">
           {renderLedgerFilterBar()}
-          <div className="border border-md-outline-variant rounded-[24px] overflow-x-auto bg-md-surface-lowest shadow-m3-1">
+          <div className="rounded-[24px] overflow-x-auto bg-md-surface-lowest dark:bg-md-surface-container shadow-m3-1">
             <table className="w-full text-left text-sm border-collapse">
               <thead>
-                <tr className="bg-md-surface-low border-b border-md-outline-variant text-md-on-surface-variant uppercase text-[11px] font-bold tracking-wider">
+                <tr className="bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant uppercase text-[11px] font-bold tracking-wider">
                   <th className="py-3.5 px-4">ID</th>
                   <th className="py-3.5 px-4">Date</th>
                   <th className="py-3.5 px-4">Direction</th>
@@ -1883,7 +1779,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                   <th className="py-3.5 px-4 text-right">Edit</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-md-outline-variant/50">
+              <tbody className="">
                 {filteredTransfers.length === 0 ? (
                   <tr>
                     <td
@@ -1897,7 +1793,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                   filteredTransfers.map((t) => (
                     <tr
                       key={t.id}
-                      className="hover:bg-md-surface-low transition-colors"
+                      className="even:bg-md-surface-low/50 dark:even:bg-md-surface-low/40 hover:bg-md-surface-high/60 transition-colors"
                     >
                       <td className="py-3.5 px-4 font-mono text-md-on-surface-variant text-xs font-semibold">
                         {t.transCode || "-"}
@@ -1934,7 +1830,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                         {onEditTransaction && (
                           <button
                             onClick={() => onEditTransaction(t)}
-                            className="p-1.5 rounded-lg bg-md-surface-low border border-md-outline-variant text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container inline-flex items-center justify-center transition-colors"
+                            className="p-1.5 rounded-lg bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container inline-flex items-center justify-center transition-colors"
                             title="Edit entry"
                           >
                             <Pencil className="w-3.5 h-3.5" />
@@ -1946,7 +1842,7 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                 )}
               </tbody>
               <tfoot>
-                <tr className="bg-md-surface-low border-t border-md-outline-variant font-bold text-md-on-surface text-sm">
+                <tr className="bg-md-surface-container dark:bg-md-surface-high font-bold text-md-on-surface text-sm">
                   <td colSpan={3} className="py-3.5 px-4">
                     Total Transfers (Filtered)
                   </td>

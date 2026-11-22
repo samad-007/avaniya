@@ -57,9 +57,9 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-md-surface-lowest border border-md-outline-variant rounded-[28px] max-w-lg w-full min-w-0 max-h-[92vh] overflow-y-auto overflow-x-hidden p-5 sm:p-6 shadow-m3-3 my-auto flex flex-col gap-5 animate-modal"
+        className="bg-md-surface-lowest dark:bg-md-surface-low rounded-[28px] max-w-lg w-full min-w-0 max-h-[92vh] overflow-y-auto overflow-x-hidden p-5 sm:p-6 shadow-m3-3 my-auto flex flex-col gap-5 animate-modal"
       >
-        <div className="flex items-start justify-between border-b border-md-outline-variant/60 pb-4 gap-2">
+        <div className="flex items-start justify-between pb-4 gap-2">
           <div className="min-w-0 flex-1">
             <h2 className="font-display text-lg font-bold text-md-on-surface tracking-tight flex items-center gap-2">
               <Download className="w-5 h-5 text-md-primary flex-shrink-0" />
@@ -79,7 +79,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
         </div>
 
         <div className="flex flex-col gap-3 min-w-0">
-          <div className="bg-md-surface-low border border-md-outline-variant/80 rounded-[22px] p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 hover:border-md-primary transition-all min-w-0">
+          <div className="bg-md-surface-container dark:bg-md-surface-high/80 rounded-[22px] p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 transition-all min-w-0">
             <div className="flex items-start gap-3.5 min-w-0 flex-1">
               <div className="w-10 h-10 rounded-[14px] bg-md-positive-container text-md-on-positive-container flex items-center justify-center flex-shrink-0">
                 <FileSpreadsheet className="w-5 h-5" />
@@ -102,7 +102,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
             </button>
           </div>
 
-          <div className="bg-md-surface-low border border-md-outline-variant/80 rounded-[22px] p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 hover:border-md-primary transition-all min-w-0">
+          <div className="bg-md-surface-container dark:bg-md-surface-high/80 rounded-[22px] p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 transition-all min-w-0">
             <div className="flex items-start gap-3.5 min-w-0 flex-1">
               <div className="w-10 h-10 rounded-[14px] bg-md-error-container text-md-on-error-container flex items-center justify-center flex-shrink-0">
                 <FileText className="w-5 h-5" />
@@ -125,7 +125,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
             </button>
           </div>
 
-          <div className="bg-md-surface-low border border-md-outline-variant/80 rounded-[22px] p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 hover:border-md-primary transition-all min-w-0">
+          <div className="bg-md-surface-container dark:bg-md-surface-high/80 rounded-[22px] p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 transition-all min-w-0">
             <div className="flex items-start gap-3.5 min-w-0 flex-1">
               <div className="w-10 h-10 rounded-[14px] bg-md-tertiary-container text-md-on-tertiary-container flex items-center justify-center flex-shrink-0">
                 <Database className="w-5 h-5" />
@@ -149,7 +149,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => 
           </div>
         </div>
 
-        <div className="pt-3 border-t border-md-outline-variant/60 flex justify-end">
+        <div className="pt-3 flex justify-end">
           <button onClick={onClose} className="m3-btn-outlined px-5 py-2 text-xs">
             Close
           </button>

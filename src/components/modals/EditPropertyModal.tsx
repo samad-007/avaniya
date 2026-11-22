@@ -193,18 +193,18 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-md-surface-lowest border border-md-outline-variant rounded-[24px] max-w-2xl w-full p-5 sm:p-6 shadow-m3-3 flex flex-col gap-5 my-auto max-h-[90vh] overflow-y-auto overflow-x-hidden animate-modal min-w-0"
+        className="bg-md-surface-lowest dark:bg-md-surface-container rounded-[24px] max-w-2xl w-full p-5 sm:p-6 shadow-m3-3 flex flex-col gap-5 my-auto max-h-[90vh] overflow-y-auto overflow-x-hidden animate-modal min-w-0"
       >
         {/* Header */}
-        <div className="flex items-start justify-between pb-4 border-b border-md-outline-variant/60 gap-3">
+        <div className="flex items-start justify-between pb-4 gap-3">
           <div className="flex items-start gap-3 min-w-0 flex-1">
-            <div className="w-10 h-10 rounded-[18px] bg-md-primary-container border border-md-outline-variant text-md-primary flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 rounded-[18px] bg-md-primary-container text-md-primary flex items-center justify-center flex-shrink-0">
               <Building2 className="w-5 h-5" />
             </div>
             <div className="min-w-0 flex-1">
               <h2 className="text-base sm:text-lg font-bold text-md-on-surface tracking-tight flex items-center gap-2 flex-wrap">
                 <span className="break-words">Edit Property: {property.name}</span>
-                <span className="text-xs font-mono font-semibold text-md-on-surface-variant bg-md-surface-container border border-md-outline-variant px-2 py-0.5 rounded-md flex-shrink-0">
+                <span className="text-xs font-mono font-semibold text-md-on-surface-variant bg-md-surface-container px-2 py-0.5 rounded-md flex-shrink-0">
                   {property.propertyCode}
                 </span>
               </h2>
@@ -224,7 +224,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
         </div>
 
         {errorMsg && (
-          <div className="bg-md-error-container border border-md-outline-variant text-md-error text-xs px-3.5 py-2.5 rounded-[18px] font-medium">
+          <div className="bg-md-error-container text-md-error text-xs px-3.5 py-2.5 rounded-[18px] font-medium">
             {errorMsg}
           </div>
         )}
@@ -243,7 +243,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                className="w-full bg-md-surface-low border border-md-outline-variant rounded-[18px] px-3.5 py-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary focus:ring-2 focus:ring-md-primary/20 min-w-0"
+                className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-[18px] px-3.5 py-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary focus:ring-2 focus:ring-md-primary/20 min-w-0"
                 required
               />
             </div>
@@ -260,7 +260,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                     type: e.target.value as "commercial" | "personal",
                   })
                 }
-                className="w-full bg-md-surface-low border border-md-outline-variant rounded-[18px] px-3.5 py-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary min-w-0"
+                className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-[18px] px-3.5 py-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary min-w-0"
               >
                 <option value="commercial">Business Land Deal</option>
                 <option value="personal">Personal Home / Asset</option>
@@ -280,7 +280,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                     setFormData({ ...formData, location: e.target.value })
                   }
                   placeholder="e.g. OMR Sholinganallur, Survey No. 442/1B"
-                  className="w-full bg-md-surface-low border border-md-outline-variant rounded-[18px] pl-10 pr-3.5 py-2.5 text-md-on-surface placeholder:text-md-on-surface-variant text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary min-w-0"
+                  className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-[18px] pl-10 pr-3.5 py-2.5 text-md-on-surface placeholder:text-md-on-surface-variant text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary min-w-0"
                 />
               </div>
             </div>
@@ -302,7 +302,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                       | "closed",
                   })
                 }
-                className="w-full bg-md-surface-low border border-md-outline-variant rounded-[18px] px-3.5 py-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary min-w-0"
+                className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-[18px] px-3.5 py-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary min-w-0"
               >
                 <option value="open">Open (Token / Advance Paid)</option>
                 <option value="in_progress">In Progress (Paying)</option>
@@ -327,7 +327,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                       acquisitionDate: e.target.value,
                     })
                   }
-                  className="w-full bg-md-surface-low border border-md-outline-variant rounded-[18px] pl-10 pr-3.5 py-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary min-w-0"
+                  className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-[18px] pl-10 pr-3.5 py-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary min-w-0"
                 />
               </div>
             </div>
@@ -347,7 +347,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                       agreementDueDate: e.target.value,
                     })
                   }
-                  className="w-full bg-md-surface-low border border-md-outline-variant rounded-[18px] pl-10 pr-3.5 py-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-warning min-w-0"
+                  className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-[18px] pl-10 pr-3.5 py-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus: min-w-0"
                 />
               </div>
             </div>
@@ -367,7 +367,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                       targetSettlementDate: e.target.value,
                     })
                   }
-                  className="w-full bg-md-surface-low border border-md-outline-variant rounded-[18px] pl-10 pr-3.5 py-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-tertiary min-w-0"
+                  className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-[18px] pl-10 pr-3.5 py-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-tertiary min-w-0"
                 />
               </div>
             </div>
@@ -397,13 +397,13 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                   setFormData({ ...formData, attachmentUrl: e.target.value })
                 }
                 placeholder="https://drive.google.com/..."
-                className="w-full bg-md-surface-low border border-md-outline-variant rounded-[18px] px-3.5 py-2.5 text-md-on-surface placeholder:text-md-on-surface-variant text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary min-w-0"
+                className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-[18px] px-3.5 py-2.5 text-md-on-surface placeholder:text-md-on-surface-variant text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary min-w-0"
               />
             </div>
           </div>
 
           {/* Section 2: Area & Rate */}
-          <div className="pt-3 border-t border-md-outline-variant/60">
+          <div className="pt-3">
             <h4 className="text-xs font-bold text-md-on-surface mb-2.5">
               Area &amp; Rate
             </h4>
@@ -427,7 +427,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                     });
                   }}
                   placeholder="e.g. 5400"
-                  className="w-full bg-md-surface-low border border-md-outline-variant rounded-[18px] px-3.5 py-2.5 text-md-on-surface text-sm font-mono outline-none focus:bg-md-surface-lowest focus:border-md-primary min-w-0"
+                  className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-[18px] px-3.5 py-2.5 text-md-on-surface text-sm font-mono outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary min-w-0"
                 />
               </div>
 
@@ -450,14 +450,14 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                     });
                   }}
                   placeholder="e.g. 4500"
-                  className="w-full bg-md-surface-low border border-md-outline-variant rounded-[18px] px-3.5 py-2.5 text-md-on-surface text-sm font-mono outline-none focus:bg-md-surface-lowest focus:border-md-primary min-w-0"
+                  className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-[18px] px-3.5 py-2.5 text-md-on-surface text-sm font-mono outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary min-w-0"
                 />
               </div>
             </div>
           </div>
 
           {/* Section 3: Prices */}
-          <div className="pt-3 border-t border-md-outline-variant/60">
+          <div className="pt-3">
             <h4 className="text-xs font-bold text-md-on-surface mb-2.5">
               Prices &amp; Valuation
             </h4>
@@ -475,7 +475,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                       agreedPurchasePrice: parseFloat(e.target.value) || 0,
                     })
                   }
-                  className="w-full bg-md-surface-low border border-md-outline-variant rounded-[18px] px-3.5 py-2.5 text-md-on-surface text-sm font-mono font-bold outline-none focus:bg-md-surface-lowest focus:border-md-primary min-w-0"
+                  className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-[18px] px-3.5 py-2.5 text-md-on-surface text-sm font-mono font-bold outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary min-w-0"
                 />
                 <span className="text-xs text-md-positive font-mono font-semibold">
                   {formatINRCompact(formData.agreedPurchasePrice || 0)}
@@ -495,7 +495,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                       targetSalePrice: parseFloat(e.target.value) || 0,
                     })
                   }
-                  className="w-full bg-md-surface-low border border-md-outline-variant rounded-[18px] px-3.5 py-2.5 text-md-on-surface text-sm font-mono font-bold outline-none focus:bg-md-surface-lowest focus:border-md-tertiary min-w-0"
+                  className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-[18px] px-3.5 py-2.5 text-md-on-surface text-sm font-mono font-bold outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-tertiary min-w-0"
                 />
                 <span className="text-xs text-md-tertiary font-mono font-semibold">
                   {formatINRCompact(formData.targetSalePrice || 0)}
@@ -516,7 +516,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                     })
                   }
                   placeholder="Once buyer finalized"
-                  className="w-full bg-md-surface-low border border-md-outline-variant rounded-[18px] px-3.5 py-2.5 text-md-on-surface text-sm font-mono font-bold outline-none focus:bg-md-surface-lowest focus:border-md-warning min-w-0"
+                  className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-[18px] px-3.5 py-2.5 text-md-on-surface text-sm font-mono font-bold outline-none focus:bg-md-surface-lowest focus: min-w-0"
                 />
                 <span className="text-xs text-md-warning font-mono font-semibold">
                   {formData.agreedSellingPrice
@@ -528,7 +528,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
           </div>
 
           {/* Section 4: Notes */}
-          <div className="pt-3 border-t border-md-outline-variant/60 flex flex-col gap-1.5 min-w-0">
+          <div className="pt-3 flex flex-col gap-1.5 min-w-0">
             <label className="text-xs font-semibold text-md-on-surface">
               Notes (Optional)
             </label>
@@ -539,12 +539,12 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                 setFormData({ ...formData, notes: e.target.value })
               }
               placeholder="e.g. EC verified, agreement signed..."
-              className="w-full bg-md-surface-low border border-md-outline-variant rounded-[18px] px-3.5 py-2.5 text-md-on-surface placeholder:text-md-on-surface-variant text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary min-w-0 resize-none"
+              className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-[18px] px-3.5 py-2.5 text-md-on-surface placeholder:text-md-on-surface-variant text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary min-w-0 resize-none"
             />
           </div>
 
           {/* Section 5: Milestones */}
-          <div className="pt-3 border-t border-md-outline-variant/60 flex flex-col gap-2.5">
+          <div className="pt-3 flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-md-on-surface">
                 Payment Milestones
@@ -564,7 +564,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                 {formData.milestones.map((m, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-2 bg-md-surface-low border border-md-outline-variant p-2.5 rounded-[18px] min-w-0"
+                    className="flex items-center gap-2 bg-md-surface-container dark:bg-md-surface-high p-2.5 rounded-[18px] min-w-0"
                   >
                     <input
                       type="checkbox"
@@ -583,7 +583,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                         handleUpdateMilestone(idx, { name: e.target.value })
                       }
                       placeholder="Milestone title"
-                      className="flex-1 min-w-0 bg-transparent text-sm text-md-on-surface outline-none border-b border-transparent focus:border-md-primary"
+                      className="flex-1 min-w-0 bg-transparent text-sm text-md-on-surface outline-none rounded-lg px-2 py-0.5 focus:ring-2 focus:ring-md-primary"
                     />
                     <input
                       type="number"
@@ -594,7 +594,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                         })
                       }
                       placeholder="₹ Due"
-                      className="w-24 sm:w-28 bg-md-surface-lowest border border-md-outline-variant rounded-lg px-2 py-1 text-sm font-mono text-right text-md-on-surface font-bold flex-shrink-0"
+                      className="w-24 sm:w-28 bg-md-surface-container dark:bg-md-surface-high rounded-lg px-2 py-1 text-sm font-mono text-right text-md-on-surface font-bold flex-shrink-0"
                     />
                     <button
                       type="button"
@@ -614,7 +614,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
           </div>
 
           {/* Section 6: Sub-Plots */}
-          <div className="pt-3 border-t border-md-outline-variant/60 flex flex-col gap-2.5">
+          <div className="pt-3 flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Grid className="w-4 h-4 text-md-primary" />
@@ -637,7 +637,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                 {formData.subPlots.map((sp, idx) => (
                   <div
                     key={sp.id || idx}
-                    className="grid grid-cols-1 sm:grid-cols-6 gap-2 bg-md-surface-low border border-md-outline-variant p-2.5 rounded-[18px] items-center text-xs min-w-0"
+                    className="grid grid-cols-1 sm:grid-cols-6 gap-2 bg-md-surface-container dark:bg-md-surface-high p-2.5 rounded-[18px] items-center text-xs min-w-0"
                   >
                     <div className="flex items-center gap-1.5 min-w-0">
                       <span className="text-md-on-surface-variant font-mono flex-shrink-0">
@@ -652,7 +652,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                           })
                         }
                         placeholder="No"
-                        className="w-full sm:w-16 bg-md-surface-lowest border border-md-outline-variant rounded-lg px-2 py-1 text-md-on-surface font-mono font-bold min-w-0"
+                        className="w-full sm:w-16 bg-md-surface-container dark:bg-md-surface-high rounded-lg px-2 py-1 text-md-on-surface font-mono font-bold min-w-0"
                       />
                     </div>
                     <div className="flex flex-col gap-0.5 min-w-0">
@@ -666,7 +666,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                           })
                         }
                         placeholder="Sq.ft"
-                        className="w-full bg-md-surface-lowest border border-md-outline-variant rounded-lg px-2 py-1 text-md-on-surface font-mono min-w-0"
+                        className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-lg px-2 py-1 text-md-on-surface font-mono min-w-0"
                       />
                     </div>
                     <div className="flex flex-col gap-0.5 sm:col-span-2 min-w-0">
@@ -682,7 +682,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                           })
                         }
                         placeholder="Target Price"
-                        className="w-full bg-md-surface-lowest border border-md-outline-variant rounded-lg px-2 py-1 text-md-on-surface font-mono font-semibold min-w-0"
+                        className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-lg px-2 py-1 text-md-on-surface font-mono font-semibold min-w-0"
                       />
                     </div>
                     <div className="flex flex-col gap-0.5 min-w-0">
@@ -697,13 +697,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                               | "sold",
                           })
                         }
-                        className={`w-full bg-md-surface-lowest border border-md-outline-variant rounded-lg px-1.5 py-1 text-xs font-semibold min-w-0 ${
-                          sp.status === "sold"
-                            ? "text-md-positive"
-                            : sp.status === "booked"
-                            ? "text-md-warning"
-                            : "text-md-on-surface-variant"
-                        }`}
+                        className={`w-full bg-md-surface-container dark:bg-md-surface-high rounded-lg px-1.5 py-1 text-xs font-semibold min-w-0 ${ sp.status === "sold" ? "text-md-positive" : sp.status === "booked" ? "text-md-warning" : "text-md-on-surface-variant" }`}
                       >
                         <option value="available">Available</option>
                         <option value="booked">Booked</option>
@@ -720,7 +714,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                           })
                         }
                         placeholder="Buyer"
-                        className="w-full bg-md-surface-lowest border border-md-outline-variant rounded-lg px-2 py-1 text-md-on-surface text-xs min-w-0"
+                        className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-lg px-2 py-1 text-md-on-surface text-xs min-w-0"
                       />
                       <button
                         type="button"
@@ -741,7 +735,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
           </div>
 
           {/* Section 7: Partners */}
-          <div className="pt-3 border-t border-md-outline-variant/60 flex flex-col gap-2.5">
+          <div className="pt-3 flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Users className="w-4 h-4 text-md-secondary" />
@@ -764,7 +758,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                 {formData.partners.map((p, idx) => (
                   <div
                     key={idx}
-                    className="grid grid-cols-1 sm:grid-cols-4 gap-2 bg-md-surface-low border border-md-outline-variant p-2.5 rounded-[18px] items-center text-xs min-w-0"
+                    className="grid grid-cols-1 sm:grid-cols-4 gap-2 bg-md-surface-container dark:bg-md-surface-high p-2.5 rounded-[18px] items-center text-xs min-w-0"
                   >
                     <input
                       type="text"
@@ -773,7 +767,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                         handleUpdatePartner(idx, { name: e.target.value })
                       }
                       placeholder="Partner Name"
-                      className="w-full bg-md-surface-lowest border border-md-outline-variant rounded-lg px-2 py-1.5 text-md-on-surface text-xs font-semibold sm:col-span-2 min-w-0"
+                      className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-lg px-2 py-1.5 text-md-on-surface text-xs font-semibold sm:col-span-2 min-w-0"
                     />
                     <div className="flex items-center gap-1 min-w-0">
                       <input
@@ -785,7 +779,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                           })
                         }
                         placeholder="%"
-                        className="w-full min-w-0 bg-md-surface-lowest border border-md-outline-variant rounded-lg px-2 py-1.5 text-md-on-surface text-xs font-mono font-bold"
+                        className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-lg px-2 py-1.5 text-md-on-surface text-xs font-mono font-bold"
                       />
                       <span className="text-md-on-surface-variant font-bold flex-shrink-0">
                         %
@@ -801,7 +795,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
                           })
                         }
                         placeholder="₹ Committed"
-                        className="w-full min-w-0 bg-md-surface-lowest border border-md-outline-variant rounded-lg px-2 py-1.5 text-md-on-surface text-xs font-mono"
+                        className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-lg px-2 py-1.5 text-md-on-surface text-xs font-mono"
                       />
                       <button
                         type="button"
@@ -822,7 +816,7 @@ export const EditPropertyModal: React.FC<EditPropertyModalProps> = ({
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-md-outline-variant/60 mt-1 flex-wrap">
+          <div className="flex items-center justify-end gap-2.5 pt-4 mt-1 flex-wrap">
             <button
               type="button"
               onClick={onClose}

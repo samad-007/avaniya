@@ -78,22 +78,14 @@ export const KpiStrip: React.FC<KpiStripProps> = ({
         <button
           type="button"
           onClick={() => handleSelectPanel("A")}
-          className={`px-3 py-1 rounded-full transition-all ${
-            activePanel === "A"
-              ? "bg-md-primary text-md-on-primary shadow-m3-1"
-              : "text-md-on-surface-variant hover:text-md-on-surface"
-          }`}
+          className={`px-3 py-1 rounded-full transition-all ${ activePanel === "A" ? "bg-md-primary text-md-on-primary shadow-m3-1" : "text-md-on-surface-variant hover:text-md-on-surface" }`}
         >
           Overview
         </button>
         <button
           type="button"
           onClick={() => handleSelectPanel("B")}
-          className={`px-3 py-1 rounded-full transition-all ${
-            activePanel === "B"
-              ? "bg-md-primary text-md-on-primary shadow-m3-1"
-              : "text-md-on-surface-variant hover:text-md-on-surface"
-          }`}
+          className={`px-3 py-1 rounded-full transition-all ${ activePanel === "B" ? "bg-md-primary text-md-on-primary shadow-m3-1" : "text-md-on-surface-variant hover:text-md-on-surface" }`}
         >
           More Details
         </button>

@@ -58,9 +58,9 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-md-surface-lowest border border-md-outline-variant rounded-[28px] max-w-lg w-full min-w-0 max-h-[92vh] overflow-y-auto overflow-x-hidden p-5 sm:p-6 shadow-m3-3 my-auto flex flex-col gap-5 animate-modal"
+        className="bg-md-surface-lowest dark:bg-md-surface-low rounded-[28px] max-w-lg w-full min-w-0 max-h-[92vh] overflow-y-auto overflow-x-hidden p-5 sm:p-6 shadow-m3-3 my-auto flex flex-col gap-5 animate-modal"
       >
-        <div className="flex items-start justify-between border-b border-md-outline-variant/60 pb-4 gap-2">
+        <div className="flex items-start justify-between pb-4 gap-2">
           <div className="min-w-0 flex-1">
             <h2 className="font-display text-lg font-bold text-md-on-surface tracking-tight flex items-center gap-2">
               <Tag className="w-5 h-5 text-md-primary flex-shrink-0" />
@@ -89,7 +89,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Panchayat Approval, Borewell Drilling, Brokerage"
-              className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-2xl p-2.5 text-md-on-surface placeholder:text-md-on-surface-variant/60 text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary focus:ring-2 focus:ring-md-primary/20 transition-all"
+              className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-2xl p-2.5 text-md-on-surface placeholder:text-md-on-surface-variant/60 text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary focus:ring-2 focus:ring-md-primary/20 transition-all"
               required
             />
           </div>
@@ -104,7 +104,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
                 onChange={(e) =>
                   setType(e.target.value as "outflow" | "inflow" | "transfer")
                 }
-                className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-2xl p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary truncate"
+                className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-2xl p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary truncate"
               >
                 <option value="outflow">Money Paid (Expense)</option>
                 <option value="inflow">Money Received (Income)</option>
@@ -121,7 +121,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
                 onChange={(e) =>
                   setScope(e.target.value as "commercial" | "personal" | "both")
                 }
-                className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-2xl p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary truncate"
+                className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-2xl p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary truncate"
               >
                 <option value="both">Both Business &amp; Personal</option>
                 <option value="commercial">Business Deals Only</option>
@@ -130,7 +130,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 bg-md-primary-container/40 p-4 rounded-[20px] border border-md-outline-variant/80 min-w-0">
+          <div className="flex flex-col gap-2 bg-md-primary-container/40 p-4 rounded-[20px] min-w-0">
             <div className="flex items-center gap-1.5 text-xs font-bold text-md-on-primary-container">
               <ShieldCheck className="w-4 h-4 text-md-primary" />
               <span>How should this affect your totals?</span>
@@ -141,7 +141,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
             <select
               value={financialRole}
               onChange={(e) => setFinancialRole(e.target.value as FinancialRole)}
-              className="w-full min-w-0 bg-md-surface-lowest border border-md-outline-variant rounded-2xl p-2.5 text-md-on-surface font-medium text-xs sm:text-sm mt-1 outline-none focus:border-md-primary truncate"
+              className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-2xl p-2.5 text-md-on-surface font-medium text-xs sm:text-sm mt-1 outline-none focus:ring-2 focus:ring-md-primary truncate"
             >
               <option value="property_expense">
                 Extra Property Cost (Adds to total cost &amp; reduces profit)
@@ -171,11 +171,11 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
             <div className="text-xs font-semibold text-md-on-surface-variant">
               Saved Categories ({categories.length})
             </div>
-            <div className="max-h-36 overflow-y-auto border border-md-outline-variant/80 rounded-2xl p-2.5 bg-md-surface-low flex flex-wrap gap-1.5">
+            <div className="max-h-36 overflow-y-auto rounded-2xl p-2.5 bg-md-surface-low flex flex-wrap gap-1.5">
               {categories.map((c, idx) => (
                 <span
                   key={idx}
-                  className="px-3 py-1 rounded-full bg-md-surface-lowest text-xs font-medium text-md-on-surface border border-md-outline-variant/80"
+                  className="px-3 py-1 rounded-full bg-md-surface-lowest text-xs font-medium text-md-on-surface"
                 >
                   {c.name}
                 </span>
@@ -183,7 +183,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 pt-3 border-t border-md-outline-variant/60 flex-wrap sm:flex-nowrap">
+          <div className="flex items-center gap-2.5 pt-3 flex-wrap sm:flex-nowrap">
             <button
               type="submit"
               disabled={isSubmitting}

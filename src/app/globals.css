@@ -6,37 +6,69 @@
 
 :root {
   --md-sys-color-primary: #006c4c;
+  --md-sys-color-primary-rgb: 0 108 76;
   --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-on-primary-rgb: 255 255 255;
   --md-sys-color-primary-container: #89f8c7;
+  --md-sys-color-primary-container-rgb: 137 248 199;
   --md-sys-color-on-primary-container: #002114;
+  --md-sys-color-on-primary-container-rgb: 0 33 20;
   --md-sys-color-secondary: #4c6358;
+  --md-sys-color-secondary-rgb: 76 99 88;
   --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-on-secondary-rgb: 255 255 255;
   --md-sys-color-secondary-container: #cee9da;
+  --md-sys-color-secondary-container-rgb: 206 233 218;
   --md-sys-color-on-secondary-container: #092017;
+  --md-sys-color-on-secondary-container-rgb: 9 32 23;
   --md-sys-color-tertiary: #3e6374;
+  --md-sys-color-tertiary-rgb: 62 99 116;
   --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-on-tertiary-rgb: 255 255 255;
   --md-sys-color-tertiary-container: #c2e8fc;
+  --md-sys-color-tertiary-container-rgb: 194 232 252;
   --md-sys-color-on-tertiary-container: #001f2a;
+  --md-sys-color-on-tertiary-container-rgb: 0 31 42;
   --md-sys-color-surface: #f5fbf6;
+  --md-sys-color-surface-rgb: 245 251 246;
   --md-sys-color-surface-container-lowest: #ffffff;
+  --md-sys-color-surface-container-lowest-rgb: 255 255 255;
   --md-sys-color-surface-container-low: #eff5f0;
+  --md-sys-color-surface-container-low-rgb: 239 245 240;
   --md-sys-color-surface-container: #e9efea;
+  --md-sys-color-surface-container-rgb: 233 239 234;
   --md-sys-color-surface-container-high: #e3eae5;
+  --md-sys-color-surface-container-high-rgb: 227 234 229;
   --md-sys-color-surface-container-highest: #dee4df;
+  --md-sys-color-surface-container-highest-rgb: 222 228 223;
   --md-sys-color-on-surface: #171d1a;
+  --md-sys-color-on-surface-rgb: 23 29 26;
   --md-sys-color-on-surface-variant: #404944;
+  --md-sys-color-on-surface-variant-rgb: 64 73 68;
   --md-sys-color-outline: #707974;
+  --md-sys-color-outline-rgb: 112 121 116;
   --md-sys-color-outline-variant: #c0c9c2;
+  --md-sys-color-outline-variant-rgb: 192 201 194;
   --md-sys-color-error: #ba1a1a;
+  --md-sys-color-error-rgb: 186 26 26;
   --md-sys-color-on-error: #ffffff;
+  --md-sys-color-on-error-rgb: 255 255 255;
   --md-sys-color-error-container: #ffdad6;
+  --md-sys-color-error-container-rgb: 255 218 214;
   --md-sys-color-on-error-container: #410002;
+  --md-sys-color-on-error-container-rgb: 65 0 2;
   --md-sys-color-positive: #0f7648;
+  --md-sys-color-positive-rgb: 15 118 72;
   --md-sys-color-positive-container: #d1f7e3;
+  --md-sys-color-positive-container-rgb: 209 247 227;
   --md-sys-color-on-positive-container: #043920;
+  --md-sys-color-on-positive-container-rgb: 4 57 32;
   --md-sys-color-warning: #a15c00;
+  --md-sys-color-warning-rgb: 161 92 0;
   --md-sys-color-warning-container: #ffebcc;
+  --md-sys-color-warning-container-rgb: 255 235 204;
   --md-sys-color-on-warning-container: #3d2100;
+  --md-sys-color-on-warning-container-rgb: 61 33 0;
 
   --font-display: "Google Sans Flex", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-sans: "Google Sans Flex", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -181,22 +213,21 @@ body {
 
 .m3-btn-outlined,
 .btn-action-secondary {
-  background-color: var(--md-sys-color-surface-container-lowest);
+  background-color: var(--md-sys-color-surface-container-high);
   color: var(--md-sys-color-on-surface);
-  border: 1px solid var(--md-sys-color-outline-variant);
+  border: none;
   border-radius: 9999px;
   font-weight: 600;
   cursor: pointer;
   transition: transform 240ms var(--md-motion-spring),
     border-radius 220ms var(--md-motion-spring),
     background-color 160ms ease,
-    border-color 160ms ease;
+    filter 160ms ease;
 }
 
 .m3-btn-outlined:hover,
 .btn-action-secondary:hover {
-  background-color: var(--md-sys-color-surface-container-high);
-  border-color: var(--md-sys-color-outline);
+  background-color: var(--md-sys-color-surface-container-highest);
   transform: translateY(-1px);
 }
 
@@ -212,17 +243,27 @@ body {
 
 .m3-card {
   background-color: var(--md-sys-color-surface-container-lowest);
-  border: 1px solid var(--md-sys-color-outline-variant);
+  border: none;
   border-radius: 26px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 14px -4px rgba(0, 0, 0, 0.05);
   transition: transform 260ms var(--md-motion-spring),
     box-shadow 220ms var(--md-motion-emphasized),
-    border-color 180ms ease,
     background-color 220ms ease;
 }
 
+.dark .m3-card {
+  background-color: var(--md-sys-color-surface-container);
+  box-shadow: 0 2px 10px -2px rgba(0, 0, 0, 0.25);
+}
+
 .m3-card:hover {
-  border-color: var(--md-sys-color-primary);
   box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+
+.dark .m3-card:hover {
+  background-color: var(--md-sys-color-surface-container-high);
+  box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.35);
 }
 
 .bg-grid-subtle {

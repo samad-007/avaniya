@@ -11,39 +11,60 @@ const config: Config = {
     extend: {
       colors: {
         md: {
-          primary: "var(--md-sys-color-primary)",
-          "on-primary": "var(--md-sys-color-on-primary)",
-          "primary-container": "var(--md-sys-color-primary-container)",
-          "on-primary-container": "var(--md-sys-color-on-primary-container)",
-          secondary: "var(--md-sys-color-secondary)",
-          "on-secondary": "var(--md-sys-color-on-secondary)",
-          "secondary-container": "var(--md-sys-color-secondary-container)",
+          primary: "rgb(var(--md-sys-color-primary-rgb) / <alpha-value>)",
+          "on-primary": "rgb(var(--md-sys-color-on-primary-rgb) / <alpha-value>)",
+          "primary-container":
+            "rgb(var(--md-sys-color-primary-container-rgb) / <alpha-value>)",
+          "on-primary-container":
+            "rgb(var(--md-sys-color-on-primary-container-rgb) / <alpha-value>)",
+          secondary: "rgb(var(--md-sys-color-secondary-rgb) / <alpha-value>)",
+          "on-secondary":
+            "rgb(var(--md-sys-color-on-secondary-rgb) / <alpha-value>)",
+          "secondary-container":
+            "rgb(var(--md-sys-color-secondary-container-rgb) / <alpha-value>)",
           "on-secondary-container":
-            "var(--md-sys-color-on-secondary-container)",
-          tertiary: "var(--md-sys-color-tertiary)",
-          "on-tertiary": "var(--md-sys-color-on-tertiary)",
-          "tertiary-container": "var(--md-sys-color-tertiary-container)",
-          "on-tertiary-container": "var(--md-sys-color-on-tertiary-container)",
-          surface: "var(--md-sys-color-surface)",
-          "surface-lowest": "var(--md-sys-color-surface-container-lowest)",
-          "surface-low": "var(--md-sys-color-surface-container-low)",
-          "surface-container": "var(--md-sys-color-surface-container)",
-          "surface-high": "var(--md-sys-color-surface-container-high)",
-          "surface-highest": "var(--md-sys-color-surface-container-highest)",
-          "on-surface": "var(--md-sys-color-on-surface)",
-          "on-surface-variant": "var(--md-sys-color-on-surface-variant)",
-          outline: "var(--md-sys-color-outline)",
-          "outline-variant": "var(--md-sys-color-outline-variant)",
-          error: "var(--md-sys-color-error)",
-          "on-error": "var(--md-sys-color-on-error)",
-          "error-container": "var(--md-sys-color-error-container)",
-          "on-error-container": "var(--md-sys-color-on-error-container)",
-          positive: "var(--md-sys-color-positive)",
-          "positive-container": "var(--md-sys-color-positive-container)",
-          "on-positive-container": "var(--md-sys-color-on-positive-container)",
-          warning: "var(--md-sys-color-warning)",
-          "warning-container": "var(--md-sys-color-warning-container)",
-          "on-warning-container": "var(--md-sys-color-on-warning-container)",
+            "rgb(var(--md-sys-color-on-secondary-container-rgb) / <alpha-value>)",
+          tertiary: "rgb(var(--md-sys-color-tertiary-rgb) / <alpha-value>)",
+          "on-tertiary":
+            "rgb(var(--md-sys-color-on-tertiary-rgb) / <alpha-value>)",
+          "tertiary-container":
+            "rgb(var(--md-sys-color-tertiary-container-rgb) / <alpha-value>)",
+          "on-tertiary-container":
+            "rgb(var(--md-sys-color-on-tertiary-container-rgb) / <alpha-value>)",
+          surface: "rgb(var(--md-sys-color-surface-rgb) / <alpha-value>)",
+          "surface-lowest":
+            "rgb(var(--md-sys-color-surface-container-lowest-rgb) / <alpha-value>)",
+          "surface-low":
+            "rgb(var(--md-sys-color-surface-container-low-rgb) / <alpha-value>)",
+          "surface-container":
+            "rgb(var(--md-sys-color-surface-container-rgb) / <alpha-value>)",
+          "surface-high":
+            "rgb(var(--md-sys-color-surface-container-high-rgb) / <alpha-value>)",
+          "surface-highest":
+            "rgb(var(--md-sys-color-surface-container-highest-rgb) / <alpha-value>)",
+          "on-surface":
+            "rgb(var(--md-sys-color-on-surface-rgb) / <alpha-value>)",
+          "on-surface-variant":
+            "rgb(var(--md-sys-color-on-surface-variant-rgb) / <alpha-value>)",
+          outline: "rgb(var(--md-sys-color-outline-rgb) / <alpha-value>)",
+          "outline-variant":
+            "rgb(var(--md-sys-color-outline-variant-rgb) / <alpha-value>)",
+          error: "rgb(var(--md-sys-color-error-rgb) / <alpha-value>)",
+          "on-error": "rgb(var(--md-sys-color-on-error-rgb) / <alpha-value>)",
+          "error-container":
+            "rgb(var(--md-sys-color-error-container-rgb) / <alpha-value>)",
+          "on-error-container":
+            "rgb(var(--md-sys-color-on-error-container-rgb) / <alpha-value>)",
+          positive: "rgb(var(--md-sys-color-positive-rgb) / <alpha-value>)",
+          "positive-container":
+            "rgb(var(--md-sys-color-positive-container-rgb) / <alpha-value>)",
+          "on-positive-container":
+            "rgb(var(--md-sys-color-on-positive-container-rgb) / <alpha-value>)",
+          warning: "rgb(var(--md-sys-color-warning-rgb) / <alpha-value>)",
+          "warning-container":
+            "rgb(var(--md-sys-color-warning-container-rgb) / <alpha-value>)",
+          "on-warning-container":
+            "rgb(var(--md-sys-color-on-warning-container-rgb) / <alpha-value>)",
         },
       },
       fontFamily: {

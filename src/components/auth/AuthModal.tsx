@@ -103,15 +103,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           onClose();
         }
       }}
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto overflow-x-hidden animate-backdrop ${
-        allowClose
-          ? "bg-black/50 backdrop-blur-sm"
-          : "bg-md-surface bg-grid-subtle"
-      }`}
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto overflow-x-hidden animate-backdrop ${ allowClose ? "bg-black/50 backdrop-blur-sm" : "bg-md-surface bg-grid-subtle" }`}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative bg-md-surface-lowest border border-md-outline-variant rounded-[32px] max-w-md w-full min-w-0 p-6 sm:p-8 shadow-m3-3 flex flex-col gap-5 my-auto overflow-y-auto overflow-x-hidden animate-modal"
+        className="relative bg-md-surface-lowest dark:bg-md-surface-low rounded-[32px] max-w-md w-full min-w-0 p-6 sm:p-8 shadow-m3-3 flex flex-col gap-5 my-auto overflow-y-auto overflow-x-hidden animate-modal"
       >
         <div className="absolute right-4 top-4 flex items-center gap-1.5">
           <button
@@ -141,7 +137,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Brand Header */}
         <div className="flex flex-col items-center text-center gap-2.5 min-w-0 pt-1">
-          <div className="relative w-16 h-16 rounded-[22px] overflow-hidden border border-md-outline-variant bg-md-primary-container p-0.5 shadow-m3-1 flex-shrink-0">
+          <div className="relative w-16 h-16 rounded-[22px] overflow-hidden bg-md-primary-container p-0.5 shadow-m3-1 flex-shrink-0">
             <Image
               src="/logo.jpg"
               alt="Avaniya"
@@ -169,11 +165,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               setTab("login");
               setErrorMsg("");
             }}
-            className={`py-2 rounded-full text-sm font-semibold transition-all duration-200 truncate ${
-              tab === "login"
-                ? "bg-md-primary text-md-on-primary shadow-m3-1"
-                : "text-md-on-surface-variant hover:text-md-on-surface"
-            }`}
+            className={`py-2 rounded-full text-sm font-semibold transition-all duration-200 truncate ${ tab === "login" ? "bg-md-primary text-md-on-primary shadow-m3-1" : "text-md-on-surface-variant hover:text-md-on-surface" }`}
           >
             Sign In
           </button>
@@ -183,11 +175,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               setTab("signup");
               setErrorMsg("");
             }}
-            className={`py-2 rounded-full text-sm font-semibold transition-all duration-200 truncate ${
-              tab === "signup"
-                ? "bg-md-primary text-md-on-primary shadow-m3-1"
-                : "text-md-on-surface-variant hover:text-md-on-surface"
-            }`}
+            className={`py-2 rounded-full text-sm font-semibold transition-all duration-200 truncate ${ tab === "signup" ? "bg-md-primary text-md-on-primary shadow-m3-1" : "text-md-on-surface-variant hover:text-md-on-surface" }`}
           >
             Create Account
           </button>
@@ -217,7 +205,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Rajesh Properties"
-                  className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-2xl pl-10 pr-3.5 py-2.5 text-md-on-surface placeholder:text-md-on-surface-variant/60 text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary focus:ring-2 focus:ring-md-primary/20 transition-all"
+                  className="w-full min-w-0 bg-md-surface-container rounded-2xl pl-10 pr-3.5 py-2.5 text-md-on-surface placeholder:text-md-on-surface-variant/60 text-sm outline-none focus:bg-md-surface-high focus:ring-2 focus:ring-md-primary transition-all"
                   required={tab === "signup"}
                 />
               </div>
@@ -235,7 +223,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
-                className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-2xl pl-10 pr-3.5 py-2.5 text-md-on-surface placeholder:text-md-on-surface-variant/60 text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary focus:ring-2 focus:ring-md-primary/20 transition-all"
+                className="w-full min-w-0 bg-md-surface-container rounded-2xl pl-10 pr-3.5 py-2.5 text-md-on-surface placeholder:text-md-on-surface-variant/60 text-sm outline-none focus:bg-md-surface-high focus:ring-2 focus:ring-md-primary transition-all"
                 required
               />
             </div>
@@ -252,7 +240,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-2xl pl-10 pr-10 py-2.5 text-md-on-surface placeholder:text-md-on-surface-variant/60 text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary focus:ring-2 focus:ring-md-primary/20 transition-all"
+                className="w-full min-w-0 bg-md-surface-container rounded-2xl pl-10 pr-10 py-2.5 text-md-on-surface placeholder:text-md-on-surface-variant/60 text-sm outline-none focus:bg-md-surface-high focus:ring-2 focus:ring-md-primary transition-all"
                 required
               />
               <button
@@ -287,7 +275,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </form>
 
         {/* Demo Fast Track */}
-        <div className="pt-4 border-t border-md-outline-variant/60 flex flex-col gap-2.5">
+        <div className="pt-2 flex flex-col gap-2.5">
           <button
             type="button"
             onClick={handleDemoLogin}

@@ -31,10 +31,10 @@ export const ThemeSettingsModal: React.FC<ThemeSettingsModalProps> = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-md-surface-lowest border border-md-outline-variant rounded-[28px] max-w-2xl w-full min-w-0 max-h-[92vh] overflow-y-auto overflow-x-hidden p-5 sm:p-7 shadow-m3-3 my-auto flex flex-col gap-6 animate-modal"
+        className="bg-md-surface-lowest dark:bg-md-surface-low rounded-[28px] max-w-2xl w-full min-w-0 max-h-[92vh] overflow-y-auto overflow-x-hidden p-5 sm:p-7 shadow-m3-3 my-auto flex flex-col gap-6 animate-modal"
       >
         {/* Header */}
-        <div className="flex items-start justify-between gap-3 pb-4 border-b border-md-outline-variant/60">
+        <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-11 h-11 rounded-[16px] bg-md-primary-container text-md-on-primary-container flex items-center justify-center flex-shrink-0">
               <Palette className="w-5 h-5" />
@@ -73,11 +73,7 @@ export const ThemeSettingsModal: React.FC<ThemeSettingsModalProps> = ({
             <button
               type="button"
               onClick={() => setMode("light")}
-              className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-full text-sm font-semibold transition-all duration-200 ${
-                mode === "light"
-                  ? "bg-md-primary text-md-on-primary shadow-m3-1"
-                  : "text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high"
-              }`}
+              className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-full text-sm font-semibold transition-all duration-200 ${ mode === "light" ? "bg-md-primary text-md-on-primary shadow-m3-1" : "text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high" }`}
             >
               <Sun className="w-4 h-4" />
               <span>Light Mode</span>
@@ -85,11 +81,7 @@ export const ThemeSettingsModal: React.FC<ThemeSettingsModalProps> = ({
             <button
               type="button"
               onClick={() => setMode("dark")}
-              className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-full text-sm font-semibold transition-all duration-200 ${
-                mode === "dark"
-                  ? "bg-md-primary text-md-on-primary shadow-m3-1"
-                  : "text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high"
-              }`}
+              className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-full text-sm font-semibold transition-all duration-200 ${ mode === "dark" ? "bg-md-primary text-md-on-primary shadow-m3-1" : "text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high" }`}
             >
               <Moon className="w-4 h-4" />
               <span>Dark Mode</span>
@@ -121,11 +113,7 @@ export const ThemeSettingsModal: React.FC<ThemeSettingsModalProps> = ({
                   key={p.id}
                   type="button"
                   onClick={() => setPaletteId(p.id)}
-                  className={`group relative flex flex-col gap-2.5 p-3.5 rounded-[22px] border text-left transition-all duration-200 active:scale-[0.98] ${
-                    isSelected
-                      ? "bg-md-primary-container/50 border-md-primary ring-2 ring-md-primary/25 shadow-m3-1"
-                      : "bg-md-surface-low border-md-outline-variant/80 hover:border-md-outline hover:bg-md-surface-container"
-                  }`}
+                  className={`group relative flex flex-col gap-2.5 p-3.5 rounded-[22px] text-left transition-all duration-200 active:scale-[0.98] ${ isSelected ? "bg-md-primary-container/60 ring-2 ring-md-primary shadow-m3-1" : "bg-md-surface-container hover:bg-md-surface-high" }`}
                 >
                   {/* M3 3-Tone Expressive Color Wheel Badge */}
                   <div className="flex items-center justify-between gap-2 w-full">
@@ -168,7 +156,7 @@ export const ThemeSettingsModal: React.FC<ThemeSettingsModalProps> = ({
 
         {/* Section 3: Quick Link to Categories */}
         {onOpenCategories && (
-          <div className="pt-4 border-t border-md-outline-variant/60 flex items-center justify-between gap-3 flex-wrap">
+          <div className="p-4 rounded-[22px] bg-md-surface-container flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-full bg-md-secondary-container text-md-on-secondary-container flex items-center justify-center flex-shrink-0">
                 <Tag className="w-4 h-4" />

@@ -143,7 +143,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
   );
 
   const renderFilterBar = () => (
-    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 bg-md-surface-lowest p-3 rounded-[24px] border border-md-outline-variant shadow-m3-1">
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 bg-md-surface-lowest dark:bg-md-surface-container p-3 rounded-[24px] shadow-m3-1">
       <div className="relative flex-1">
         <Search className="w-4 h-4 text-md-on-surface-variant absolute left-3.5 top-1/2 -translate-y-1/2" />
         <input
@@ -151,12 +151,12 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search by property, category, or notes..."
-          className="w-full bg-md-surface-low border border-md-outline-variant rounded-[18px] pl-10 pr-3.5 py-2 text-xs text-md-on-surface placeholder:text-md-on-surface-variant outline-none focus:bg-md-surface-lowest focus:border-md-primary focus:ring-2 focus:ring-md-primary/20 transition-all"
+          className="w-full bg-md-surface-low dark:bg-md-surface-high rounded-full pl-10 pr-4 py-2 text-xs text-md-on-surface placeholder:text-md-on-surface-variant outline-none focus:ring-2 focus:ring-md-primary transition-all"
         />
       </div>
 
       <div className="flex items-center gap-2 overflow-x-auto pb-0.5 scrollbar-none">
-        <div className="flex items-center gap-0.5 bg-md-surface-container p-1 rounded-[18px] border border-md-outline-variant/80">
+        <div className="flex items-center gap-0.5 bg-md-surface-container dark:bg-md-surface-high p-1 rounded-full">
           {(
             [
               { id: "all", label: "All Time" },
@@ -169,18 +169,14 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
               key={chip.id}
               type="button"
               onClick={() => setDateFilter(chip.id)}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all whitespace-nowrap ${
-                dateFilter === chip.id
-                  ? "bg-md-surface-lowest text-md-on-surface shadow-sm"
-                  : "text-md-on-surface-variant hover:text-md-on-surface"
-              }`}
+              className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-all whitespace-nowrap ${ dateFilter === chip.id ? "bg-md-primary text-md-on-primary shadow-sm" : "text-md-on-surface-variant hover:text-md-on-surface" }`}
             >
               {chip.label}
             </button>
           ))}
         </div>
 
-        <div className="flex items-center gap-0.5 bg-md-surface-container p-1 rounded-[18px] border border-md-outline-variant/80">
+        <div className="flex items-center gap-0.5 bg-md-surface-container dark:bg-md-surface-high p-1 rounded-full">
           {(
             [
               { id: "all", label: "All" },
@@ -192,11 +188,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
               key={m.id}
               type="button"
               onClick={() => setModeFilter(m.id)}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all whitespace-nowrap ${
-                modeFilter === m.id
-                  ? "bg-md-surface-lowest text-md-on-surface shadow-sm"
-                  : "text-md-on-surface-variant hover:text-md-on-surface"
-              }`}
+              className={`px-3 py-1 rounded-full text-[11px] font-semibold transition-all whitespace-nowrap ${ modeFilter === m.id ? "bg-md-primary text-md-on-primary shadow-sm" : "text-md-on-surface-variant hover:text-md-on-surface" }`}
             >
               {m.label}
             </button>
@@ -208,58 +200,42 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Sub Navigation Pills */}
-      <div className="flex items-center justify-between border-b border-md-outline-variant overflow-x-auto pb-0.5 gap-3 scrollbar-none">
-        <div className="flex items-center gap-1">
+      {/* M3 Expressive Pill Navigation Tabs */}
+      <div className="flex items-center justify-between overflow-x-auto gap-3 scrollbar-none">
+        <div className="flex items-center gap-1 bg-md-surface-container p-1.5 rounded-full">
           <button
             onClick={() => setActiveSubTab("properties")}
-            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all flex items-center gap-1.5 ${
-              activeSubTab === "properties"
-                ? "border-md-primary text-md-on-surface"
-                : "border-transparent text-md-on-surface-variant hover:text-md-on-surface"
-            }`}
+            className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-full whitespace-nowrap transition-all flex items-center gap-1.5 ${ activeSubTab === "properties" ? "bg-md-primary text-md-on-primary shadow-m3-1" : "text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high" }`}
           >
             <Home className="w-3.5 h-3.5" />
             <span>My Properties</span>
-            <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-md-surface-container text-md-on-surface-variant font-mono">
+            <span className={`text-[11px] px-1.5 py-0.5 rounded-full font-mono ${ activeSubTab === "properties" ? "bg-md-on-primary/20 text-md-on-primary" : "bg-md-surface-high text-md-on-surface-variant" }`}>
               {metrics.properties.length}
             </span>
           </button>
           <button
             onClick={() => setActiveSubTab("outflows")}
-            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all flex items-center gap-1.5 ${
-              activeSubTab === "outflows"
-                ? "border-md-primary text-md-on-surface"
-                : "border-transparent text-md-on-surface-variant hover:text-md-on-surface"
-            }`}
+            className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-full whitespace-nowrap transition-all flex items-center gap-1.5 ${ activeSubTab === "outflows" ? "bg-md-primary text-md-on-primary shadow-m3-1" : "text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high" }`}
           >
             <Receipt className="w-3.5 h-3.5" />
             <span>Payments Made</span>
-            <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-md-surface-container text-md-on-surface-variant font-mono">
+            <span className={`text-[11px] px-1.5 py-0.5 rounded-full font-mono ${ activeSubTab === "outflows" ? "bg-md-on-primary/20 text-md-on-primary" : "bg-md-surface-high text-md-on-surface-variant" }`}>
               {formatINRCompact(metrics.outflowsTotal)}
             </span>
           </button>
           <button
             onClick={() => setActiveSubTab("inflows")}
-            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all flex items-center gap-1.5 ${
-              activeSubTab === "inflows"
-                ? "border-md-primary text-md-on-surface"
-                : "border-transparent text-md-on-surface-variant hover:text-md-on-surface"
-            }`}
+            className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-full whitespace-nowrap transition-all flex items-center gap-1.5 ${ activeSubTab === "inflows" ? "bg-md-primary text-md-on-primary shadow-m3-1" : "text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high" }`}
           >
             <Wallet className="w-3.5 h-3.5" />
             <span>Funds Added</span>
-            <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-md-primary-container text-md-positive font-mono">
+            <span className={`text-[11px] px-1.5 py-0.5 rounded-full font-mono ${ activeSubTab === "inflows" ? "bg-md-on-primary/20 text-md-on-primary" : "bg-md-positive-container text-md-on-positive-container" }`}>
               {formatINRCompact(metrics.inflowsTotal)}
             </span>
           </button>
           <button
             onClick={() => setActiveSubTab("categories")}
-            className={`px-3.5 py-2.5 text-xs sm:text-sm font-semibold border-b-2 whitespace-nowrap transition-all flex items-center gap-1.5 ${
-              activeSubTab === "categories"
-                ? "border-md-primary text-md-on-surface"
-                : "border-transparent text-md-on-surface-variant hover:text-md-on-surface"
-            }`}
+            className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-full whitespace-nowrap transition-all flex items-center gap-1.5 ${ activeSubTab === "categories" ? "bg-md-primary text-md-on-primary shadow-m3-1" : "text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high" }`}
           >
             <PieChart className="w-3.5 h-3.5" />
             <span>Spending Breakdown</span>
@@ -267,7 +243,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 flex-shrink-0 pb-1.5">
+        <div className="flex items-center gap-2 flex-shrink-0">
           {activeSubTab === "outflows" && (
             <button
               onClick={() => onOpenEntryModal("outflow")}
@@ -302,8 +278,8 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
       {activeSubTab === "properties" && (
         <>
           {metrics.properties.length === 0 ? (
-            <div className="bg-md-surface-lowest border border-dashed border-md-outline rounded-[24px] p-10 text-center flex flex-col items-center gap-3 shadow-m3-1">
-              <div className="w-12 h-12 rounded-[24px] bg-md-primary-container border border-md-outline-variant flex items-center justify-center text-md-primary">
+            <div className="bg-md-surface-container/70 rounded-[24px] p-10 text-center flex flex-col items-center gap-3 shadow-m3-1">
+              <div className="w-12 h-12 rounded-[24px] bg-md-primary-container flex items-center justify-center text-md-primary">
                 <Home className="w-6 h-6" />
               </div>
               <h3 className="text-base font-bold text-md-on-surface">
@@ -343,7 +319,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                   <div
                     key={p.id}
                     onClick={() => onSelectProperty(pData)}
-                    className="bg-md-surface-lowest border border-md-outline-variant rounded-[24px] p-5 flex flex-col justify-between gap-4 cursor-pointer hover:border-md-primary shadow-m3-1 hover:shadow-m3-2 transition-standard group"
+                    className="bg-md-surface-lowest dark:bg-md-surface-container rounded-[24px] p-5 flex flex-col justify-between gap-4 cursor-pointer shadow-m3-1 hover:shadow-m3-2 transition-standard group"
                   >
                     {/* Header */}
                     <div className="flex items-start justify-between gap-2.5">
@@ -352,7 +328,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                           <span className="text-base sm:text-lg font-bold text-md-on-surface group-hover:text-md-positive transition-colors">
                             {p.name}
                           </span>
-                          <span className="font-mono text-[11px] font-semibold px-2 py-0.5 rounded-md bg-md-surface-container text-md-on-surface-variant border border-md-outline-variant">
+                          <span className="font-mono text-[11px] font-semibold px-2 py-0.5 rounded-md bg-md-surface-container text-md-on-surface-variant">
                             {p.propertyCode}
                           </span>
                         </div>
@@ -367,7 +343,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                             <span>Booked {formatDateIN(p.acquisitionDate)}</span>
                           )}
                           {p.agreementDueDate && (
-                            <span className="flex items-center gap-1 font-mono text-[11px] font-semibold px-2 py-0.5 rounded-full bg-md-warning-container text-md-warning border border-md-outline-variant">
+                            <span className="flex items-center gap-1 font-mono text-[11px] font-semibold px-2 py-0.5 rounded-full bg-md-warning-container text-md-warning">
                               <Clock className="w-3 h-3" />
                               Due {formatDateIN(p.agreementDueDate)}
                             </span>
@@ -384,7 +360,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                               formatPersonalPropertyWhatsApp(pData)
                             );
                           }}
-                          className="p-2 rounded-[18px] bg-md-primary-container border border-md-outline-variant text-md-positive hover:bg-md-primary-container transition-colors"
+                          className="p-2 rounded-[18px] bg-md-primary-container text-md-positive hover:bg-md-primary-container transition-colors"
                           title="Share summary on WhatsApp"
                         >
                           <Share2 className="w-3.5 h-3.5" />
@@ -395,7 +371,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="p-2 rounded-[18px] bg-md-tertiary-container border border-md-outline-variant text-md-tertiary hover:bg-md-tertiary-container transition-colors"
+                            className="p-2 rounded-[18px] bg-md-tertiary-container text-md-tertiary hover:bg-md-tertiary-container transition-colors"
                             title="Open documents"
                           >
                             <Link2 className="w-3.5 h-3.5" />
@@ -408,7 +384,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                               e.stopPropagation();
                               onEditProperty(p);
                             }}
-                            className="p-2 rounded-[18px] bg-md-surface-low border border-md-outline-variant text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container transition-colors"
+                            className="p-2 rounded-[18px] bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container transition-colors"
                             title="Edit property details"
                           >
                             <Pencil className="w-3.5 h-3.5" />
@@ -418,7 +394,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                     </div>
 
                     {/* Financial Summary */}
-                    <div className="grid grid-cols-2 gap-2.5 bg-md-surface-low p-3.5 rounded-[18px] border border-md-outline-variant/80">
+                    <div className="grid grid-cols-2 gap-2.5 bg-md-surface-low dark:bg-md-surface-high/60 p-3.5 rounded-[18px]">
                       <div>
                         <div className="text-[11px] font-semibold text-md-on-surface-variant">
                           Total Cost
@@ -466,18 +442,16 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                       </div>
                       <div className="w-full h-2 bg-md-surface-container rounded-full overflow-hidden">
                         <div
-                          className={`h-full rounded-full transition-all duration-300 ${
-                            progress >= 100 ? "bg-md-primary-container0" : "bg-md-primary"
-                          }`}
+                          className={`h-full rounded-full transition-all duration-300 ${ progress >= 100 ? "bg-md-primary" : "bg-md-primary" }`}
                           style={{ width: `${progress}%` }}
                         ></div>
                       </div>
                     </div>
 
                     {/* Footer Row */}
-                    <div className="flex items-center justify-between pt-2 border-t border-md-outline-variant/60 text-xs">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-semibold bg-md-warning-container text-md-warning border border-md-outline-variant">
-                        <span className="w-1.5 h-1.5 rounded-full bg-md-warning-container0" />
+                    <div className="flex items-center justify-between pt-2 text-xs">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-semibold bg-md-warning-container text-md-warning">
+                        <span className="w-1.5 h-1.5 rounded-full bg-md-warning" />
                         {formatStatusLabel(p.status)}
                       </span>
                       <span className="text-md-on-surface-variant group-hover:text-md-positive font-semibold flex items-center gap-1 transition-colors">
@@ -496,10 +470,10 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
       {activeSubTab === "outflows" && (
         <div className="flex flex-col gap-3">
           {renderFilterBar()}
-          <div className="border border-md-outline-variant rounded-[24px] overflow-x-auto bg-md-surface-lowest shadow-m3-1">
+          <div className="rounded-[24px] overflow-x-auto bg-md-surface-lowest dark:bg-md-surface-container shadow-m3-1">
             <table className="w-full text-left text-sm border-collapse">
               <thead>
-                <tr className="bg-md-surface-low border-b border-md-outline-variant text-md-on-surface-variant uppercase text-[11px] font-bold tracking-wider">
+                <tr className="bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant uppercase text-[11px] font-bold tracking-wider">
                   <th className="py-3.5 px-4">Date</th>
                   <th className="py-3.5 px-4">Property</th>
                   <th className="py-3.5 px-4">Category</th>
@@ -509,7 +483,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                   <th className="py-3.5 px-4 text-right">Edit</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-md-outline-variant/50">
+              <tbody className="">
                 {filteredOutflows.length === 0 ? (
                   <tr>
                     <td
@@ -523,7 +497,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                   filteredOutflows.map((t) => (
                     <tr
                       key={t.id}
-                      className="hover:bg-md-surface-low transition-colors"
+                      className="even:bg-md-surface-low/50 dark:even:bg-md-surface-low/40 hover:bg-md-surface-high/60 transition-colors"
                     >
                       <td className="py-3.5 px-4 text-md-on-surface-variant whitespace-nowrap">
                         {formatDateIN(t.date)}
@@ -536,11 +510,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                       </td>
                       <td className="py-3.5 px-4">
                         <span
-                          className={`font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
-                            t.mode === "Cash"
-                              ? "bg-md-warning-container text-md-warning border-md-outline-variant"
-                              : "bg-md-tertiary-container text-md-tertiary border-md-outline-variant"
-                          }`}
+                          className={`font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full ${ t.mode === "Cash" ? "bg-md-warning-container text-md-warning " : "bg-md-tertiary-container text-md-tertiary " }`}
                         >
                           {t.mode}
                         </span>
@@ -568,7 +538,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                         {onEditTransaction && (
                           <button
                             onClick={() => onEditTransaction(t)}
-                            className="p-1.5 rounded-lg bg-md-surface-low border border-md-outline-variant text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container inline-flex items-center justify-center transition-colors"
+                            className="p-1.5 rounded-lg bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container inline-flex items-center justify-center transition-colors"
                             title="Edit entry"
                           >
                             <Pencil className="w-3.5 h-3.5" />
@@ -580,7 +550,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                 )}
               </tbody>
               <tfoot>
-                <tr className="bg-md-surface-low border-t border-md-outline-variant font-bold text-md-on-surface text-sm">
+                <tr className="bg-md-surface-container dark:bg-md-surface-high font-bold text-md-on-surface text-sm">
                   <td colSpan={4} className="py-3.5 px-4">
                     Total Payments (Filtered)
                   </td>
@@ -601,10 +571,10 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
       {activeSubTab === "inflows" && (
         <div className="flex flex-col gap-3">
           {renderFilterBar()}
-          <div className="border border-md-outline-variant rounded-[24px] overflow-x-auto bg-md-surface-lowest shadow-m3-1">
+          <div className="rounded-[24px] overflow-x-auto bg-md-surface-lowest dark:bg-md-surface-container shadow-m3-1">
             <table className="w-full text-left text-sm border-collapse">
               <thead>
-                <tr className="bg-md-surface-low border-b border-md-outline-variant text-md-on-surface-variant uppercase text-[11px] font-bold tracking-wider">
+                <tr className="bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant uppercase text-[11px] font-bold tracking-wider">
                   <th className="py-3.5 px-4">Date</th>
                   <th className="py-3.5 px-4">Type</th>
                   <th className="py-3.5 px-4">Source / Purpose</th>
@@ -614,7 +584,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                   <th className="py-3.5 px-4 text-right">Edit</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-md-outline-variant/50">
+              <tbody className="">
                 {filteredInflowsAndWithdrawals.length === 0 ? (
                   <tr>
                     <td
@@ -630,18 +600,14 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                     return (
                       <tr
                         key={t.id}
-                        className="hover:bg-md-surface-low transition-colors"
+                        className="even:bg-md-surface-low/50 dark:even:bg-md-surface-low/40 hover:bg-md-surface-high/60 transition-colors"
                       >
                         <td className="py-3.5 px-4 text-md-on-surface-variant whitespace-nowrap">
                           {formatDateIN(t.date)}
                         </td>
                         <td className="py-3.5 px-4">
                           <span
-                            className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
-                              isInflow
-                                ? "bg-md-primary-container text-md-positive border-md-outline-variant"
-                                : "bg-md-error-container text-md-error border-md-outline-variant"
-                            }`}
+                            className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${ isInflow ? "bg-md-primary-container text-md-positive " : "bg-md-error-container text-md-error " }`}
                           >
                             {isInflow ? "Funds Added" : "Withdrawn"}
                           </span>
@@ -650,14 +616,12 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                           {t.recipientOrSource || t.category}
                         </td>
                         <td className="py-3.5 px-4">
-                          <span className="font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full border bg-md-tertiary-container text-md-tertiary border-md-outline-variant">
+                          <span className="font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full bg-md-tertiary-container text-md-tertiary">
                             {t.mode}
                           </span>
                         </td>
                         <td
-                          className={`py-3.5 px-4 text-right font-mono font-bold ${
-                            isInflow ? "text-md-positive" : "text-md-error"
-                          }`}
+                          className={`py-3.5 px-4 text-right font-mono font-bold ${ isInflow ? "text-md-positive" : "text-md-error" }`}
                         >
                           {isInflow ? "+" : "-"}
                           {formatINR(t.amount)}
@@ -682,7 +646,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                           {onEditTransaction && (
                             <button
                               onClick={() => onEditTransaction(t)}
-                              className="p-1.5 rounded-lg bg-md-surface-low border border-md-outline-variant text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container inline-flex items-center justify-center transition-colors"
+                              className="p-1.5 rounded-lg bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container inline-flex items-center justify-center transition-colors"
                               title="Edit entry"
                             >
                               <Pencil className="w-3.5 h-3.5" />
@@ -695,7 +659,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                 )}
               </tbody>
               <tfoot>
-                <tr className="bg-md-surface-low border-t border-md-outline-variant font-bold text-md-on-surface text-sm">
+                <tr className="bg-md-surface-container dark:bg-md-surface-high font-bold text-md-on-surface text-sm">
                   <td colSpan={4} className="py-3.5 px-4">
                     Net Personal Funds (Filtered)
                   </td>
@@ -719,7 +683,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
       {/* SubTab 4: Spending Breakdown */}
       {activeSubTab === "categories" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="border border-md-outline-variant rounded-[24px] p-6 bg-md-surface-lowest shadow-m3-1 flex flex-col gap-4">
+          <div className="rounded-[24px] p-6 bg-md-surface-lowest dark:bg-md-surface-container shadow-m3-1 flex flex-col gap-4">
             <h3 className="text-sm font-bold text-md-on-surface">
               Where Your Money Went
             </h3>
@@ -744,7 +708,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                     </div>
                     <div className="w-full h-2 bg-md-surface-container rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-md-primary-container0 rounded-full"
+                        className="h-full bg-md-primary rounded-full"
                         style={{ width: `${cat.percentage}%` }}
                       ></div>
                     </div>
@@ -754,7 +718,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
             )}
           </div>
 
-          <div className="border border-md-outline-variant rounded-[24px] p-6 bg-md-surface-lowest shadow-m3-1 flex flex-col justify-between gap-4">
+          <div className="rounded-[24px] p-6 bg-md-surface-lowest dark:bg-md-surface-container shadow-m3-1 flex flex-col justify-between gap-4">
             <div>
               <h3 className="text-sm font-bold text-md-on-surface">
                 Available Balance Split
@@ -764,7 +728,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
               </p>
             </div>
             <div className="grid grid-cols-2 gap-3.5 my-auto">
-              <div className="bg-md-primary-container/50 p-4 rounded-[18px] border border-md-outline-variant">
+              <div className="bg-md-primary-container/50 p-4 rounded-[18px]">
                 <div className="text-xs font-semibold text-md-positive">
                   Bank Balance
                 </div>
@@ -772,7 +736,7 @@ export const PersonalView: React.FC<PersonalViewProps> = ({
                   {formatINR(metrics.currentBankBalance)}
                 </div>
               </div>
-              <div className="bg-md-surface-low p-4 rounded-[18px] border border-md-outline-variant">
+              <div className="bg-md-surface-low p-4 rounded-[18px]">
                 <div className="text-xs font-semibold text-md-on-surface-variant">
                   Cash in Hand
                 </div>

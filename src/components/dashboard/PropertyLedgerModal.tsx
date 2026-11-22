@@ -97,12 +97,12 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-md-surface-lowest border border-md-outline-variant rounded-[24px] max-w-4xl w-full min-w-0 max-h-[92vh] flex flex-col shadow-m3-3 overflow-hidden my-auto animate-modal"
+        className="bg-md-surface-lowest dark:bg-md-surface-container rounded-[24px] max-w-4xl w-full min-w-0 max-h-[92vh] flex flex-col shadow-m3-3 overflow-hidden my-auto animate-modal"
       >
         {/* Modal Header */}
-        <div className="p-4 md:p-5 border-b border-md-outline-variant flex items-start justify-between bg-md-surface-low gap-3 flex-wrap sm:flex-nowrap">
+        <div className="p-4 md:p-5 flex items-start justify-between bg-md-surface-low gap-3 flex-wrap sm:flex-nowrap">
           <div className="flex items-start gap-3.5 min-w-0 flex-1">
-            <div className="w-11 h-11 rounded-[18px] bg-md-primary-container border border-md-outline-variant flex items-center justify-center text-md-positive font-bold font-mono text-sm flex-shrink-0">
+            <div className="w-11 h-11 rounded-[18px] bg-md-primary-container flex items-center justify-center text-md-positive font-bold font-mono text-sm flex-shrink-0">
               {prop.propertyCode.slice(0, 3)}
             </div>
             <div className="min-w-0 flex-1">
@@ -110,29 +110,17 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                 <h2 className="text-xl md:text-2xl font-bold text-md-on-surface tracking-tight break-words">
                   {prop.name}
                 </h2>
-                <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded-md bg-md-surface-lowest text-md-on-surface-variant border border-md-outline-variant">
+                <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded-md bg-md-surface-lowest text-md-on-surface-variant">
                   {prop.propertyCode}
                 </span>
                 <span
-                  className={`text-xs px-2.5 py-0.5 rounded-full font-semibold border ${
-                    prop.status === "sold"
-                      ? "bg-md-primary-container text-md-positive border-md-outline-variant"
-                      : prop.status === "in_progress"
-                      ? "bg-md-warning-container text-md-warning border-md-outline-variant"
-                      : "bg-md-surface-container text-md-on-surface border-md-outline-variant"
-                  }`}
+                  className={`text-xs px-2.5 py-0.5 rounded-full font-semibold ${ prop.status === "sold" ? "bg-md-primary-container text-md-positive " : prop.status === "in_progress" ? "bg-md-warning-container text-md-warning " : "bg-md-surface-container text-md-on-surface " }`}
                 >
                   {formatStatusLabel(prop.status)}
                 </span>
                 {prop.agreementDueDate && (
                   <span
-                    className={`flex items-center gap-1 font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
-                      propertyMetrics?.deadlineStatus === "overdue"
-                        ? "bg-md-error-container text-md-error border-md-outline-variant"
-                        : propertyMetrics?.deadlineStatus === "urgent"
-                        ? "bg-md-warning-container text-md-warning border-md-outline-variant"
-                        : "bg-md-surface-lowest text-md-on-surface-variant border-md-outline-variant"
-                    }`}
+                    className={`flex items-center gap-1 font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full ${ propertyMetrics?.deadlineStatus === "overdue" ? "bg-md-error-container text-md-error " : propertyMetrics?.deadlineStatus === "urgent" ? "bg-md-warning-container text-md-warning " : "bg-md-surface-lowest text-md-on-surface-variant " }`}
                   >
                     <Clock className="w-3 h-3" />
                     Due {formatDateIN(prop.agreementDueDate)}
@@ -183,7 +171,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                 onClick={() =>
                   openWhatsAppShare(formatPropertyWhatsApp(propertyMetrics))
                 }
-                className="p-2 sm:px-3 rounded-[18px] bg-md-primary-container border border-md-outline-variant text-md-positive hover:bg-md-primary-container transition-colors flex items-center gap-1.5 text-xs font-semibold"
+                className="p-2 sm:px-3 rounded-[18px] bg-md-primary-container text-md-positive hover:bg-md-primary-container transition-colors flex items-center gap-1.5 text-xs font-semibold"
                 title="Share summary on WhatsApp"
               >
                 <Share2 className="w-3.5 h-3.5" />
@@ -196,7 +184,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                 href={prop.attachmentUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 sm:px-3 rounded-[18px] bg-md-tertiary-container border border-md-outline-variant text-md-tertiary hover:bg-md-tertiary-container transition-colors flex items-center gap-1.5 text-xs font-semibold"
+                className="p-2 sm:px-3 rounded-[18px] bg-md-tertiary-container text-md-tertiary hover:bg-md-tertiary-container transition-colors flex items-center gap-1.5 text-xs font-semibold"
                 title="Open attached documents"
               >
                 <Link2 className="w-3.5 h-3.5" />
@@ -230,7 +218,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
           {/* Commercial Financial Breakdown */}
           {isCommercial && propertyMetrics && (
             <div className="flex flex-col gap-3.5">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-md-surface-low p-4 rounded-[24px] border border-md-outline-variant">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-md-surface-low p-4 rounded-[24px]">
                 <div>
                   <div className="text-xs font-semibold text-md-on-surface-variant">
                     Buy Price
@@ -304,7 +292,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
               </div>
 
               {/* Sub-strip for Payments & Balances */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-md-surface-lowest p-4 rounded-[24px] border border-md-outline-variant text-xs sm:text-sm shadow-m3-1">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-md-surface-lowest p-4 rounded-[24px] text-xs sm:text-sm shadow-m3-1">
                 <div>
                   <span className="text-md-on-surface-variant text-xs font-medium block">
                     Paid to Seller (Bank)
@@ -353,7 +341,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
 
           {/* Personal Mode Financial Breakdown */}
           {!isCommercial && personalPropertyData && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5 bg-md-surface-low p-4 rounded-[24px] border border-md-outline-variant">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5 bg-md-surface-low p-4 rounded-[24px]">
               <div>
                 <div className="text-xs font-semibold text-md-on-surface-variant">
                   Total Property Cost
@@ -397,11 +385,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                 {prop.milestones.map((m, idx) => (
                   <div
                     key={idx}
-                    className={`p-3.5 rounded-[18px] border flex flex-col justify-between gap-2 ${
-                      m.status === "completed"
-                        ? "bg-md-primary-container/50 border-md-outline-variant text-md-on-surface"
-                        : "bg-md-surface-low border-md-outline-variant text-md-on-surface-variant"
-                    }`}
+                    className={`p-3.5 rounded-[18px] flex flex-col justify-between gap-2 ${ m.status === "completed" ? "bg-md-primary-container/50 text-md-on-surface" : "bg-md-surface-low text-md-on-surface-variant" }`}
                   >
                     <div className="flex items-center justify-between text-xs sm:text-sm">
                       <span className="font-semibold text-md-on-surface">
@@ -418,11 +402,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                         {formatINR(m.targetAmount)}
                       </span>
                       <span
-                        className={`text-[11px] font-semibold uppercase ${
-                          m.status === "completed"
-                            ? "text-md-positive"
-                            : "text-md-on-surface-variant"
-                        }`}
+                        className={`text-[11px] font-semibold uppercase ${ m.status === "completed" ? "text-md-positive" : "text-md-on-surface-variant" }`}
                       >
                         {m.status}
                       </span>
@@ -443,23 +423,23 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                 </div>
                 {propertyMetrics?.subPlotStats && (
                   <div className="flex items-center gap-2 text-xs font-mono">
-                    <span className="px-2.5 py-0.5 rounded-full bg-md-primary-container text-md-positive border border-md-outline-variant font-semibold">
+                    <span className="px-2.5 py-0.5 rounded-full bg-md-primary-container text-md-positive font-semibold">
                       {propertyMetrics.subPlotStats.sold} Sold
                     </span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-md-warning-container text-md-warning border border-md-outline-variant font-semibold">
+                    <span className="px-2.5 py-0.5 rounded-full bg-md-warning-container text-md-warning font-semibold">
                       {propertyMetrics.subPlotStats.booked} Booked
                     </span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-md-surface-container text-md-on-surface-variant border border-md-outline-variant font-semibold">
+                    <span className="px-2.5 py-0.5 rounded-full bg-md-surface-container text-md-on-surface-variant font-semibold">
                       {propertyMetrics.subPlotStats.available} Available
                     </span>
                   </div>
                 )}
               </div>
 
-              <div className="w-full min-w-0 border border-md-outline-variant rounded-[24px] overflow-x-auto bg-md-surface-lowest">
+              <div className="w-full min-w-0 rounded-[24px] overflow-x-auto bg-md-surface-lowest dark:bg-md-surface-container">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="bg-md-surface-low border-b border-md-outline-variant text-md-on-surface-variant uppercase font-bold tracking-wider">
+                    <tr className="bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant uppercase font-bold tracking-wider">
                       <th className="py-2.5 px-3.5">Plot #</th>
                       <th className="py-2.5 px-3.5">Area (Sq.ft)</th>
                       <th className="py-2.5 px-3.5 text-right">Target Price</th>
@@ -468,7 +448,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                       <th className="py-2.5 px-3.5 text-right">Sold Amount</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-md-outline-variant/50">
+                  <tbody className="">
                     {prop.subPlots.map((sp, idx) => (
                       <tr key={idx} className="hover:bg-md-surface-low">
                         <td className="py-2.5 px-3.5 font-mono font-bold text-md-on-surface">
@@ -484,13 +464,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                         </td>
                         <td className="py-2.5 px-3.5">
                           <span
-                            className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border capitalize ${
-                              sp.status === "sold"
-                                ? "bg-md-primary-container text-md-positive border-md-outline-variant"
-                                : sp.status === "booked"
-                                ? "bg-md-warning-container text-md-warning border-md-outline-variant"
-                                : "bg-md-surface-container text-md-on-surface-variant border-md-outline-variant"
-                            }`}
+                            className={`text-[11px] font-semibold px-2 py-0.5 rounded-full capitalize ${ sp.status === "sold" ? "bg-md-primary-container text-md-positive " : sp.status === "booked" ? "bg-md-warning-container text-md-warning " : "bg-md-surface-container text-md-on-surface-variant " }`}
                           >
                             {sp.status}
                           </span>
@@ -519,10 +493,10 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                 <span>Partners Equity Split ({prop.partners.length})</span>
               </div>
 
-              <div className="w-full min-w-0 border border-md-outline-variant rounded-[24px] overflow-x-auto bg-md-surface-lowest">
+              <div className="w-full min-w-0 rounded-[24px] overflow-x-auto bg-md-surface-lowest dark:bg-md-surface-container">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="bg-md-surface-low border-b border-md-outline-variant text-md-on-surface-variant uppercase font-bold tracking-wider">
+                    <tr className="bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant uppercase font-bold tracking-wider">
                       <th className="py-2.5 px-3.5">Partner</th>
                       <th className="py-2.5 px-3.5 text-right">Share %</th>
                       <th className="py-2.5 px-3.5 text-right">Committed</th>
@@ -531,7 +505,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                       <th className="py-2.5 px-3.5 text-right">Expected Profit</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-md-outline-variant/50">
+                  <tbody className="">
                     {prop.partners.map((partner, idx) => {
                       const alloc = propertyMetrics?.partnerAllocations?.find(
                         (pa) => pa.name === partner.name
@@ -582,7 +556,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => onOpenEntryModal("outflow", prop.propertyCode)}
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-[18px] text-xs font-semibold bg-md-error-container text-md-error border border-md-outline-variant hover:bg-md-error-container transition-colors"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-[18px] text-xs font-semibold bg-md-error-container text-md-error hover:bg-md-error-container transition-colors"
                 >
                   <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
                   <span>Record Payment</span>
@@ -601,10 +575,10 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
               </div>
             </div>
 
-            <div className="w-full min-w-0 border border-md-outline-variant rounded-[24px] overflow-x-auto bg-md-surface-lowest">
+            <div className="w-full min-w-0 rounded-[24px] overflow-x-auto bg-md-surface-lowest dark:bg-md-surface-container">
               <table className="w-full text-left text-sm border-collapse">
                 <thead>
-                  <tr className="bg-md-surface-low border-b border-md-outline-variant text-md-on-surface-variant uppercase text-[11px] font-bold tracking-wider">
+                  <tr className="bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant uppercase text-[11px] font-bold tracking-wider">
                     <th className="py-3 px-3.5">ID</th>
                     <th className="py-3 px-3.5">Date</th>
                     <th className="py-3 px-3.5">Category</th>
@@ -614,7 +588,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                     <th className="py-3 px-3.5 text-right">Edit</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-md-outline-variant/50">
+                <tbody className="">
                   {txs.length === 0 ? (
                     <tr>
                       <td
@@ -626,7 +600,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                     </tr>
                   ) : (
                     txs.map((t) => (
-                      <tr key={t.id} className="hover:bg-md-surface-low transition-colors">
+                      <tr key={t.id} className="even:bg-md-surface-low/50 dark:even:bg-md-surface-low/40 hover:bg-md-surface-high/60 transition-colors">
                         <td className="py-3 px-3.5 font-mono text-md-on-surface-variant text-xs font-semibold">
                           {t.transCode || "-"}
                         </td>
@@ -637,23 +611,23 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                           <div className="flex items-center gap-1.5 flex-wrap">
                             <span>{t.category}</span>
                             {t.subPlotNumber && (
-                              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-md-primary-container text-md-positive border border-md-outline-variant">
+                              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-md-primary-container text-md-positive">
                                 Plot #{t.subPlotNumber}
                               </span>
                             )}
                             {t.borneBy === "seller" && (
-                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-md-warning-container text-md-warning border border-md-outline-variant font-bold">
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-md-warning-container text-md-warning font-bold">
                                 For Seller
                               </span>
                             )}
                             {t.borneBy === "buyer" && (
-                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-md-tertiary-container text-md-tertiary border border-md-outline-variant font-bold">
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-md-tertiary-container text-md-tertiary font-bold">
                                 For Buyer
                               </span>
                             )}
                             {t.borneBy === "split" && (
                               <span
-                                className="text-[10px] px-1.5 py-0.5 rounded-full bg-md-secondary-container text-md-secondary border border-md-outline-variant font-bold"
+                                className="text-[10px] px-1.5 py-0.5 rounded-full bg-md-secondary-container text-md-secondary font-bold"
                                 title={`Self: ₹${(t.amountSelf || 0).toLocaleString("en-IN")} | Seller: ₹${(t.amountSeller || 0).toLocaleString("en-IN")} | Buyer: ₹${(t.amountBuyer || 0).toLocaleString("en-IN")}`}
                               >
                                 Split
@@ -663,11 +637,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                         </td>
                         <td className="py-3 px-3.5">
                           <span
-                            className={`inline-flex items-center gap-1 font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
-                              t.mode === "Cash"
-                                ? "bg-md-warning-container text-md-warning border-md-outline-variant"
-                                : "bg-md-tertiary-container text-md-tertiary border-md-outline-variant"
-                            }`}
+                            className={`inline-flex items-center gap-1 font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full ${ t.mode === "Cash" ? "bg-md-warning-container text-md-warning " : "bg-md-tertiary-container text-md-tertiary " }`}
                           >
                             {t.mode === "Cash" ? (
                               <Banknote className="w-3 h-3" />
@@ -678,11 +648,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                           </span>
                         </td>
                         <td
-                          className={`py-3 px-3.5 text-right font-mono font-bold ${
-                            t.transactionType === "deal_inflow"
-                              ? "text-md-positive"
-                              : "text-md-on-surface"
-                          }`}
+                          className={`py-3 px-3.5 text-right font-mono font-bold ${ t.transactionType === "deal_inflow" ? "text-md-positive" : "text-md-on-surface" }`}
                         >
                           {t.transactionType === "deal_inflow" ? "+ " : ""}
                           {formatINR(t.amount)}
@@ -709,7 +675,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                           {onEditTransaction && (
                             <button
                               onClick={() => onEditTransaction(t)}
-                              className="p-1.5 rounded-lg bg-md-surface-low border border-md-outline-variant text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container inline-flex items-center justify-center transition-colors"
+                              className="p-1.5 rounded-lg bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container inline-flex items-center justify-center transition-colors"
                               title="Edit entry"
                             >
                               <Pencil className="w-3.5 h-3.5" />
@@ -722,7 +688,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
                 </tbody>
                 {txs.length > 0 && (
                   <tfoot>
-                    <tr className="bg-md-surface-low border-t border-md-outline-variant font-bold text-md-on-surface text-sm">
+                    <tr className="bg-md-surface-container dark:bg-md-surface-high font-bold text-md-on-surface text-sm">
                       <td colSpan={4} className="py-3.5 px-3.5">
                         Total Recorded for {prop.propertyCode}
                       </td>
@@ -741,7 +707,7 @@ export const PropertyLedgerModal: React.FC<PropertyLedgerModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 border-t border-md-outline-variant/60 bg-md-surface-low flex justify-between items-center gap-2">
+        <div className="p-4 bg-md-surface-low flex justify-between items-center gap-2">
           {onEditProperty ? (
             <button
               onClick={() => onEditProperty(prop)}

@@ -209,10 +209,10 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-md-surface-lowest border border-md-outline-variant rounded-[24px] max-w-lg w-full min-w-0 max-h-[92vh] overflow-y-auto overflow-x-hidden p-5 sm:p-6 shadow-m3-3 my-auto flex flex-col gap-5 animate-modal"
+        className="bg-md-surface-lowest dark:bg-md-surface-container rounded-[24px] max-w-lg w-full min-w-0 max-h-[92vh] overflow-y-auto overflow-x-hidden p-5 sm:p-6 shadow-m3-3 my-auto flex flex-col gap-5 animate-modal"
       >
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-md-outline-variant/60 pb-4 gap-2">
+        <div className="flex items-start justify-between pb-4 gap-2">
           <div className="min-w-0 flex-1">
             <h2 className="text-lg font-bold text-md-on-surface tracking-tight">
               Add a New Property
@@ -232,15 +232,11 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-sm">
           {/* Scope Type Toggle */}
-          <div className="grid grid-cols-2 gap-1.5 bg-md-surface-container p-1 rounded-[18px] border border-md-outline-variant">
+          <div className="grid grid-cols-2 gap-1.5 bg-md-surface-container p-1 rounded-[18px]">
             <button
               type="button"
               onClick={() => setType("commercial")}
-              className={`py-2 rounded-lg flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-all ${
-                type === "commercial"
-                  ? "bg-md-surface-lowest text-md-on-surface shadow-sm"
-                  : "text-md-on-surface-variant hover:text-md-on-surface"
-              }`}
+              className={`py-2 rounded-lg flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-all ${ type === "commercial" ? "bg-md-surface-lowest text-md-on-surface shadow-sm" : "text-md-on-surface-variant hover:text-md-on-surface" }`}
             >
               <Building2 className="w-4 h-4 text-md-primary" />
               <span>Business Land Deal</span>
@@ -248,11 +244,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
             <button
               type="button"
               onClick={() => setType("personal")}
-              className={`py-2 rounded-lg flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-all ${
-                type === "personal"
-                  ? "bg-md-surface-lowest text-md-on-surface shadow-sm"
-                  : "text-md-on-surface-variant hover:text-md-on-surface"
-              }`}
+              className={`py-2 rounded-lg flex items-center justify-center gap-2 font-semibold text-xs sm:text-sm transition-all ${ type === "personal" ? "bg-md-surface-lowest text-md-on-surface shadow-sm" : "text-md-on-surface-variant hover:text-md-on-surface" }`}
             >
               <Home className="w-4 h-4 text-md-primary" />
               <span>Personal Home / Asset</span>
@@ -270,7 +262,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Andal Avenue, Prestige 3BHK"
-                className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-[18px] p-2.5 text-md-on-surface placeholder:text-md-on-surface-variant text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary focus:ring-2 focus:ring-md-primary/20"
+                className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-[18px] p-2.5 text-md-on-surface placeholder:text-md-on-surface-variant text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary focus:ring-2 focus:ring-md-primary/20"
                 required
               />
             </div>
@@ -283,7 +275,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                 value={propertyCode}
                 onChange={(e) => setPropertyCode(e.target.value)}
                 placeholder="Auto"
-                className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-[18px] p-2.5 text-md-on-surface placeholder:text-md-on-surface-variant font-mono text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary"
+                className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-[18px] p-2.5 text-md-on-surface placeholder:text-md-on-surface-variant font-mono text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary"
               />
             </div>
           </div>
@@ -299,7 +291,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="e.g. OMR Chennai, Anna Nagar"
-                className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-[18px] p-2.5 text-md-on-surface placeholder:text-md-on-surface-variant text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary"
+                className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-[18px] p-2.5 text-md-on-surface placeholder:text-md-on-surface-variant text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary"
               />
             </div>
             <div className="flex flex-col gap-1.5 min-w-0">
@@ -310,7 +302,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                 type="date"
                 value={acquisitionDate}
                 onChange={(e) => setAcquisitionDate(e.target.value)}
-                className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-[18px] p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary"
+                className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-[18px] p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary"
               />
             </div>
           </div>
@@ -325,7 +317,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                 type="date"
                 value={agreementDueDate}
                 onChange={(e) => setAgreementDueDate(e.target.value)}
-                className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-[18px] p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-warning"
+                className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-[18px] p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:"
               />
             </div>
             <div className="flex flex-col gap-1.5 min-w-0">
@@ -336,13 +328,13 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                 type="date"
                 value={targetSettlementDate}
                 onChange={(e) => setTargetSettlementDate(e.target.value)}
-                className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-[18px] p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-tertiary"
+                className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-[18px] p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-tertiary"
               />
             </div>
           </div>
 
           {/* Sq.ft Calculator */}
-          <div className="bg-md-warning-container/50 border border-md-outline-variant rounded-[18px] p-3.5 flex flex-col gap-2.5">
+          <div className="bg-md-warning-container/50 rounded-[18px] p-3.5 flex flex-col gap-2.5">
             <div className="flex items-center gap-1.5 text-xs text-md-on-warning-container font-bold">
               <Calculator className="w-4 h-4 text-md-warning" />
               <span>Area &amp; Rate Calculator (Optional)</span>
@@ -362,7 +354,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                     )
                   }
                   placeholder="e.g. 1200"
-                  className="w-full min-w-0 bg-md-surface-lowest border border-md-outline-variant rounded-[18px] p-2 text-md-on-surface font-mono text-sm mt-1 outline-none focus:border-md-warning"
+                  className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-[18px] p-2 text-md-on-surface font-mono text-sm mt-1 outline-none focus:"
                 />
               </div>
               <div className="min-w-0">
@@ -379,7 +371,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                     )
                   }
                   placeholder="e.g. 4500"
-                  className="w-full min-w-0 bg-md-surface-lowest border border-md-outline-variant rounded-[18px] p-2 text-md-on-surface font-mono text-sm mt-1 outline-none focus:border-md-warning"
+                  className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-[18px] p-2 text-md-on-surface font-mono text-sm mt-1 outline-none focus:"
                 />
               </div>
             </div>
@@ -397,10 +389,10 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                 setAgreedPurchasePrice(parseFloat(e.target.value) || 0)
               }
               placeholder="0"
-              className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-[18px] p-3 text-xl font-mono font-bold text-md-on-surface outline-none focus:bg-md-surface-lowest focus:border-md-primary focus:ring-2 focus:ring-md-primary/20"
+              className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-[18px] p-3 text-xl font-mono font-bold text-md-on-surface outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary focus:ring-2 focus:ring-md-primary/20"
               required
             />
-            <div className="text-xs font-mono text-md-warning bg-md-warning-container border border-md-outline-variant rounded-lg px-3 py-1.5 font-semibold">
+            <div className="text-xs font-mono text-md-warning bg-md-warning-container rounded-lg px-3 py-1.5 font-semibold">
               {amountToVerbalSummary(agreedPurchasePrice)}
             </div>
           </div>
@@ -419,7 +411,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                     setTargetSalePrice(parseFloat(e.target.value) || 0)
                   }
                   placeholder="Optional"
-                  className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-[18px] p-2.5 text-md-on-surface font-mono text-sm outline-none focus:bg-md-surface-lowest focus:border-md-tertiary"
+                  className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-[18px] p-2.5 text-md-on-surface font-mono text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-tertiary"
                 />
               </div>
               <div className="flex flex-col gap-1.5 min-w-0">
@@ -433,7 +425,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                     setAgreedSellingPrice(parseFloat(e.target.value) || 0)
                   }
                   placeholder="If buyer finalized"
-                  className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-[18px] p-2.5 text-md-on-surface font-mono text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary"
+                  className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-[18px] p-2.5 text-md-on-surface font-mono text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary"
                 />
               </div>
             </div>
@@ -457,7 +449,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                       | "closed"
                   )
                 }
-                className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-[18px] p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary truncate"
+                className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-[18px] p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary truncate"
               >
                 <option value="open">Open (Token / Advance Paid)</option>
                 <option value="in_progress">In Progress (Paying)</option>
@@ -476,7 +468,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                 value={attachmentUrl}
                 onChange={(e) => setAttachmentUrl(e.target.value)}
                 placeholder="Google Drive / Dropbox URL"
-                className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-[18px] p-2.5 text-md-on-surface placeholder:text-md-on-surface-variant text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary"
+                className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-[18px] p-2.5 text-md-on-surface placeholder:text-md-on-surface-variant text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary"
               />
             </div>
           </div>
@@ -491,13 +483,13 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Any helpful reminders about this property..."
               rows={2}
-              className="w-full min-w-0 bg-md-surface-low border border-md-outline-variant rounded-[18px] p-2.5 text-md-on-surface placeholder:text-md-on-surface-variant text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary resize-none"
+              className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-[18px] p-2.5 text-md-on-surface placeholder:text-md-on-surface-variant text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary resize-none"
             />
           </div>
 
           {/* Sub-Plots Inventory (Commercial Only) */}
           {type === "commercial" && (
-            <div className="pt-3 border-t border-md-outline-variant/60 flex flex-col gap-2.5">
+            <div className="pt-3 flex flex-col gap-2.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Grid className="w-4 h-4 text-md-primary" />
@@ -520,7 +512,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                   {subPlots.map((sp, idx) => (
                     <div
                       key={sp.id || idx}
-                      className="grid grid-cols-1 sm:grid-cols-6 gap-2 bg-md-surface-low border border-md-outline-variant p-2.5 rounded-[18px] items-center text-xs"
+                      className="grid grid-cols-1 sm:grid-cols-6 gap-2 bg-md-surface-container dark:bg-md-surface-high p-2.5 rounded-[18px] items-center text-xs"
                     >
                       <input
                         type="text"
@@ -531,7 +523,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                           })
                         }
                         placeholder="Plot #"
-                        className="w-full min-w-0 bg-md-surface-lowest border border-md-outline-variant rounded-lg px-2 py-1.5 text-md-on-surface font-mono font-bold"
+                        className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-lg px-2 py-1.5 text-md-on-surface font-mono font-bold"
                       />
                       <input
                         type="number"
@@ -542,7 +534,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                           })
                         }
                         placeholder="Sq.ft"
-                        className="w-full min-w-0 bg-md-surface-lowest border border-md-outline-variant rounded-lg px-2 py-1.5 text-md-on-surface font-mono"
+                        className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-lg px-2 py-1.5 text-md-on-surface font-mono"
                       />
                       <input
                         type="number"
@@ -553,7 +545,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                           })
                         }
                         placeholder="Target ₹"
-                        className="w-full min-w-0 bg-md-surface-lowest border border-md-outline-variant rounded-lg px-2 py-1.5 text-md-on-surface font-mono font-semibold sm:col-span-2"
+                        className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-lg px-2 py-1.5 text-md-on-surface font-mono font-semibold sm:col-span-2"
                       />
                       <select
                         value={sp.status}
@@ -565,7 +557,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                               | "sold",
                           })
                         }
-                        className="w-full min-w-0 bg-md-surface-lowest border border-md-outline-variant rounded-lg px-1.5 py-1.5 text-xs font-semibold text-md-on-surface truncate"
+                        className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-lg px-1.5 py-1.5 text-xs font-semibold text-md-on-surface truncate"
                       >
                         <option value="available">Available</option>
                         <option value="booked">Booked</option>
@@ -589,7 +581,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
 
           {/* Joint Venture Partners (Commercial Only) */}
           {type === "commercial" && (
-            <div className="pt-3 border-t border-md-outline-variant/60 flex flex-col gap-2.5">
+            <div className="pt-3 flex flex-col gap-2.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Users className="w-4 h-4 text-md-secondary" />
@@ -612,7 +604,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                   {partners.map((p, idx) => (
                     <div
                       key={idx}
-                      className="grid grid-cols-1 sm:grid-cols-4 gap-2 bg-md-surface-low border border-md-outline-variant p-2.5 rounded-[18px] items-center text-xs"
+                      className="grid grid-cols-1 sm:grid-cols-4 gap-2 bg-md-surface-container dark:bg-md-surface-high p-2.5 rounded-[18px] items-center text-xs"
                     >
                       <input
                         type="text"
@@ -621,7 +613,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                           handleUpdatePartner(idx, { name: e.target.value })
                         }
                         placeholder="Partner Name"
-                        className="w-full min-w-0 bg-md-surface-lowest border border-md-outline-variant rounded-lg px-2 py-1.5 text-md-on-surface font-semibold sm:col-span-2"
+                        className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-lg px-2 py-1.5 text-md-on-surface font-semibold sm:col-span-2"
                       />
                       <div className="flex items-center gap-1 min-w-0">
                         <input
@@ -633,7 +625,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
                             })
                           }
                           placeholder="%"
-                          className="w-full min-w-0 bg-md-surface-lowest border border-md-outline-variant rounded-lg px-2 py-1.5 text-md-on-surface font-mono font-bold"
+                          className="w-full min-w-0 bg-md-surface-container dark:bg-md-surface-high rounded-lg px-2 py-1.5 text-md-on-surface font-mono font-bold"
                         />
                         <span className="text-md-on-surface-variant font-bold flex-shrink-0">
                           %
@@ -656,7 +648,7 @@ export const NewPropertyModal: React.FC<NewPropertyModalProps> = ({
           )}
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2.5 pt-3 border-t border-md-outline-variant/60 flex-wrap sm:flex-nowrap">
+          <div className="flex items-center gap-2.5 pt-3 flex-wrap sm:flex-nowrap">
             <button
               type="submit"
               disabled={isSubmitting}

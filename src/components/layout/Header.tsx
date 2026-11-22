@@ -59,13 +59,13 @@ export const Header: React.FC<HeaderProps> = ({
   const { mode, toggleMode, palette } = useTheme();
 
   return (
-    <header className="sticky top-0 z-40 bg-md-surface-lowest/95 backdrop-blur-md border-b border-md-outline-variant/80 px-3 sm:px-5 py-3 w-full max-w-[100vw] overflow-x-hidden shadow-m3-1 transition-standard">
+    <header className="sticky top-0 z-40 bg-md-surface-lowest/90 dark:bg-md-surface-low/90 backdrop-blur-xl px-3 sm:px-5 py-3 w-full max-w-[100vw] overflow-x-hidden shadow-m3-1 transition-standard">
       <div className="max-w-[1440px] mx-auto flex flex-col gap-3">
         {/* Row 1: Brand, M3 Connected Mode Switcher, Theme & User Controls */}
         <div className="flex items-center justify-between gap-3 w-full">
           {/* Brand & Logo */}
           <div className="flex items-center gap-2.5 sm:gap-3 flex-shrink-0 min-w-0">
-            <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-[14px] overflow-hidden border border-md-outline-variant bg-md-primary-container flex items-center justify-center flex-shrink-0 shadow-sm">
+            <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-[14px] overflow-hidden bg-md-primary-container flex items-center justify-center flex-shrink-0 shadow-sm">
               <Image
                 src="/logo.jpg"
                 alt="Avaniya"
@@ -98,22 +98,14 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="hidden md:flex items-center bg-md-surface-container p-1 rounded-full shrink-0 gap-1">
             <button
               onClick={() => onModeChange("commercial")}
-              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
-                currentMode === "commercial"
-                  ? "bg-md-primary text-md-on-primary shadow-m3-1"
-                  : "text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high"
-              }`}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${ currentMode === "commercial" ? "bg-md-primary text-md-on-primary shadow-m3-1" : "text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high" }`}
             >
               <Building2 className="w-3.5 h-3.5" />
               <span>Business Deals</span>
             </button>
             <button
               onClick={() => onModeChange("personal")}
-              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
-                currentMode === "personal"
-                  ? "bg-md-primary text-md-on-primary shadow-m3-1"
-                  : "text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high"
-              }`}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${ currentMode === "personal" ? "bg-md-primary text-md-on-primary shadow-m3-1" : "text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-high" }`}
             >
               <Home className="w-3.5 h-3.5" />
               <span>Personal Homes</span>
@@ -157,13 +149,11 @@ export const Header: React.FC<HeaderProps> = ({
             {user ? (
               <div className="flex items-center gap-1.5 flex-shrink-0">
                 <div
-                  className="flex items-center gap-2 bg-md-surface-low px-3 py-1.5 rounded-full border border-md-outline-variant/80 text-xs text-md-on-surface flex-shrink-0"
+                  className="flex items-center gap-2 bg-md-surface-container px-3 py-1.5 rounded-full text-xs text-md-on-surface flex-shrink-0"
                   title={`Signed in as ${user.email}`}
                 >
                   <div
-                    className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                      isSuperAdmin ? "bg-md-warning" : "bg-md-primary"
-                    }`}
+                    className={`w-2 h-2 rounded-full flex-shrink-0 ${ isSuperAdmin ? "bg-md-warning" : "bg-md-primary" }`}
                   />
                   <span className="font-semibold text-xs whitespace-nowrap">
                     {user.name}
@@ -176,7 +166,7 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
                 <button
                   onClick={onLogout}
-                  className="p-2 rounded-full bg-md-surface-low text-md-on-surface-variant border border-md-outline-variant/80 hover:text-md-on-error-container hover:border-md-error hover:bg-md-error-container transition-all flex-shrink-0"
+                  className="p-2 rounded-full bg-md-surface-container text-md-on-surface-variant hover:text-md-on-error-container hover:bg-md-error-container transition-all flex-shrink-0"
                   title="Sign Out"
                   aria-label="Sign Out"
                 >
@@ -196,7 +186,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Row 2: Desktop M3 Expressive Action Toolbar */}
-        <div className="hidden md:flex items-center justify-between gap-3 pt-2.5 border-t border-md-outline-variant/50 w-full">
+        <div className="hidden md:flex items-center justify-between gap-3 pt-1 w-full">
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => onOpenEntryModal("outflow")}
@@ -224,8 +214,6 @@ export const Header: React.FC<HeaderProps> = ({
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Add Property</span>
             </button>
-
-            <div className="h-5 w-px bg-md-outline-variant/70 mx-0.5" />
 
             <button
               onClick={() => onOpenEntryModal("withdrawal")}
@@ -261,7 +249,7 @@ export const Header: React.FC<HeaderProps> = ({
           {isSuperAdmin ? (
             <div className="flex items-center gap-2">
               {onSwitchDataset && (
-                <div className="flex items-center gap-1.5 bg-md-primary-container/60 px-3 py-1.5 rounded-full border border-md-outline-variant text-xs">
+                <div className="flex items-center gap-1.5 bg-md-primary-container/75 px-3 py-1.5 rounded-full text-xs">
                   <FolderLock className="w-3.5 h-3.5 text-md-on-primary-container shrink-0" />
                   <select
                     value={currentDatasetId || "ds_yousuf_portfolio"}
@@ -318,22 +306,14 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex md:hidden items-center bg-md-surface-container p-1 rounded-full w-full gap-1">
           <button
             onClick={() => onModeChange("commercial")}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-full text-xs font-semibold transition-all ${
-              currentMode === "commercial"
-                ? "bg-md-primary text-md-on-primary shadow-m3-1"
-                : "text-md-on-surface-variant"
-            }`}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-full text-xs font-semibold transition-all ${ currentMode === "commercial" ? "bg-md-primary text-md-on-primary shadow-m3-1" : "text-md-on-surface-variant" }`}
           >
             <Building2 className="w-3.5 h-3.5 flex-shrink-0" />
             <span className="truncate">Business Deals</span>
           </button>
           <button
             onClick={() => onModeChange("personal")}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-full text-xs font-semibold transition-all ${
-              currentMode === "personal"
-                ? "bg-md-primary text-md-on-primary shadow-m3-1"
-                : "text-md-on-surface-variant"
-            }`}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-full text-xs font-semibold transition-all ${ currentMode === "personal" ? "bg-md-primary text-md-on-primary shadow-m3-1" : "text-md-on-surface-variant" }`}
           >
             <Home className="w-3.5 h-3.5 flex-shrink-0" />
             <span className="truncate">Personal Homes</span>
@@ -342,7 +322,7 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Mobile Super Admin Controls (< md) */}
         {isSuperAdmin && (
-          <div className="flex md:hidden items-center justify-between bg-md-primary-container/50 border border-md-outline-variant rounded-full px-3 py-1.5 text-xs w-full gap-2">
+          <div className="flex md:hidden items-center justify-between bg-md-primary-container/75 rounded-full px-3 py-1.5 text-xs w-full gap-2">
             {onSwitchDataset && (
               <div className="flex items-center gap-1.5 flex-1 min-w-0">
                 <FolderLock className="w-3.5 h-3.5 text-md-on-primary-container shrink-0" />

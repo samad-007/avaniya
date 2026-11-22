@@ -214,9 +214,7 @@ export const CyclingKpiCard: React.FC<CyclingKpiCardProps> = ({
 
       {/* Main Content */}
       <div
-        className={`flex flex-col justify-between flex-1 transition-all duration-150 ease-out transform ${
-          isFlipping ? "opacity-0 -translate-y-0.5" : "opacity-100 translate-y-0"
-        }`}
+        className={`flex flex-col justify-between flex-1 transition-all duration-150 ease-out transform ${ isFlipping ? "opacity-0 -translate-y-0.5" : "opacity-100 translate-y-0" }`}
       >
         <div
           className="text-xs font-semibold text-md-on-surface-variant truncate"
@@ -226,9 +224,7 @@ export const CyclingKpiCard: React.FC<CyclingKpiCardProps> = ({
         </div>
 
         <div
-          className={`font-display text-xl md:text-2xl font-bold font-mono tracking-tight my-1 ${
-            currentPanel.valueColor || "text-md-on-surface"
-          }`}
+          className={`font-display text-xl md:text-2xl font-bold font-mono tracking-tight my-1 ${ currentPanel.valueColor || "text-md-on-surface" }`}
         >
           {currentPanel.value}
         </div>

@@ -29,7 +29,7 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-md-surface-lowest border border-md-outline-variant rounded-[28px] max-w-sm w-full min-w-0 p-6 shadow-m3-3 flex flex-col gap-4 my-auto overflow-y-auto overflow-x-hidden animate-modal"
+        className="bg-md-surface-lowest dark:bg-md-surface-low rounded-[28px] max-w-sm w-full min-w-0 p-6 shadow-m3-3 flex flex-col gap-4 my-auto overflow-y-auto overflow-x-hidden animate-modal"
       >
         <div className="flex items-start justify-between gap-3">
           <div className="w-11 h-11 rounded-[16px] bg-md-error-container text-md-on-error-container flex items-center justify-center flex-shrink-0">
@@ -63,7 +63,7 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-md-outline-variant/60 flex-wrap sm:flex-nowrap">
+        <div className="flex items-center justify-end gap-2.5 pt-3 flex-wrap sm:flex-nowrap">
           <button
             type="button"
             onClick={onClose}

@@ -163,9 +163,9 @@ export const LoanModal: React.FC<LoanModalProps> = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-md-surface-lowest border border-md-outline-variant rounded-[28px] max-w-lg w-full max-h-[92vh] overflow-y-auto overflow-x-hidden p-5 sm:p-6 shadow-m3-3 my-auto flex flex-col gap-5 animate-modal min-w-0"
+        className="bg-md-surface-lowest dark:bg-md-surface-low rounded-[28px] max-w-lg w-full max-h-[92vh] overflow-y-auto overflow-x-hidden p-5 sm:p-6 shadow-m3-3 my-auto flex flex-col gap-5 animate-modal min-w-0"
       >
-        <div className="flex items-start justify-between border-b border-md-outline-variant/60 pb-4 gap-2">
+        <div className="flex items-start justify-between pb-4 gap-2">
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
             <div className="w-10 h-10 rounded-[14px] bg-md-primary-container text-md-on-primary-container flex items-center justify-center flex-shrink-0">
               <HandCoins className="w-5 h-5" />
@@ -213,11 +213,7 @@ export const LoanModal: React.FC<LoanModalProps> = ({
                     key={item.id}
                     type="button"
                     onClick={() => setLenderType(item.id)}
-                    className={`py-2 px-2.5 rounded-full border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all min-w-0 ${
-                      active
-                        ? "bg-md-primary text-md-on-primary border-md-primary shadow-m3-1"
-                        : "bg-md-surface-low text-md-on-surface-variant border-md-outline-variant hover:text-md-on-surface hover:bg-md-surface-container"
-                    }`}
+                    className={`py-2 px-2.5 rounded-full text-xs font-semibold flex items-center justify-center gap-1.5 transition-all min-w-0 ${ active ? "bg-md-primary text-md-on-primary  shadow-m3-1" : "bg-md-surface-low text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container" }`}
                   >
                     {Icon && <Icon className="w-3.5 h-3.5 flex-shrink-0" />}
                     <span className="truncate">{item.label}</span>
@@ -237,7 +233,7 @@ export const LoanModal: React.FC<LoanModalProps> = ({
                 value={lenderName}
                 onChange={(e) => setLenderName(e.target.value)}
                 placeholder="e.g. HDFC Bank, Ramesh Uncle"
-                className="w-full bg-md-surface-low border border-md-outline-variant rounded-2xl p-2.5 text-md-on-surface placeholder:text-md-on-surface-variant/60 text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary focus:ring-2 focus:ring-md-primary/20 min-w-0"
+                className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-2xl p-2.5 text-md-on-surface placeholder:text-md-on-surface-variant/60 text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary focus:ring-2 focus:ring-md-primary/20 min-w-0"
                 required
               />
             </div>
@@ -250,7 +246,7 @@ export const LoanModal: React.FC<LoanModalProps> = ({
                 value={loanCode}
                 onChange={(e) => setLoanCode(e.target.value)}
                 placeholder="Auto"
-                className="w-full bg-md-surface-low border border-md-outline-variant rounded-2xl p-2.5 text-md-on-surface placeholder:text-md-on-surface-variant/60 font-mono text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary min-w-0"
+                className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-2xl p-2.5 text-md-on-surface placeholder:text-md-on-surface-variant/60 font-mono text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary min-w-0"
               />
             </div>
           </div>
@@ -266,7 +262,7 @@ export const LoanModal: React.FC<LoanModalProps> = ({
                 setPrincipalAmount(parseFloat(e.target.value) || 0)
               }
               placeholder="0"
-              className="w-full bg-md-surface-low border border-md-outline-variant rounded-2xl p-3 text-xl font-mono font-bold text-md-on-surface outline-none focus:bg-md-surface-lowest focus:border-md-primary focus:ring-2 focus:ring-md-primary/20"
+              className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-2xl p-3 text-xl font-mono font-bold text-md-on-surface outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary focus:ring-2 focus:ring-md-primary/20"
               required
             />
             <div className="text-xs font-mono text-md-on-warning-container bg-md-warning-container rounded-xl px-3 py-1.5 font-semibold">
@@ -290,7 +286,7 @@ export const LoanModal: React.FC<LoanModalProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 bg-md-surface-low p-4 rounded-[20px] border border-md-outline-variant/80 min-w-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 bg-md-surface-low p-4 rounded-[20px] min-w-0">
             <div className="flex flex-col gap-1.5 min-w-0">
               <label className="text-xs font-semibold text-md-on-surface-variant">
                 Interest Rate (% per year)
@@ -305,7 +301,7 @@ export const LoanModal: React.FC<LoanModalProps> = ({
                   )
                 }
                 placeholder="e.g. 10.5"
-                className="w-full bg-md-surface-lowest border border-md-outline-variant rounded-2xl p-2.5 text-md-on-surface font-mono text-sm outline-none focus:border-md-primary min-w-0"
+                className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-2xl p-2.5 text-md-on-surface font-mono text-sm outline-none focus:ring-2 focus:ring-md-primary min-w-0"
               />
               <span className="text-[11px] text-md-on-surface-variant">
                 Leave blank if interest-free
@@ -326,14 +322,14 @@ export const LoanModal: React.FC<LoanModalProps> = ({
                   )
                 }
                 placeholder="e.g. 15"
-                className="w-full bg-md-surface-lowest border border-md-outline-variant rounded-2xl p-2.5 text-md-on-surface font-mono text-sm outline-none focus:border-md-primary min-w-0"
+                className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-2xl p-2.5 text-md-on-surface font-mono text-sm outline-none focus:ring-2 focus:ring-md-primary min-w-0"
               />
               <span className="text-[11px] text-md-on-surface-variant">
                 Optional, for partner loans
               </span>
             </div>
 
-            <div className="sm:col-span-2 flex flex-col gap-1.5 pt-2 border-t border-md-outline-variant/60 min-w-0">
+            <div className="sm:col-span-2 flex flex-col gap-1.5 pt-2 min-w-0">
               <label className="text-xs font-semibold text-md-on-surface-variant">
                 Profit Share Terms (Optional)
               </label>
@@ -342,7 +338,7 @@ export const LoanModal: React.FC<LoanModalProps> = ({
                 value={profitShareTerms}
                 onChange={(e) => setProfitShareTerms(e.target.value)}
                 placeholder="e.g. 15% of net profit when plot is sold"
-                className="w-full bg-md-surface-lowest border border-md-outline-variant rounded-2xl p-2.5 text-md-on-surface text-xs outline-none focus:border-md-primary min-w-0"
+                className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-2xl p-2.5 text-md-on-surface text-xs outline-none focus:ring-2 focus:ring-md-primary min-w-0"
               />
             </div>
           </div>
@@ -356,7 +352,7 @@ export const LoanModal: React.FC<LoanModalProps> = ({
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full bg-md-surface-low border border-md-outline-variant rounded-2xl p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary min-w-0"
+                className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-2xl p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary min-w-0"
                 required
               />
             </div>
@@ -374,7 +370,7 @@ export const LoanModal: React.FC<LoanModalProps> = ({
                   )
                 }
                 placeholder="12"
-                className="w-full bg-md-surface-low border border-md-outline-variant rounded-2xl p-2.5 text-md-on-surface font-mono text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary min-w-0"
+                className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-2xl p-2.5 text-md-on-surface font-mono text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary min-w-0"
               />
             </div>
 
@@ -385,7 +381,7 @@ export const LoanModal: React.FC<LoanModalProps> = ({
               <select
                 value={linkedPropertyCode}
                 onChange={(e) => setLinkedPropertyCode(e.target.value)}
-                className="w-full bg-md-surface-low border border-md-outline-variant rounded-2xl p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary min-w-0 truncate"
+                className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-2xl p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary min-w-0 truncate"
               >
                 <option value="">General Portfolio</option>
                 {properties.map((p) => (
@@ -406,7 +402,7 @@ export const LoanModal: React.FC<LoanModalProps> = ({
               onChange={(e) =>
                 setStatus(e.target.value as "active" | "closed" | "defaulted")
               }
-              className="w-full bg-md-surface-low border border-md-outline-variant rounded-2xl p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary min-w-0 truncate"
+              className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-2xl p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary min-w-0 truncate"
             >
               <option value="active">Active (Still Repaying)</option>
               <option value="closed">Closed (Fully Repaid)</option>
@@ -423,11 +419,11 @@ export const LoanModal: React.FC<LoanModalProps> = ({
               onChange={(e) => setNotes(e.target.value)}
               placeholder="e.g. EMI due on 5th of every month..."
               rows={2}
-              className="w-full bg-md-surface-low border border-md-outline-variant rounded-2xl p-2.5 text-md-on-surface placeholder:text-md-on-surface-variant/60 text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary resize-none min-w-0"
+              className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-2xl p-2.5 text-md-on-surface placeholder:text-md-on-surface-variant/60 text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary resize-none min-w-0"
             />
           </div>
 
-          <div className="flex items-center justify-between gap-2.5 pt-3 border-t border-md-outline-variant/60 flex-wrap">
+          <div className="flex items-center justify-between gap-2.5 pt-3 flex-wrap">
             {isEditing && onDelete ? (
               <div>
                 {!showDeleteConfirm ? (

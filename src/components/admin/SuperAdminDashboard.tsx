@@ -230,12 +230,12 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-md-surface-lowest border border-md-outline-variant rounded-[24px] max-w-5xl w-full max-h-[92vh] flex flex-col shadow-m3-3 overflow-hidden my-auto animate-modal"
+        className="bg-md-surface-lowest dark:bg-md-surface-container rounded-[24px] max-w-5xl w-full max-h-[92vh] flex flex-col shadow-m3-3 overflow-hidden my-auto animate-modal"
       >
         {/* Header */}
-        <div className="p-4 md:p-5 border-b border-md-outline-variant flex items-center justify-between bg-md-surface-low gap-3 flex-wrap">
+        <div className="p-4 md:p-5 flex items-center justify-between bg-md-surface-low gap-3 flex-wrap">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-[18px] bg-md-primary-container border border-md-outline-variant text-md-primary flex items-center justify-center">
+            <div className="w-11 h-11 rounded-[18px] bg-md-primary-container text-md-primary flex items-center justify-center">
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
@@ -243,7 +243,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                 <h2 className="text-base md:text-lg font-bold text-md-on-surface tracking-tight">
                   Admin Console
                 </h2>
-                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-md-primary-container text-md-positive border border-md-outline-variant">
+                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-md-primary-container text-md-positive">
                   Admin Access
                 </span>
               </div>
@@ -263,9 +263,9 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
             </button>
 
             {user && (
-              <div className="flex items-center gap-1.5 pl-2 border-l border-md-outline-variant">
-                <div className="flex items-center gap-1.5 bg-md-surface-lowest px-2.5 py-1.5 rounded-[18px] border border-md-outline-variant text-xs text-md-on-surface">
-                  <div className="w-2 h-2 rounded-full bg-md-warning-container0 flex-shrink-0" />
+              <div className="flex items-center gap-1.5 pl-2">
+                <div className="flex items-center gap-1.5 bg-md-surface-lowest px-2.5 py-1.5 rounded-[18px] text-xs text-md-on-surface">
+                  <div className="w-2 h-2 rounded-full bg-md-warning flex-shrink-0" />
                   <span className="font-semibold text-xs whitespace-nowrap">
                     {user.name}
                   </span>
@@ -273,7 +273,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                 {onLogout && (
                   <button
                     onClick={onLogout}
-                    className="p-2 rounded-[18px] bg-md-surface-lowest text-md-on-surface-variant border border-md-outline-variant hover:text-md-error hover:bg-md-error-container hover:border-md-outline-variant transition-colors"
+                    className="p-2 rounded-[18px] bg-md-surface-lowest text-md-on-surface-variant hover:text-md-error hover:bg-md-error-container hover: transition-colors"
                     title="Sign Out"
                   >
                     <LogOut className="w-4 h-4" />
@@ -295,14 +295,14 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
         {/* Scrollable Content */}
         <div className="p-4 md:p-6 overflow-y-auto flex-1 flex flex-col gap-5">
           {errorMsg && (
-            <div className="bg-md-error-container border border-md-outline-variant text-md-error text-xs sm:text-sm px-3.5 py-2.5 rounded-[18px] flex items-center gap-2 font-medium">
+            <div className="bg-md-error-container text-md-error text-xs sm:text-sm px-3.5 py-2.5 rounded-[18px] flex items-center gap-2 font-medium">
               <AlertCircle className="w-4 h-4 text-md-error" />
               <span>{errorMsg}</span>
             </div>
           )}
 
           {createdCredential && (
-            <div className="bg-md-primary-container/50 border border-md-outline-variant rounded-[24px] p-4 sm:p-5 flex flex-col gap-3.5 animate-modal">
+            <div className="bg-md-primary-container/50 rounded-[24px] p-4 sm:p-5 flex flex-col gap-3.5 animate-modal">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-sm font-bold text-md-on-primary-container">
                   <KeyRound className="w-4 h-4 text-md-primary" />
@@ -316,7 +316,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm font-mono bg-md-surface-lowest p-3.5 rounded-[18px] border border-md-outline-variant">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm font-mono bg-md-surface-lowest p-3.5 rounded-[18px]">
                 <div>
                   <span className="text-md-on-surface-variant text-xs block mb-0.5">
                     Email
@@ -329,7 +329,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                   <span className="text-md-on-surface-variant text-xs block mb-0.5">
                     Password
                   </span>
-                  <span className="text-md-positive font-bold bg-md-primary-container px-2 py-0.5 rounded border border-md-outline-variant inline-block">
+                  <span className="text-md-positive font-bold bg-md-primary-container px-2 py-0.5 rounded inline-block">
                     {createdCredential.password}
                   </span>
                 </div>
@@ -365,7 +365,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
 
           {/* Stats */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-            <div className="bg-md-surface-low border border-md-outline-variant rounded-[24px] p-4">
+            <div className="bg-md-surface-container dark:bg-md-surface-high rounded-[24px] p-4">
               <div className="text-xs text-md-on-surface-variant font-semibold">
                 Total Users
               </div>
@@ -373,7 +373,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                 {users.length}
               </div>
             </div>
-            <div className="bg-md-surface-low border border-md-outline-variant rounded-[24px] p-4">
+            <div className="bg-md-surface-container dark:bg-md-surface-high rounded-[24px] p-4">
               <div className="text-xs text-md-on-surface-variant font-semibold">
                 Active Portfolios
               </div>
@@ -381,7 +381,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                 {new Set(users.map((u) => u.datasetId)).size}
               </div>
             </div>
-            <div className="bg-md-surface-low border border-md-outline-variant rounded-[24px] p-4">
+            <div className="bg-md-surface-container dark:bg-md-surface-high rounded-[24px] p-4">
               <div className="text-xs text-md-on-surface-variant font-semibold">
                 Total Properties
               </div>
@@ -389,7 +389,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                 {users.reduce((sum, u) => sum + u.propertyCount, 0)}
               </div>
             </div>
-            <div className="bg-md-surface-low border border-md-outline-variant rounded-[24px] p-4">
+            <div className="bg-md-surface-container dark:bg-md-surface-high rounded-[24px] p-4">
               <div className="text-xs text-md-on-surface-variant font-semibold">
                 Total Entries
               </div>
@@ -417,10 +417,10 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
               </button>
             </div>
 
-            <div className="border border-md-outline-variant rounded-[24px] overflow-x-auto bg-md-surface-lowest">
+            <div className="rounded-[24px] overflow-x-auto bg-md-surface-lowest dark:bg-md-surface-container">
               <table className="w-full text-left text-sm border-collapse">
                 <thead>
-                  <tr className="bg-md-surface-low border-b border-md-outline-variant text-md-on-surface-variant uppercase text-[11px] font-bold tracking-wider">
+                  <tr className="bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant uppercase text-[11px] font-bold tracking-wider">
                     <th className="py-3 px-4">User</th>
                     <th className="py-3 px-4">Email</th>
                     <th className="py-3 px-4">Role</th>
@@ -430,7 +430,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                     <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-md-outline-variant/50">
+                <tbody className="">
                   {users.map((u) => {
                     const isViewing =
                       currentDatasetId === u.datasetId ||
@@ -439,9 +439,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                     return (
                       <tr
                         key={u.id}
-                        className={`hover:bg-md-surface-low transition-colors ${
-                          isViewing ? "bg-md-primary-container/35" : ""
-                        }`}
+                        className={`even:bg-md-surface-low/50 dark:even:bg-md-surface-low/40 hover:bg-md-surface-high/60 transition-colors ${ isViewing ? "bg-md-primary-container/35" : "" }`}
                       >
                         <td className="py-3 px-4 font-bold text-md-on-surface">
                           <div className="flex items-center gap-2">
@@ -458,13 +456,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                         </td>
                         <td className="py-3 px-4">
                           <span
-                            className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${
-                              u.role === "super_admin"
-                                ? "bg-md-warning-container text-md-on-warning-container border-md-outline-variant"
-                                : u.role === "admin"
-                                ? "bg-md-tertiary-container text-md-tertiary border-md-outline-variant"
-                                : "bg-md-surface-container text-md-on-surface-variant border-md-outline-variant"
-                            }`}
+                            className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${ u.role === "super_admin" ? "bg-md-warning-container text-md-on-warning-container " : u.role === "admin" ? "bg-md-tertiary-container text-md-tertiary " : "bg-md-surface-container text-md-on-surface-variant " }`}
                           >
                             {u.role.toUpperCase()}
                           </span>
@@ -492,7 +484,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
 
                             <button
                               onClick={() => handleResetPassword(u)}
-                              className="p-1.5 rounded-lg bg-md-surface-low border border-md-outline-variant text-md-on-surface-variant hover:text-md-warning hover:bg-md-warning-container transition-colors"
+                              className="p-1.5 rounded-lg bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant hover:text-md-warning hover:bg-md-warning-container transition-colors"
                               title="Reset password"
                             >
                               <KeyRound className="w-3.5 h-3.5" />
@@ -501,7 +493,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                             {u.role !== "super_admin" && (
                               <button
                                 onClick={() => handleDeleteUser(u)}
-                                className="p-1.5 rounded-lg bg-md-surface-low border border-md-outline-variant text-md-on-surface-variant hover:text-md-error hover:bg-md-error-container transition-colors"
+                                className="p-1.5 rounded-lg bg-md-surface-container dark:bg-md-surface-high text-md-on-surface-variant hover:text-md-error hover:bg-md-error-container transition-colors"
                                 title="Delete user"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -530,9 +522,9 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
           >
             <div
               onClick={(e) => e.stopPropagation()}
-              className="bg-md-surface-lowest border border-md-outline-variant rounded-[24px] max-w-md w-full p-6 shadow-m3-3 flex flex-col gap-4 animate-modal"
+              className="bg-md-surface-lowest dark:bg-md-surface-container rounded-[24px] max-w-md w-full p-6 shadow-m3-3 flex flex-col gap-4 animate-modal"
             >
-              <div className="flex items-center justify-between border-b border-md-outline-variant/60 pb-3">
+              <div className="flex items-center justify-between pb-3">
                 <h3 className="text-base font-bold text-md-on-surface">
                   Add New User
                 </h3>
@@ -554,7 +546,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
                     placeholder="e.g. Mohammed Yousuf"
-                    className="bg-md-surface-low border border-md-outline-variant rounded-[18px] p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary"
+                    className="bg-md-surface-container dark:bg-md-surface-high rounded-[18px] p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary"
                     required
                   />
                 </div>
@@ -568,7 +560,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
                     placeholder="user@example.com"
-                    className="bg-md-surface-low border border-md-outline-variant rounded-[18px] p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:border-md-primary"
+                    className="bg-md-surface-container dark:bg-md-surface-high rounded-[18px] p-2.5 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary"
                     required
                   />
                 </div>
@@ -583,7 +575,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                       onChange={(e) =>
                         setNewRole(e.target.value as "admin" | "user")
                       }
-                      className="bg-md-surface-low border border-md-outline-variant rounded-[18px] p-2.5 text-md-on-surface text-sm outline-none"
+                      className="bg-md-surface-container dark:bg-md-surface-high rounded-[18px] p-2.5 text-md-on-surface text-sm outline-none"
                     >
                       <option value="user">User (Client)</option>
                       <option value="admin">Admin</option>
@@ -597,7 +589,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                     <select
                       value={newDatasetId}
                       onChange={(e) => setNewDatasetId(e.target.value)}
-                      className="bg-md-surface-low border border-md-outline-variant rounded-[18px] p-2.5 text-md-on-surface text-sm outline-none"
+                      className="bg-md-surface-container dark:bg-md-surface-high rounded-[18px] p-2.5 text-md-on-surface text-sm outline-none"
                     >
                       <option value="new">New Dedicated Portfolio</option>
                       <option value="ds_yousuf_portfolio">
@@ -612,7 +604,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-1.5 bg-md-primary-container/45 p-3.5 rounded-[18px] border border-md-outline-variant">
+                <div className="flex flex-col gap-1.5 bg-md-primary-container/45 p-3.5 rounded-[18px]">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-semibold text-md-on-primary-container">
                       Generated Password
@@ -631,12 +623,12 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                       type="text"
                       value={generatedPassword}
                       readOnly
-                      className="w-full bg-md-surface-lowest border border-md-outline-variant rounded-lg px-3 py-2 text-md-on-primary-container font-mono font-bold text-sm"
+                      className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-lg px-3 py-2 text-md-on-primary-container font-mono font-bold text-sm"
                     />
                     <button
                       type="button"
                       onClick={() => handleCopyPassword(generatedPassword)}
-                      className="p-2 rounded-lg bg-md-surface-lowest border border-md-outline-variant text-md-on-surface hover:bg-md-surface-low transition-colors"
+                      className="p-2 rounded-lg bg-md-surface-container dark:bg-md-surface-high text-md-on-surface even:bg-md-surface-low/50 dark:even:bg-md-surface-low/40 hover:bg-md-surface-high/60 transition-colors"
                       title="Copy password"
                     >
                       {copied ? (
@@ -669,7 +661,7 @@ export const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
         )}
 
         {/* Footer */}
-        <div className="p-4 border-t border-md-outline-variant/60 bg-md-surface-low flex justify-end">
+        <div className="p-4 bg-md-surface-low flex justify-end">
           <button
             onClick={onClose}
             className="btn-action-primary px-4 py-2 rounded-[18px] text-xs"
