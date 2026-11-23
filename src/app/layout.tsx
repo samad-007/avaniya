@@ -16,7 +16,10 @@ export const metadata: Metadata = {
     title: "Avaniya",
   },
   icons: {
-    icon: "/icon",
+    icon: [
+      { url: "/logo.svg", type: "image/svg+xml" },
+      { url: "/icon", type: "image/png" },
+    ],
     apple: "/apple-icon",
   },
 };

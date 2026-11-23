@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
+import { AvaniyaLogo } from "@/components/ui/AvaniyaLogo";
 import {
   Building2,
   Home,
@@ -66,15 +66,8 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center justify-between gap-2 sm:gap-3 w-full min-w-0">
           {/* Brand & Logo */}
           <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 md:flex-initial">
-            <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-[12px] sm:rounded-[14px] overflow-hidden bg-md-primary-container flex items-center justify-center flex-shrink-0 shadow-sm">
-              <Image
-                src="/logo.jpg"
-                alt="Avaniya"
-                width={40}
-                height={40}
-                className="object-cover w-full h-full"
-                priority
-              />
+            <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-[12px] sm:rounded-[14px] overflow-hidden flex items-center justify-center flex-shrink-0 shadow-sm">
+              <AvaniyaLogo className="w-full h-full" />
             </div>
             <div className="min-w-0">
               <div className="font-display text-sm sm:text-lg font-extrabold text-md-on-surface tracking-tight flex items-center gap-1.5 sm:gap-2 min-w-0">

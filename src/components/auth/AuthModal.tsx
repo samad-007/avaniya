@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
+import { AvaniyaLogo } from "@/components/ui/AvaniyaLogo";
 import {
   Lock,
   Mail,
@@ -138,15 +138,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Brand Header */}
         <div className="flex flex-col items-center text-center gap-2.5 min-w-0 pt-1">
-          <div className="relative w-16 h-16 rounded-[22px] overflow-hidden bg-md-primary-container p-0.5 shadow-m3-1 flex-shrink-0">
-            <Image
-              src="/logo.jpg"
-              alt="Avaniya"
-              width={64}
-              height={64}
-              className="object-cover w-full h-full rounded-[19px]"
-              priority
-            />
+          <div className="relative w-16 h-16 rounded-[22px] overflow-hidden shadow-m3-1 flex-shrink-0">
+            <AvaniyaLogo className="w-full h-full" />
           </div>
           <div className="mt-0.5 min-w-0">
             <h1 className="font-display text-2xl font-extrabold text-md-on-surface tracking-tight break-words">
