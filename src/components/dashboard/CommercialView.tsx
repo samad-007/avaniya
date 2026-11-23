@@ -1451,9 +1451,11 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {loans.map((l) => {
-                  const loanMetric = metrics.loanMetrics?.find(
-                    (m) => m.loan.loanCode === l.loanCode || m.loan.id === l.id
-                  );
+                  const loanMetric =
+                    metrics.loanMetrics?.find((m) => m.loan.id === l.id) ??
+                    metrics.loanMetrics?.find(
+                      (m) => m.loan.loanCode === l.loanCode
+                    );
                   const borrowed =
                     loanMetric?.totalBorrowed ?? l.principalAmount;
                   const repaid = loanMetric?.principalRepaidTotal ?? 0;

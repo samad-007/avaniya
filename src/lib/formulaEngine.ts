@@ -553,41 +553,25 @@ export function calculateCommercialMetrics(
     0
   );
 
-  // Per-Loan Financial Metrics
+  // Per-Loan Financial Metrics (strictly independent per loan by loanId / loanCode)
   const commLoans = loans.filter((l) => l.scope === "commercial");
   const matchedLoanTxIds = new Set<string>();
   const loanMetrics: LoanFinancialMetrics[] = commLoans.map((l) => {
     const codeLower = (l.loanCode || "").trim().toLowerCase();
-    const lenderLower = (l.lenderName || "").trim().toLowerCase();
 
     const lTx = commTx.filter((t) => {
       const txLoanId = (t.loanId || "").trim();
       const txLoanCode = (t.loanCode || "").trim().toLowerCase();
 
-      // If transaction explicitly targets a loan via loanId or loanCode, match strictly (case-insensitive)
-      if (txLoanId || txLoanCode) {
-        const matched =
-          (txLoanId !== "" && txLoanId === l.id) ||
-          (txLoanCode !== "" && codeLower !== "" && txLoanCode === codeLower);
-        if (matched && t.id) matchedLoanTxIds.add(t.id);
-        return matched;
+      // Match strictly by unique loan identity — never by lenderName/recipientOrSource or remarks
+      // so multiple loans from the same person/title remain 100% independent.
+      let matched = false;
+      if (txLoanId !== "") {
+        matched = txLoanId === l.id;
+      } else if (txLoanCode !== "" && codeLower !== "") {
+        matched = txLoanCode === codeLower;
       }
 
-      // Otherwise fall back to remarks/lenderName matching for unlinked loan transactions
-      const isLoanTxType =
-        t.transactionType === "loan_inflow" ||
-        t.transactionType === "loan_repayment" ||
-        t.transactionType === "loan_interest" ||
-        t.transactionType === "loan_profit_share";
-      if (!isLoanTxType) return false;
-
-      const matched =
-        (Boolean(lenderLower) &&
-          Boolean(t.recipientOrSource) &&
-          t.recipientOrSource!.toLowerCase().includes(lenderLower)) ||
-        (Boolean(codeLower) &&
-          Boolean(t.remarks) &&
-          t.remarks!.toLowerCase().includes(codeLower));
       if (matched && t.id) matchedLoanTxIds.add(t.id);
       return matched;
     });
