@@ -520,12 +520,13 @@ export const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                   onChange={(e) => {
                     const selectedCode = e.target.value;
                     const matched = loans.find(
-                      (l) => l.loanCode === selectedCode
+                      (l) =>
+                        l.loanCode.toLowerCase() === selectedCode.toLowerCase()
                     );
                     setFormData({
                       ...formData,
                       loanCode: selectedCode,
-                      loanId: matched?.id,
+                      loanId: matched ? matched.id : "",
                     });
                   }}
                   className="w-full bg-md-surface-container dark:bg-md-surface-high rounded-[18px] px-3 py-2 text-md-on-surface text-sm outline-none focus:bg-md-surface-lowest focus:ring-2 focus:ring-md-primary min-w-0 truncate"

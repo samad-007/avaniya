@@ -54,6 +54,16 @@ export async function PATCH(
       updates.amountBuyer = Math.round(parseFloat(updates.amountBuyer) || 0);
     }
 
+    if (updates.loanCode !== undefined) {
+      updates.loanCode = String(updates.loanCode).trim();
+      if (!updates.loanCode) {
+        updates.loanId = "";
+      }
+    }
+    if (updates.loanId !== undefined) {
+      updates.loanId = String(updates.loanId).trim();
+    }
+
     const updated = await updateTransaction(id, updates, datasetId);
     if (!updated) {
       return NextResponse.json(

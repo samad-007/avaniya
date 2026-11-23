@@ -553,23 +553,34 @@ export function calculateCommercialMetrics(
     0
   );
 
-  // Per-Loan Financial Metrics (strictly independent per loan by loanId / loanCode)
+  // Per-Loan Financial Metrics (strictly independent per loan by loanCode / loanId)
   const commLoans = loans.filter((l) => l.scope === "commercial");
+  const loanCodeCounts = new Map<string, number>();
+  commLoans.forEach((l) => {
+    const code = (l.loanCode || "").trim().toLowerCase();
+    if (code) loanCodeCounts.set(code, (loanCodeCounts.get(code) || 0) + 1);
+  });
+
   const matchedLoanTxIds = new Set<string>();
   const loanMetrics: LoanFinancialMetrics[] = commLoans.map((l) => {
     const codeLower = (l.loanCode || "").trim().toLowerCase();
+    const isDuplicateCode =
+      codeLower !== "" && (loanCodeCounts.get(codeLower) || 0) > 1;
 
     const lTx = commTx.filter((t) => {
       const txLoanId = (t.loanId || "").trim();
       const txLoanCode = (t.loanCode || "").trim().toLowerCase();
 
-      // Match strictly by unique loan identity — never by lenderName/recipientOrSource or remarks
-      // so multiple loans from the same person/title remain 100% independent.
+      // Match strictly by unique loan identity — never by lenderName/recipientOrSource or remarks.
+      // When txLoanCode is explicitly present, it must match l.loanCode so a stale loanId
+      // cannot pull another loan's transaction (e.g. Loan-003) into LOAN-001.
       let matched = false;
-      if (txLoanId !== "") {
+      if (txLoanCode !== "" && codeLower !== "") {
+        if (txLoanCode === codeLower) {
+          matched = isDuplicateCode && txLoanId !== "" ? txLoanId === l.id : true;
+        }
+      } else if (txLoanCode === "" && txLoanId !== "") {
         matched = txLoanId === l.id;
-      } else if (txLoanCode !== "" && codeLower !== "") {
-        matched = txLoanCode === codeLower;
       }
 
       if (matched && t.id) matchedLoanTxIds.add(t.id);
