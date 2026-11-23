@@ -555,17 +555,42 @@ export function calculateCommercialMetrics(
 
   // Per-Loan Financial Metrics
   const commLoans = loans.filter((l) => l.scope === "commercial");
+  const matchedLoanTxIds = new Set<string>();
   const loanMetrics: LoanFinancialMetrics[] = commLoans.map((l) => {
-    const lTx = commTx.filter(
-      (t) =>
-        t.loanId === l.id ||
-        t.loanCode === l.loanCode ||
-        (t.recipientOrSource &&
-          t.recipientOrSource.toLowerCase().includes(l.lenderName.toLowerCase())) ||
-        (t.remarks &&
-          l.loanCode &&
-          t.remarks.toLowerCase().includes(l.loanCode.toLowerCase()))
-    );
+    const codeLower = (l.loanCode || "").trim().toLowerCase();
+    const lenderLower = (l.lenderName || "").trim().toLowerCase();
+
+    const lTx = commTx.filter((t) => {
+      const txLoanId = (t.loanId || "").trim();
+      const txLoanCode = (t.loanCode || "").trim().toLowerCase();
+
+      // If transaction explicitly targets a loan via loanId or loanCode, match strictly (case-insensitive)
+      if (txLoanId || txLoanCode) {
+        const matched =
+          (txLoanId !== "" && txLoanId === l.id) ||
+          (txLoanCode !== "" && codeLower !== "" && txLoanCode === codeLower);
+        if (matched && t.id) matchedLoanTxIds.add(t.id);
+        return matched;
+      }
+
+      // Otherwise fall back to remarks/lenderName matching for unlinked loan transactions
+      const isLoanTxType =
+        t.transactionType === "loan_inflow" ||
+        t.transactionType === "loan_repayment" ||
+        t.transactionType === "loan_interest" ||
+        t.transactionType === "loan_profit_share";
+      if (!isLoanTxType) return false;
+
+      const matched =
+        (Boolean(lenderLower) &&
+          Boolean(t.recipientOrSource) &&
+          t.recipientOrSource!.toLowerCase().includes(lenderLower)) ||
+        (Boolean(codeLower) &&
+          Boolean(t.remarks) &&
+          t.remarks!.toLowerCase().includes(codeLower));
+      if (matched && t.id) matchedLoanTxIds.add(t.id);
+      return matched;
+    });
 
     const lInflows = lTx.filter((t) => t.transactionType === "loan_inflow");
     const totalBorrowedBank = lInflows
@@ -574,8 +599,8 @@ export function calculateCommercialMetrics(
     const totalBorrowedCash = lInflows
       .filter((t) => t.mode === "Cash")
       .reduce((sum, t) => sum + t.amount, 0);
-    const totalBorrowed =
-      totalBorrowedBank + totalBorrowedCash || l.principalAmount || 0;
+    const loggedBorrowed = totalBorrowedBank + totalBorrowedCash;
+    const totalBorrowed = loggedBorrowed > 0 ? loggedBorrowed : l.principalAmount || 0;
 
     const lRepayments = lTx.filter(
       (t) => t.transactionType === "loan_repayment"
@@ -669,8 +694,29 @@ export function calculateCommercialMetrics(
     (a) => a.status === "overdue"
   ).length;
 
+  // Reconcile portfolio-level borrowed & outstanding principal with per-loan metrics
+  // (includes agreed principal for loans without explicit loan_inflow entries, plus any unlinked loan txns)
+  const unlinkedLoanInflows = loanInTx
+    .filter((t) => !t.id || !matchedLoanTxIds.has(t.id))
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
+  const unlinkedLoanRepayments = loanRepayTx
+    .filter((t) => !t.id || !matchedLoanTxIds.has(t.id))
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
+
+  const reconciledLoansBorrowedTotal =
+    loanMetrics.length > 0
+      ? loanMetrics.reduce((sum, lm) => sum + lm.totalBorrowed, 0) +
+        unlinkedLoanInflows
+      : loansBorrowedTotal;
+
+  const reconciledOutstandingLoansPrincipal =
+    loanMetrics.length > 0
+      ? loanMetrics.reduce((sum, lm) => sum + lm.outstandingPrincipal, 0) +
+        Math.max(0, unlinkedLoanInflows - unlinkedLoanRepayments)
+      : outstandingLoansPrincipal;
+
   const totalLiabilitiesAndObligations =
-    totalPendingPayable + outstandingLoansPrincipal;
+    totalPendingPayable + reconciledOutstandingLoansPrincipal;
 
   return {
     capitalInjectedBank: Math.round(capitalInjectedBank),
@@ -691,7 +737,7 @@ export function calculateCommercialMetrics(
     dealInflowsTotal: Math.round(dealInflowsTotal),
     loansBorrowedBank: Math.round(loansBorrowedBank),
     loansBorrowedCash: Math.round(loansBorrowedCash),
-    loansBorrowedTotal: Math.round(loansBorrowedTotal),
+    loansBorrowedTotal: Math.round(reconciledLoansBorrowedTotal),
     loansRepaidBank: Math.round(loansRepaidBank),
     loansRepaidCash: Math.round(loansRepaidCash),
     loansRepaidTotal: Math.round(loansRepaidTotal),
@@ -702,7 +748,7 @@ export function calculateCommercialMetrics(
     loansProfitSharePaidCash: Math.round(loansProfitSharePaidCash),
     loansProfitSharePaidTotal: Math.round(loansProfitSharePaidTotal),
     totalFinanceCosts: Math.round(totalFinanceCosts),
-    outstandingLoansPrincipal: Math.round(outstandingLoansPrincipal),
+    outstandingLoansPrincipal: Math.round(reconciledOutstandingLoansPrincipal),
     totalLiabilitiesAndObligations: Math.round(totalLiabilitiesAndObligations),
     transfersBankToCash: Math.round(transfersBankToCash),
     transfersCashToBank: Math.round(transfersCashToBank),

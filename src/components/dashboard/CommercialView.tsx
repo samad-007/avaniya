@@ -1532,11 +1532,17 @@ export const CommercialView: React.FC<CommercialViewProps> = ({
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-md-surface-low dark:bg-md-surface-high/60 p-3 rounded-[18px]">
                         <div>
                           <div className="text-[11px] font-semibold text-md-on-surface-variant">
-                            Loan Amount
+                            Borrowed
                           </div>
                           <div className="text-xs sm:text-sm font-bold font-mono text-md-on-surface mt-0.5">
-                            {formatINRCompact(l.principalAmount)}
+                            {formatINRCompact(borrowed)}
                           </div>
+                          {l.principalAmount > 0 &&
+                            borrowed !== l.principalAmount && (
+                              <div className="text-[10px] text-md-on-surface-variant font-mono">
+                                Limit: {formatINRCompact(l.principalAmount)}
+                              </div>
+                            )}
                         </div>
                         <div>
                           <div className="text-[11px] font-semibold text-md-error">
